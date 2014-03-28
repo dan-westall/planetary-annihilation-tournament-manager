@@ -2,7 +2,7 @@
 
 class tournamentCPT {
 
-    protected  $post_type = 'tournament';
+    public static $post_type = 'tournament';
 
     function __construct() {
 
@@ -44,7 +44,7 @@ class tournamentCPT {
                 'supports'            => array('title', 'editor', 'thumbnail')
             );
 
-        register_post_type( $this->post_type, $tournamentArgs );
+        register_post_type( self::$post_type, $tournamentArgs );
 
     }
 
@@ -52,7 +52,7 @@ class tournamentCPT {
 
         p2p_register_connection_type( array(
             'name' => 'tournament_staff',
-            'from' => $this->post_type,
+            'from' => self::$post_type,
             'to' => 'user',
             'sortable' => 'from',
             'admin_box' => array(
@@ -77,8 +77,8 @@ class tournamentCPT {
 
         p2p_register_connection_type( array(
             'name' => 'tournament_planets',
-            'from' => $this->post_type,
-            'to' => 'user',
+            'from' => self::$post_type,
+            'to' => planetCPT::$post_type,
             'sortable' => 'from',
             'admin_box' => array(
                 'show' => 'from',
@@ -99,7 +99,7 @@ class tournamentCPT {
 
         p2p_register_connection_type( array(
             'name' => 'tournament_players',
-            'from' => $this->post_type,
+            'from' => self::$post_type,
             'to' => 'player',
             'admin_box' => array(
                 'show' => 'from',
@@ -129,9 +129,12 @@ class tournamentCPT {
         return $template_path;
     }
 
+
     public function filter_tournament_rounds($rounds){
 
         global $post;
+
+        $post = get_post($_GET['post']);
 
         if(is_object($post)){
 
@@ -139,7 +142,7 @@ class tournamentCPT {
 
                 for($round = 1; $round <= get_post_meta($post->ID, 'rounds', true); $round ++){
 
-                    $round[$round] = sprintf('Round %s', $round);
+                    $rounds[$round] = sprintf('Round %s', $round);
 
                 }
 
@@ -170,6 +173,8 @@ class tournamentCPT {
 
         if ($signup_form_id == $entry['form_id']) {
 
+
+            //todo email shouldnt be stored with the player profile CTP should be linked either by p2p or meta int
             $find_player = array(
                 'post_type'      => self::POST_TYPE,
                 'meta_query'     => array(

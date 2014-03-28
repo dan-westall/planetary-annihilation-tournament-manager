@@ -2,6 +2,8 @@
 
 class planetCPT {
 
+    public static $post_type = 'planets';
+
     function __construct() {
 
         add_action( 'init', array( $this, 'pace_register_cpt_planet') );
@@ -36,7 +38,7 @@ class planetCPT {
             'supports'            => array('title', 'editor', 'thumbnail')
         );
 
-        register_post_type( 'planets', $planetArgs );
+        register_post_type( self::$post_type, $planetArgs );
 
     }
 }
