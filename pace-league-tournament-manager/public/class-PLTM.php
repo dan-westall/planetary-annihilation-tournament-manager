@@ -44,7 +44,10 @@ class Pace_League_Tournament_Manager {
 	 */
 	protected $plugin_slug = 'PLTM';
 
-    public static $endpoints = array('signup', 'matches', 'players', 'results', 'schedule', 'rules');
+
+
+
+    public static $endpoints = array('signup', 'matches', 'players', 'results', 'schedule', 'rules', 'planets');
 
 	/**
 	 * Instance of this class.
@@ -75,12 +78,12 @@ class Pace_League_Tournament_Manager {
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
-        add_filter( 'query_vars', array( $this, 'register_query_vars'), 0 );
 
         new planetCPT();
         new sponsorCPT();
         new playerCPT();
         new tournamentCPT();
+        new matchCPT();
 
         remove_action( 'wp_head', 'wp_generator');
         remove_action( 'wp_head', 'wp_shortlink_wp_head' );
@@ -90,7 +93,10 @@ class Pace_League_Tournament_Manager {
 
         add_action( 'init', array( $this, 'register_tournament_endpoints' ) );
 
+        add_filter( 'query_vars', array( $this, 'register_query_vars'), 0 );
         add_filter( 'body_class', array( $this, 'filter_endpoint_body_classes'));
+
+        add_filter( 'gform_submit_button', array( $this, 'filter_form_button' ), 10, 2);
 
         // Global filters
         add_filter( 'acf/load_field/name=signup_form', array( $this, 'filter_form_listing') );
@@ -131,6 +137,28 @@ class Pace_League_Tournament_Manager {
         }
 
         return $classes;
+
+    }
+
+    public function filter_form_listing($field){
+
+        $forms = RGFormsModel::get_forms( null, 'title' );
+
+        foreach($forms as $form){
+
+            $form_listing[$form->id] = $form->title;
+
+        }
+
+        $field['choices'] = $form_listing;
+
+        return $field;
+
+    }
+
+    public function filter_form_button($button, $form){
+
+        return sprintf("<a href='javascript:void(0);' id='gform_submit_button_{$form["id"]}' class='custom-button' onclick=\"$('#gform_{$form["id"]}').submit()\"><span>{$form['button']['text']}</span></a>", $form['button']['text'], $form['id']);
 
     }
 
@@ -277,24 +305,6 @@ class Pace_League_Tournament_Manager {
 
 		return $wpdb->get_col( $sql );
 
-	}
-
-	/**
-	 * Fired for each blog when the plugin is activated.
-	 *
-	 * @since    1.0.0
-	 */
-	private static function single_activate() {
-		// @TODO: Define activation functionality here
-	}
-
-	/**
-	 * Fired for each blog when the plugin is deactivated.
-	 *
-	 * @since    1.0.0
-	 */
-	private static function single_deactivate() {
-		// @TODO: Define deactivation functionality here
 	}
 
 	/**

@@ -8,11 +8,15 @@ class tournamentCPT {
 
         add_action( 'init', array( $this, 'pace_register_cpt_tournament') );
 
+        add_action( 'widgets_init', array( $this, 'register_tournament_sidebar') );
+
         add_action( 'p2p_init', array( $this, 'register_p2p_connections' ) );
         add_action( 'gform_after_submission', array( $this, 'signup_tournament_player'), 10, 2);
         add_action( 'template_include', array( $this, 'load_endpoint_template')  );
 
         add_filter( 'tournament_rounds', array( $this, 'filter_tournament_rounds' ) );
+
+        add_filter( 'the_title', array( $this, 'filter_endpoint_titles') );
 
     }
 
@@ -109,6 +113,18 @@ class tournamentCPT {
 
     }
 
+    function single_tournament_template($single) {
+        global $wp_query, $post;
+
+        /* Checks for single template by post type */
+        if ($post->post_type == self::$post_type) {
+
+           return BHAA_PLUGIN_DIR.'/includes/templates/single-league-individual.php';
+
+        }
+
+    }
+
     public function load_endpoint_template($template_path){
 
         global $wp_query, $post;
@@ -117,7 +133,7 @@ class tournamentCPT {
 
             if ($post->post_type == 'tournament' && isset( $wp_query->query_vars[$endpoint] )) {
 
-                $template_path = get_template_directory() . "/single-$endpoint-$post->post_type.php";
+                $template_path = PACE_PLUGIN_DIR . "/includes/templates/single-$post->post_type-$endpoint.php";
 
                 if(file_exists($template_path)){
                     return $template_path;
@@ -134,15 +150,19 @@ class tournamentCPT {
 
         global $post;
 
-        $post = get_post($_GET['post']);
+        if(isset($_GET['post'])){
 
-        if(is_object($post)){
+            $post = get_post($_GET['post']);
 
-            if($post->post_type == "tournament"){
+            if(is_object($post)){
 
-                for($round = 1; $round <= get_post_meta($post->ID, 'rounds', true); $round ++){
+                if($post->post_type == "tournament"){
 
-                    $rounds[$round] = sprintf('Round %s', $round);
+                    for($round = 1; $round <= get_post_meta($post->ID, 'rounds', true); $round ++){
+
+                        $rounds[$round] = sprintf('Round %s', $round);
+
+                    }
 
                 }
 
@@ -151,6 +171,51 @@ class tournamentCPT {
         }
 
         return $rounds;
+
+    }
+
+    public function filter_endpoint_titles($title){
+
+        global $post, $wp_query;
+
+        if(!is_object($post))
+            return $title;
+
+        foreach(Pace_League_Tournament_Manager::$endpoints as $endpoint){
+
+            if ($post->post_type == 'tournament' && isset( $wp_query->query_vars[$endpoint] )) {
+
+                $title .= sprintf(' - %s', ucwords($endpoint));
+
+            }
+
+        }
+
+        return $title;
+
+    }
+
+    function register_tournament_sidebar(){
+
+        register_sidebar( array(
+            'name'          => __( 'Single Tournament Widgets', 'pace' ),
+            'description'   => __( 'Used for single tournament widgets', 'pace' ),
+            'before_widget' => '<section id="%1$s" class="widget container-box %2$s">',
+            'after_widget'  => '</section>',
+            'before_title'  => '<h1 class="widget-title">',
+            'after_title'   => '</h1>',
+        ) );
+
+        register_sidebar( array(
+            'name'          => __( 'Archive Tournament Widgets', 'pace' ),
+            'id'            => 'sidebar-5',
+            'description'   => __( 'Used for archive tournament widgets', 'pace' ),
+            'before_widget' => '<section id="%1$s" class="widget %2$s">',
+            'after_widget'  => '</section>',
+            'before_title'  => '<h1 class="widget-title">',
+            'after_title'   => '</h1>',
+        ) );
+
 
     }
 
@@ -173,6 +238,14 @@ class tournamentCPT {
 
         if ($signup_form_id == $entry['form_id']) {
 
+            foreach( $form['fields'] as $field ) {
+
+                $values[$field['id']] = array(
+                    'id'    => $field['id'],
+                    'label' => $field['label'],
+                    'value' => $lead[ $field['id'] ],
+                );
+            }
 
             //todo email shouldnt be stored with the player profile CTP should be linked either by p2p or meta int
             $find_player = array(
