@@ -29,12 +29,6 @@
 
     <?php endwhile; ?>
 
-    <aside role="complementary">
-
-        <?php get_sidebar('tournament'); ?>
-
-    </aside>
-
 </div>
 
 <?php get_footer(); ?>
