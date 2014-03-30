@@ -1,44 +1,63 @@
 <?php get_header(); ?>
 
-<div id="content-wrapper"  class="clearfix content-wrapper row">
+    <div id="content-wrapper"  class="clearfix content-wrapper row">
 
-    <?php while ( have_posts() ) : the_post(); ?>
+        <div class="col-lg-2">
 
-        <article id="post-<?php the_ID(); ?>" <?php post_class('col-lg-7'); ?>  role="main">
+            <div class="container-box">
+                <ul class="content-sub-menu">
+                    <?php
 
-            <div class="content-container container-box">
+                    foreach(Pace_League_Tournament_Manager::$endpoints as $tournament_endpoint): ?>
 
-                <header class="post-header">
+                        <li><a href="<?php the_permalink(); ?>/<?php echo $tournament_endpoint; ?>"><?php echo ucwords($tournament_endpoint); ?></a></li>
 
-                    <h1 class="post-title"><?php the_title(); ?></h1>
+                    <?php endforeach; ?>
 
-                </header>
+                </ul>
+            </div>
 
-                <div class="body text">
-
-                    <?php the_content(); ?>
+        </div>
 
 
-                    <?php $form_short_code = sprintf('[gravityform id="%s" name="Tournament Signup" title="false" description="false"]', get_field('signup_form'));
+        <?php while ( have_posts() ) : the_post(); ?>
 
-                    echo do_shortcode($form_short_code); ?>
+            <article id="post-<?php the_ID(); ?>" <?php post_class('col-lg-6'); ?>  role="main">
+
+                <div class="content-container container-box">
+
+                    <header class="post-header">
+
+                        <h1 class="post-title"><?php the_title(); ?></h1>
+
+                    </header>
+
+                    <div class="body text">
+
+                        <?php $form_short_code = sprintf('[gravityform id="%s" name="Tournament Signup" title="false" description="false"]', get_field('signup_form'));
+
+                        echo do_shortcode($form_short_code); ?>
+
+
+                    </div>
+
+
 
                 </div>
 
-            </div>
+            </article>
 
-        </article>
+        <?php endwhile; ?>
 
-    <?php endwhile; ?>
+        <aside role="complementary" class="col-lg-4">
 
+            <?php get_sidebar('1'); ?>
 
-    <aside class="col-lg-5" role="complementary">
+        </aside>
 
-        <?php get_sidebar('1') ?>
-
-    </aside>
-
-</div>
+    </div>
 
 <?php get_footer(); ?>
+
+
 

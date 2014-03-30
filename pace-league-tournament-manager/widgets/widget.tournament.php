@@ -19,74 +19,20 @@ class tournament_info extends WP_Widget {
         ?>
         <?php echo $before_widget; ?>
 
+        <?php
+
+        $args = array(
+            'connected_type' => 'tournament_players',
+            'connected_items' => $post
+        );
+
+        $players = get_posts( $args );
+
+        ?>
         <div class="tournament-widget-info">
 
-            <?php if(!isset($wp_query->query_vars['signup']) && get_field('signup_closed') !== true): ?>
-
-                <a href="<?php the_permalink(); ?>/signup"><button class="action">Signup to this tournament</button></a>
-
-            <?php endif; ?>
-
-            <section class="staff tournament-meta-block">
-                <h2>Staff Members</h2>
-
-                <?php
-
-
-                    $args = array(
-                        'connected_type' => 'tournament_staff',
-                        'connected_items' => $post
-                    );
-
-                    $staff = get_users( $args );
-
-
-                    $args = array(
-                        'connected_type' => 'tournament_players',
-                        'connected_items' => $post
-                    );
-
-                    $players = get_posts( $args );
-
-
-                    ?>
-
-                    <ul style="margin-left: 10px;">
-
-                        <?php
-
-
-                        foreach($staff as $staff_member):
-
-                            if(get_user_meta($staff_member->ID, 'twitch_url', true)) : ?>
-
-                                <li class="has-twitch staff-member"><?php echo $staff_member->display_name; ?> <strong>(<?php echo p2p_get_meta( $staff_member->data->p2p_id, 'role', true ); ?>)</strong><a class="twitch-link" href="<?php echo get_user_meta($staff_member->ID, 'twitch_url', true); ?>"></a><br />
-
-                                    <small><strong><?php echo p2p_get_meta( $staff_member->data->p2p_id, 'job', true ); ?></strong></small>
-
-
-
-                                </li>
-
-                            <?php else : ?>
-
-                                <li class=" staff-member"><?php echo $staff_member->display_name; ?> <strong>(<?php echo p2p_get_meta( $staff_member->data->p2p_id, 'role', true ); ?>)</strong><br />
-
-                                <small><strong><?php echo p2p_get_meta( $staff_member->data->p2p_id, 'job', true ); ?></strong></small></li>
-
-                            <?php endif; ?>
-
-
-
-                        <?php endforeach; ?>
-
-                    </ul>
-
-
-            </section>
-
-            <section class="format tournament-meta-block">
-                <h2>Tournament Format</h2>
+            <section class="format tournament-meta-block text">
+                <h3>Tournament Format</h3>
                 <dl>
                     <dt>Rounds</dt>
                     <dd><?php the_field('rounds'); ?></dd>
@@ -97,8 +43,8 @@ class tournament_info extends WP_Widget {
                 </dl>
             </section>
 
-            <section class="prize-tiers tournament-meta-block">
-                <h2>Tournament Prizes</h2>
+            <section class="prize-tiers tournament-meta-block text">
+                <h3>Tournament Prizes</h3>
                 <dl>
 
                     <?php if( have_rows('prize_tiers') ):
@@ -117,8 +63,8 @@ class tournament_info extends WP_Widget {
             </section>
 
 
-            <section class="staff tournament-meta-block">
-                <h2>Other Information</h2>
+            <section class="staff tournament-meta-block text ">
+                <h3>Other Information</h3>
                 <dl>
 
                     <dt>Forum Link</dt>

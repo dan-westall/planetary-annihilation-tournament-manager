@@ -161,6 +161,8 @@ class Pace_League_Tournament_Manager_Admin {
         <script type='text/javascript'>
             //adding setting to fields of type "text"
             fieldSettings["text"] += ", .field_map_setting";
+            fieldSettings["email"] += ", .field_map_setting";
+            fieldSettings["textarea"] += ", .field_map_setting";
 
             //binding to the load field settings event to initialize the checkbox
             jQuery(document).bind("gform_load_field_settings", function(event, field, form){

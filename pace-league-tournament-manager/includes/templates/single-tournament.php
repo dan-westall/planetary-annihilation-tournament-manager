@@ -2,9 +2,27 @@
 
 <div id="content-wrapper"  class="clearfix content-wrapper row">
 
+    <div class="col-lg-2">
+
+            <div class="container-box">
+                <ul class="content-sub-menu">
+                <?php
+
+                foreach(Pace_League_Tournament_Manager::$endpoints as $tournament_endpoint): ?>
+
+                    <li><a href="<?php the_permalink(); ?>/<?php echo $tournament_endpoint; ?>"><?php echo ucwords($tournament_endpoint); ?></a></li>
+
+                <?php endforeach; ?>
+
+                </ul>
+            </div>
+
+    </div>
+
+
     <?php while ( have_posts() ) : the_post(); ?>
 
-        <article id="post-<?php the_ID(); ?>" <?php post_class('col-lg-5'); ?>  role="main">
+        <article id="post-<?php the_ID(); ?>" <?php post_class('col-lg-6'); ?>  role="main">
 
             <div class="content-container container-box">
 
@@ -29,7 +47,7 @@
 
     <?php endwhile; ?>
 
-    <aside role="complementary">
+    <aside role="complementary" class="col-lg-4">
 
         <?php get_sidebar('1'); ?>
 

@@ -45,8 +45,7 @@ class Pace_League_Tournament_Manager {
 	protected $plugin_slug = 'PLTM';
 
 
-
-
+    //todo move tournament endpoint functionality down into the tournament cpt class
     public static $endpoints = array('signup', 'matches', 'players', 'results', 'schedule', 'rules', 'planets');
 
 	/**
@@ -103,6 +102,8 @@ class Pace_League_Tournament_Manager {
         add_filter( 'acf/load_field/name=standard_tournament_signup_form', array( $this, 'filter_form_listing') );
 
 
+
+
 	}
 
     public function register_tournament_endpoints(){
@@ -121,6 +122,14 @@ class Pace_League_Tournament_Manager {
         }
 
         return $vars;
+    }
+
+    public static function fetch_challonge_API(){
+
+        $challongeAPI = get_field('challonge_api','option');
+
+        return $challongeAPI;
+
     }
 
     public function filter_endpoint_body_classes($classes){
@@ -161,6 +170,8 @@ class Pace_League_Tournament_Manager {
         return sprintf("<a href='javascript:void(0);' id='gform_submit_button_{$form["id"]}' class='custom-button' onclick=\"$('#gform_{$form["id"]}').submit()\"><span>{$form['button']['text']}</span></a>", $form['button']['text'], $form['id']);
 
     }
+
+
 
 	/**
 	 * Return the plugin slug.
