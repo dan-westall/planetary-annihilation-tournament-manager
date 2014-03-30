@@ -24,7 +24,8 @@ class tournamentCPT {
 
         add_filter( 'tournament_rounds', array( $this, 'filter_tournament_rounds' ) );
         add_filter( 'the_title', array( $this, 'filter_endpoint_titles') );
-        add_filter( 'single_template', array($this, 'single_tournament_template') );
+        add_filter( 'single_template', array( $this, 'single_tournament_template') );
+        add_filter( 'post_updated_messages', array( $this, 'filter_post_type_feedback_messages') );
 
 
         add_filter( 'acf/load_field/name=challonge_tournament_link', array( $this, 'filter_challonge_tournament_listing') );
@@ -434,6 +435,48 @@ class tournamentCPT {
 
     }
 
+    function filter_post_type_feedback_messages( $messages ) {
+
+        $post             = get_post();
+        $post_type        = get_post_type( $post );
+        $post_type_object = get_post_type_object( $post_type );
+
+        $messages[self::$post_type] = array(
+            0  => '', // Unused. Messages start at index 1.
+            1  => __( 'Tournament updated.', 'pace-tournament-cpt' ),
+            2  => __( 'Custom field updated.', 'pace-tournament-cpt' ),
+            3  => __( 'Custom field deleted.', 'pace-tournament-cpt' ),
+            4  => __( 'Tournament updated.', 'pace-tournament-cpt' ),
+            /* translators: %s: date and time of the revision */
+            5  => isset( $_GET['revision'] ) ? sprintf( __( 'Tournament restored to revision from %s', 'pace-tournament-cpt' ), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
+            6  => __( 'Tournament published.', 'pace-tournament-cpt' ),
+            7  => __( 'Tournament saved.', 'pace-tournament-cpt' ),
+            8  => __( 'Tournament submitted.', 'pace-tournament-cpt' ),
+            9  => sprintf(
+                __( 'Tournament scheduled for: <strong>%1$s</strong>.', 'pace-tournament-cpt' ),
+                // translators: Publish box date format, see http://php.net/date
+                date_i18n( __( 'M j, Y @ G:i', 'pace-tournament-cpt' ), strtotime( $post->post_date ) )
+            ),
+            10 => __( 'Tournament draft updated.', 'pace-tournament-cpt' ),
+        );
+
+        if ( $post_type_object->publicly_queryable ) {
+            $permalink = get_permalink( $post->ID );
+
+            $view_link = sprintf( ' <a href="%s">%s</a>', esc_url( $permalink ), __( 'View tournament', 'pace-tournament-cpt' ) );
+            $messages[ $post_type ][1] .= $view_link;
+            $messages[ $post_type ][6] .= $view_link;
+            $messages[ $post_type ][9] .= $view_link;
+
+            $preview_permalink = add_query_arg( 'preview', 'true', $permalink );
+            $preview_link = sprintf( ' <a target="_blank" href="%s">%s</a>', esc_url( $preview_permalink ), __( 'Preview tournament', 'pace-tournament-cpt' ) );
+            $messages[ $post_type ][8]  .= $preview_link;
+            $messages[ $post_type ][10] .= $preview_link;
+        }
+
+        return $messages;
+    }
+
     public function challonge_add_player_to_tournament($args = array()){
 
         $c = new ChallongeAPI(Pace_League_Tournament_Manager::fetch_challonge_API());
@@ -466,7 +509,7 @@ class tournamentCPT {
 
         if ( 'tournament_players' == $connection->p2p_type ) {
 
-
+            
 
         }
 
