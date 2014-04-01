@@ -241,8 +241,10 @@ class tournamentCPT {
         $tournament_id           = url_to_postid($entry['source_url']);
         $challonge_tournament_id = $this->get_the_challonge_tournament_id($tournament_id);
 
+        $tournament_closed = get_field('signup_closed', $tournament_id);
+
         //if tournament 0 bin
-        if ($tournament_id === 0 || get_field('signup_closed', $tournament_id) !== true)
+        if ($tournament_id === 0 || $tournament_closed !== false)
             return false;
 
         if ($signup_form_id && get_field('signup_form')) {
@@ -265,7 +267,7 @@ class tournamentCPT {
 
             //todo email shouldnt be stored with the player profile CTP should be linked either by p2p or meta int
             $find_player = array(
-                'post_type'      => self::POST_TYPE,
+                'post_type'      => playerCPT::$post_type,
                 'meta_query'     => array(
                     array(
                         'key'   => 'player_email',
@@ -279,6 +281,8 @@ class tournamentCPT {
 
             //existing player check email
             if (!empty($players)) {
+
+                $player_id = $players[0]->ID;
 
                 foreach( $form['fields'] as $field ) {
 
@@ -304,10 +308,18 @@ class tournamentCPT {
                 }
 
                 //player found add player to tornament
-                p2p_type('tournament_players')->connect($tournament_id, $players[0]->ID, $connection_meta);
+                $p2p_result = p2p_type('tournament_players')->connect($tournament_id, $player_id, $connection_meta);
+
+                $c_args = array(
+                    'email' => $values['email']['value'],
+                    'ign' => $values['ign']['value'],
+                    'challonge_tournament_id' => $challonge_tournament_id
+                );
 
                 //add player to current challonge tournament
-                $challonge_result = $this->challonge_add_player_to_tournament(array());
+                $challonge_result = $this->challonge_add_player_to_tournament($c_args);
+
+                $challonge_result = json_decode( json_encode( (array) $challonge_result), false );
 
                 //error check
                 if(true){
@@ -316,7 +328,7 @@ class tournamentCPT {
                     update_post_meta($player_id, 'challonge_data', $challonge_result);
 
                     //easy search
-                    update_post_meta($player_id, 'challonge_participant_id', $challonge_result);
+                    update_post_meta($player_id, 'challonge_participant_id', $challonge_result->id);
 
                 } else {
                     //error here
@@ -327,8 +339,9 @@ class tournamentCPT {
                 //new user accounts have been created to provide features going forward
                 //TODO discuss with group merit for creating user accounts.
                 $userdata = array(
-                    'user_login' => $entry['3'],
-                    'user_email' => $entry['3']
+                    'user_login' => $values['email']['value'],
+                    'user_email' =>$values['email']['value'],
+                    'user_pass' => wp_generate_password()
                 );
 
                 $user_id = wp_insert_user($userdata);
@@ -338,7 +351,7 @@ class tournamentCPT {
                     'post_title'  => $entry['5'],
                     'post_status' => 'publish',
                     'post_author' => $user_id,
-                    'post_type'   => self::POST_TYPE
+                    'post_type'   => playerCPT::$post_type
                 );
 
                 // Insert the post into the database
@@ -364,17 +377,18 @@ class tournamentCPT {
                 }
 
                 //player found add player to tornament
-                p2p_type('tournament_players')->connect($tournament_id, $player_id, $connection_meta);
+                $p2p_result = p2p_type('tournament_players')->connect($tournament_id, $player_id, $connection_meta);
 
                 $c_args = array(
-                    'email' => $values['email'],
-                    'ign' => $values['ign'],
-                    'seed' => '0',
+                    'email' => $values['email']['value'],
+                    'ign' => $values['ign']['value'],
                     'challonge_tournament_id' => $challonge_tournament_id
                 );
 
                 //add player to current challonge tournament
                 $challonge_result = $this->challonge_add_player_to_tournament($c_args);
+
+                $challonge_result = json_decode( json_encode( (array) $challonge_result), false );
 
                 //error check
                 if(true){
@@ -383,7 +397,7 @@ class tournamentCPT {
                     update_post_meta($player_id, 'challonge_data', $challonge_result);
 
                     //easy search
-                    update_post_meta($player_id, 'challonge_participant_id', $challonge_result);
+                    update_post_meta($player_id, 'challonge_participant_id', $challonge_result->id);
 
                 } else {
                     //error here
@@ -475,6 +489,7 @@ class tournamentCPT {
         }
 
         return $messages;
+
     }
 
     public function challonge_add_player_to_tournament($args = array()){
@@ -485,10 +500,9 @@ class tournamentCPT {
             "participant[email]"              => $args['email'],
             'participant[name]'               => $args['ign'],
             'participant[challonge_username]' => $args['ign'],
-            'participant[seed]'               => $args['seed'],
         );
 
-        $tournaments = $c->createParticipant($args['challonge_tournament_id'], $params);
+        $participant = $c->createParticipant($args['challonge_tournament_id'], $params);
 
         return $c->result;
 
@@ -509,7 +523,7 @@ class tournamentCPT {
 
         if ( 'tournament_players' == $connection->p2p_type ) {
 
-            
+
 
         }
 
@@ -574,7 +588,7 @@ class tournamentCPT {
             $challonge_tournament_id = get_post_meta($post_id, 'challonge_tournament_link',true);
         }
 
-        return $post_id;
+        return $challonge_tournament_id;
 
     }
 }

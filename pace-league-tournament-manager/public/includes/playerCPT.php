@@ -2,6 +2,8 @@
 
 class playerCPT {
 
+    public static $post_type = 'player';
+
     function __construct() {
 
         add_action('init', array($this, 'pace_register_cpt_player'));
@@ -36,7 +38,7 @@ class playerCPT {
             'supports'            => array('title')
         );
 
-        register_post_type( 'player', $playerArgs );
+        register_post_type( self::$post_type, $playerArgs );
 
     }
 }
