@@ -8,6 +8,8 @@ class playerCPT {
 
         add_action('init', array($this, 'pace_register_cpt_player'));
 
+        add_action( 'user_register', array( $this, 'action_new_player_profile' ) );
+
     }
 
     function pace_register_cpt_player() {
@@ -39,6 +41,13 @@ class playerCPT {
         );
 
         register_post_type( self::$post_type, $playerArgs );
+
+    }
+
+    public function action_new_player_profile($user_id){
+
+
+
 
     }
 }

@@ -11,14 +11,14 @@ class tournamentCPT {
         add_action( 'widgets_init', array( $this, 'register_tournament_sidebar') );
 
         add_action( 'p2p_init', array( $this, 'register_p2p_connections' ) );
-        add_action( 'p2p_created_connection', array( $this, 'challonge_add_player_to_tournament' ) );
-        add_action( 'p2p_delete_connections', array( $this, 'challonge_remove_player_to_tournament' ) );
+        add_action( 'p2p_created_connection', array( $this, 'action_p2p_add_player_from_tournament' ) );
+        add_action( 'p2p_delete_connections', array( $this, 'action_p2p_remove_player_from_tournament' ) );
         add_filter( 'p2p_connectable_args', array( $this, 'filter_p2p_tournament_player_requirements' ) );
 
         add_action( 'gform_after_submission', array( $this, 'signup_tournament_player'), 10, 2);
         add_action( 'template_include', array( $this, 'load_endpoint_template')  );
 
-        //todo sync players from challonge to wordpress, fair bit of work, need to refactor signup_tournament_player to make it abstract
+        //todo sync players from challonge to wordpress, fair bit of work, need to refactor signup_tournament_player to make it happen
         //add_action( 'save_post', array( $this, 'action_challonge_sync_check') );
 
 
@@ -235,8 +235,6 @@ class tournamentCPT {
 
         global $wpdb;
 
-        //todo abstract this function so it can be used by different calls not just this
-
         $signup_form_id          = get_field('standard_tournament_signup_form', 'option');
         $tournament_id           = url_to_postid($entry['source_url']);
         $challonge_tournament_id = $this->get_the_challonge_tournament_id($tournament_id);
@@ -251,6 +249,9 @@ class tournamentCPT {
             $signup_form_id = get_field('signup_form');
         }
 
+        if ($signup_form_id != $entry['form_id'])
+            return false;
+
         //todo move out to general function file as this is a useful snippit
         foreach( $form['fields'] as $field ) {
 
@@ -261,151 +262,92 @@ class tournamentCPT {
             );
         }
 
-        //todo create mapping function so form fields are not hard coded by id.
+        //todo email shouldnt be stored with the player profile CTP should be linked either by p2p or meta int
+        $find_player = array(
+            'post_type'      => playerCPT::$post_type,
+            'meta_query'     => array(
+                array(
+                    'key'   => 'player_email',
+                    'value' => $entry['3']
+                )
+            ),
+            'posts_per_page' => 1
+        );
 
-        if ($signup_form_id == $entry['form_id']) {
+        $players = get_posts($find_player);
 
-            //todo email shouldnt be stored with the player profile CTP should be linked either by p2p or meta int
-            $find_player = array(
-                'post_type'      => playerCPT::$post_type,
-                'meta_query'     => array(
-                    array(
-                        'key'   => 'player_email',
-                        'value' => $entry['3']
-                    )
-                ),
-                'posts_per_page' => 1
-            );
+        //existing player
+        if (!empty($players)) {
 
-            $players = get_posts($find_player);
+            $player_id = $players[0]->ID;
 
-            //existing player check email
-            if (!empty($players)) {
+            //add player to current challonge tournament
+            $challonge_result = $this->challonge_add_player_to_tournament($challonge_tournament_id, $values['email']['value'], $values['ign']['value']);
 
-                $player_id = $players[0]->ID;
-
-                foreach( $form['fields'] as $field ) {
-
-                    $values[$field['id']] = array(
-                        'id'    => $field['id'],
-                        'label' => $field['label'],
-                        'value' => $entry[ $field['id'] ],
-                    );
-                }
-
-                $connection_meta = array(
-                    'date' => current_time('mysql')
-                );
-
-                //if ladder information is entered then add that to the connection meta
-                if (false) {
-                    $connection_meta['ladder'] = 0;
-                }
-
-                //log clan at current time
-                if (!empty($entry['2'])) {
-                    $connection_meta['clan'] = 0;
-                }
+            //error check
+            if(true){
 
                 //player found add player to tornament
-                $p2p_result = p2p_type('tournament_players')->connect($tournament_id, $player_id, $connection_meta);
+                $p2p_result = $this->action_add_player_to_tournament($player_id, $tournament_id, $challonge_tournament_id, $challonge_result);
 
-                $c_args = array(
-                    'email' => $values['email']['value'],
-                    'ign' => $values['ign']['value'],
-                    'challonge_tournament_id' => $challonge_tournament_id
-                );
-
-                //add player to current challonge tournament
-                $challonge_result = $this->challonge_add_player_to_tournament($c_args);
-
-                $challonge_result = json_decode( json_encode( (array) $challonge_result), false );
-
-                //error check
-                if(true){
-
-                    //save the return to db as this has useful info in it
-                    update_post_meta($player_id, 'challonge_data', $challonge_result);
-
-                    //easy search
-                    update_post_meta($player_id, 'challonge_participant_id', $challonge_result->id);
-
-                } else {
-                    //error here
+                if(!$p2p_result){
+                    //email admins let them know something went wrong.
                 }
 
             } else {
+                //error here
+            }
 
-                //new user accounts have been created to provide features going forward
-                //TODO discuss with group merit for creating user accounts.
-                $userdata = array(
-                    'user_login' => $values['email']['value'],
-                    'user_email' =>$values['email']['value'],
-                    'user_pass' => wp_generate_password()
-                );
+        } else {
 
-                $user_id = wp_insert_user($userdata);
+            //new user accounts have been created to provide features going forward
+            $userdata = array(
+                'user_login' => $values['email']['value'],
+                'user_email' =>$values['email']['value'],
+                'user_pass' => wp_generate_password()
+            );
 
-                //create new player post
-                $new_player = array(
-                    'post_title'  => $entry['5'],
-                    'post_status' => 'publish',
-                    'post_author' => $user_id,
-                    'post_type'   => playerCPT::$post_type
-                );
+            $user_id = wp_insert_user($userdata);
 
-                // Insert the post into the database
-                $player_id = wp_insert_post($new_player);
+            //create new player post
+            $new_player = array(
+                'post_title'  => $values['ign']['value'],
+                'post_status' => 'publish',
+                'post_author' => $user_id,
+                'post_type'   => playerCPT::$post_type
+            );
 
-                update_post_meta($player_id, 'player_email', $entry['3']);
-                update_post_meta($player_id, 'user_id', $user_id);
+            // Insert the post into the database
+            $player_id = wp_insert_post($new_player);
 
-                update_user_meta($user_id, 'player_id', $player_id);
+            update_post_meta( $player_id, 'player_email', $values['email']['value']);
+            update_post_meta( $player_id, 'user_id', $user_id);
 
-                $connection_meta = array(
-                    'date' => current_time('mysql')
-                );
+            update_user_meta( $user_id, 'player_id', $player_id);
 
-                //if ladder information is entered then add that to the connection meta
-                if (false) {
-                    $connection_meta['ladder'] = 0;
+            //add player to current challonge tournament
+            $challonge_result = $this->challonge_add_player_to_tournament($challonge_tournament_id, $values['email']['value'], $values['ign']['value']);
+
+            //error check, if challonge was correct lets do p2p
+            if(true){
+
+                $p2p_result = $this->action_add_player_to_tournament($player_id, $tournament_id, $challonge_tournament_id, $challonge_result);
+
+                if(!$p2p_result){
+                    //email admins let them know something went wrong.
                 }
 
-                //log clan at current time
-                if (!empty($entry['2'])) {
-                    $connection_meta['clan'] = 0;
-                }
+            } else {
+                //error here
 
-                //player found add player to tornament
-                $p2p_result = p2p_type('tournament_players')->connect($tournament_id, $player_id, $connection_meta);
+                //change confirmation message
 
-                $c_args = array(
-                    'email' => $values['email']['value'],
-                    'ign' => $values['ign']['value'],
-                    'challonge_tournament_id' => $challonge_tournament_id
-                );
-
-                //add player to current challonge tournament
-                $challonge_result = $this->challonge_add_player_to_tournament($c_args);
-
-                $challonge_result = json_decode( json_encode( (array) $challonge_result), false );
-
-                //error check
-                if(true){
-
-                    //save the return to db as this has useful info in it
-                    update_post_meta($player_id, 'challonge_data', $challonge_result);
-
-                    //easy search
-                    update_post_meta($player_id, 'challonge_participant_id', $challonge_result->id);
-
-                } else {
-                    //error here
-                }
+                //email admins let them know something went wrong.
 
             }
 
         }
+
 
 
     }
@@ -444,8 +386,125 @@ class tournamentCPT {
 
     public function filter_p2p_tournament_player_requirements($args){
 
+        switch($_POST['p2p_type']){
+
+            case "tournament_players" :
+
+                //player profiles must have emails for challonge intergration
+                $args['meta_query'] = array(
+                    array(
+                        'key' => 'player_email',
+                        'compare' => 'EXISTS'
+                    )
+                );
+
+                break;
+
+        }
 
         return $args;
+
+    }
+
+    public function challonge_add_player_to_tournament($challonge_tournament_id, $email, $ign){
+
+        $c = new ChallongeAPI(Pace_League_Tournament_Manager::fetch_challonge_API());
+
+        $params = array(
+            "participant[email]"              => $email,
+            'participant[name]'               => $ign,
+            'participant[challonge_username]' => $ign,
+        );
+
+        $participant = $c->createParticipant($challonge_tournament_id, $params);
+
+        $result = json_decode( json_encode( (array) $participant), false );
+
+        return $result;
+
+    }
+
+    public function challonge_remove_player_from_tournament($challonge_tournament_id, $challonge_participant_id){
+
+        $c = new ChallongeAPI(Pace_League_Tournament_Manager::fetch_challonge_API());
+
+        $c->deleteParticipant($challonge_tournament_id, $challonge_participant_id);
+
+        return $c->result;
+    }
+
+    public function action_p2p_add_player_from_tournament($p2p_id){
+
+        $connection = p2p_get_connection( $p2p_id );
+
+        if ( 'tournament_players' == $connection->p2p_type ) {
+
+            $challonge_tournament_id = '';
+            $email = '';
+            $ign = '';
+
+            //add player to current challonge tournament
+            $challonge_result = $this->challonge_add_player_to_tournament($challonge_tournament_id, $email, $ign);
+
+        }
+
+    }
+
+    public function action_p2p_remove_player_from_tournament($p2p_id){
+
+        $connection = p2p_get_connection( $p2p_id );
+
+        if ( 'tournament_players' == $connection->p2p_type ) {
+
+            $challonge_tournament_id ='';
+            $challonge_participant_id = '';
+
+
+            $challonge_result = $this->challonge_remove_player_from_tournament($challonge_tournament_id, $challonge_participant_id)
+
+        }
+    }
+
+    public function action_add_player_to_tournament($player_id, $tournament_id, $challonge_tournament_id, $challonge_result){
+
+        //save the return to db as this has useful info in it
+        update_post_meta($player_id, 'challonge_data', $challonge_result);
+
+        //easy search
+        update_post_meta($player_id, 'challonge_participant_id', $challonge_result->id);
+
+        $connection_meta = array(
+            'date'                     => current_time('mysql'),
+            'challonge_tournament_id'  => $challonge_tournament_id,
+            'challonge_participant_id' => $challonge_result->id
+        );
+
+        //if ladder information is entered then add that to the connection meta
+        if (false) {
+            $connection_meta['ladder'] = 0;
+        }
+
+        //log clan at current time
+        if (!empty($entry['2'])) {
+            $connection_meta['clan'] = 0;
+        }
+
+        //player found add player to tornament
+        $p2p_result = p2p_type('tournament_players')->connect($tournament_id, $player_id, $connection_meta);
+
+        return $p2p_result;
+
+    }
+
+    public function get_the_challonge_tournament_id($post_id){
+
+        if(get_post_meta($post_id, 'challonge_tournament_link',true) == "Custom Tournament ID"){
+            $challonge_tournament_id = get_post_meta($post_id, 'custom_tournament_id',true);
+        } else {
+            $challonge_tournament_id = get_post_meta($post_id, 'challonge_tournament_link',true);
+        }
+
+        return $challonge_tournament_id;
 
     }
 
@@ -492,54 +551,7 @@ class tournamentCPT {
 
     }
 
-    public function challonge_add_player_to_tournament($args = array()){
-
-        $c = new ChallongeAPI(Pace_League_Tournament_Manager::fetch_challonge_API());
-
-        $params = array(
-            "participant[email]"              => $args['email'],
-            'participant[name]'               => $args['ign'],
-            'participant[challonge_username]' => $args['ign'],
-        );
-
-        $participant = $c->createParticipant($args['challonge_tournament_id'], $params);
-
-        return $c->result;
-
-    }
-
-    public function challonge_remove_player_from_tournament($args = array()){
-
-        $c = new ChallongeAPI(Pace_League_Tournament_Manager::fetch_challonge_API());
-
-        $c->deleteParticipant($args['challonge_tournament_id'], $args['challonge_participant_id']);
-
-        return $c->result;
-    }
-
-    public function action_p2p_add_player_from_tournament($p2p_id){
-
-        $connection = p2p_get_connection( $p2p_id );
-
-        if ( 'tournament_players' == $connection->p2p_type ) {
-
-
-
-        }
-
-    }
-
-    public function action_p2p_remove_player_from_tournament($p2p_id){
-
-        $connection = p2p_get_connection( $p2p_id );
-
-        if ( 'tournament_players' == $connection->p2p_type ) {
-
-
-
-        }
-    }
-
+    //not in use
     public function action_challonge_sync_check($post_id){
 
         if ( wp_is_post_revision( $post_id ) )
@@ -577,18 +589,6 @@ class tournamentCPT {
             }
 
         }
-
-    }
-
-    public function get_the_challonge_tournament_id($post_id){
-
-        if(get_post_meta($post_id, 'challonge_tournament_link',true) == "Custom Tournament ID"){
-            $challonge_tournament_id = get_post_meta($post_id, 'custom_tournament_id',true);
-        } else {
-            $challonge_tournament_id = get_post_meta($post_id, 'challonge_tournament_link',true);
-        }
-
-        return $challonge_tournament_id;
 
     }
 }
