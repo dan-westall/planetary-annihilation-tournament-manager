@@ -456,11 +456,10 @@ class tournamentCPT {
 
         if ( 'tournament_players' == $connection->p2p_type ) {
 
-            $challonge_tournament_id ='';
-            $challonge_participant_id = '';
+            $challonge_tournament_id = $this->get_the_challonge_tournament_id($connection->p2p_from);
+            $challonge_participant_id = p2p_get_meta( $p2p_id, 'challonge_participant_id', true );
 
-
-            $challonge_result = $this->challonge_remove_player_from_tournament($challonge_tournament_id, $challonge_participant_id)
+            $challonge_result = $this->challonge_remove_player_from_tournament($challonge_tournament_id, $challonge_participant_id);
 
         }
     }
