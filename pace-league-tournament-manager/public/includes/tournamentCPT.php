@@ -348,8 +348,6 @@ class tournamentCPT {
 
         }
 
-
-
     }
 
     public function filter_challonge_tournament_listing($field){
@@ -428,9 +426,13 @@ class tournamentCPT {
 
         $c = new ChallongeAPI(Pace_League_Tournament_Manager::fetch_challonge_API());
 
-        $c->deleteParticipant($challonge_tournament_id, $challonge_participant_id);
+        $c->verify_ssl = false;
 
-        return $c->result;
+        $participant = $c->deleteParticipant($challonge_tournament_id, $challonge_participant_id);
+
+        $result = json_decode( json_encode( (array) $participant), false );
+
+        return $result;
     }
 
     public function action_p2p_add_player_from_tournament($p2p_id){
@@ -439,12 +441,23 @@ class tournamentCPT {
 
         if ( 'tournament_players' == $connection->p2p_type ) {
 
-            $challonge_tournament_id = '';
-            $email = '';
-            $ign = '';
+            $challonge_tournament_id = $this->get_the_challonge_tournament_id($connection->p2p_from);
+
+            $email = get_post_meta($connection->p2p_to, 'player_email', true);
+            $ign   = get_the_title($connection->p2p_to);
 
             //add player to current challonge tournament
             $challonge_result = $this->challonge_add_player_to_tournament($challonge_tournament_id, $email, $ign);
+
+            p2p_add_meta( $p2p_id, 'challonge_tournament_id', $challonge_tournament_id);
+            p2p_add_meta( $p2p_id, 'challonge_participant_id', $challonge_result->id);
+            p2p_add_meta( $p2p_id, 'date', current_time('mysql') );
+
+            //save the return to db as this has useful info in it
+            update_post_meta($connection->p2p_to, 'challonge_data', $challonge_result);
+
+            //easy search
+            update_post_meta($connection->p2p_to, 'challonge_participant_id', $challonge_result->id);
 
         }
 
@@ -456,10 +469,19 @@ class tournamentCPT {
 
         if ( 'tournament_players' == $connection->p2p_type ) {
 
+            //todo tournament remove reason and history will be to be done.
+
             $challonge_tournament_id = $this->get_the_challonge_tournament_id($connection->p2p_from);
-            $challonge_participant_id = p2p_get_meta( $p2p_id, 'challonge_participant_id', true );
+            $challonge_participant_id = p2p_get_meta( $connection->p2p_id, 'challonge_participant_id', true );
 
             $challonge_result = $this->challonge_remove_player_from_tournament($challonge_tournament_id, $challonge_participant_id);
+
+            //save the return to db as this has useful info in it
+            delete_post_meta($connection->p2p_to, 'challonge_data' );
+
+            //easy search
+            delete_post_meta($connection->p2p_to, 'challonge_participant_id');
+
 
         }
     }
