@@ -2,6 +2,8 @@
 
 define( 'PACE_PLUGIN_DIR' , dirname(__FILE__) );
 
+require_once( PACE_PLUGIN_DIR.'/includes/functions.php');
+
 //3rd party library
 require_once( PACE_PLUGIN_DIR.'/includes/challonge.class.php');
 

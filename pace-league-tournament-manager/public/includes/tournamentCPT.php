@@ -11,11 +11,15 @@ class tournamentCPT {
         add_action( 'widgets_init', array( $this, 'register_tournament_sidebar') );
 
         add_action( 'p2p_init', array( $this, 'register_p2p_connections' ) );
-        add_action( 'p2p_created_connection', array( $this, 'action_p2p_add_player_from_tournament' ) );
-        add_action( 'p2p_delete_connections', array( $this, 'action_p2p_remove_player_from_tournament' ) );
+        //add_action( 'p2p_created_connection', array( $this, 'action_p2p_new_connection' ) );
+        //add_action( 'p2p_delete_connections', array( $this, 'action_p2p_delete_connection' ) );
         add_filter( 'p2p_connectable_args', array( $this, 'filter_p2p_tournament_player_requirements' ) );
 
         add_action( 'gform_after_submission', array( $this, 'signup_tournament_player'), 10, 2);
+        add_filter( 'gform_validation', array( $this, 'signup_form_validation'), 10, 4);
+        add_filter( 'gform_validation_message', array( $this, 'signup_form_validation_message'), 10, 2);
+        //add_action( 'gform_confirmation', array( $this, 'signup_custom_confirmation'), 10, 2);
+
         add_action( 'template_include', array( $this, 'load_endpoint_template')  );
 
         //todo sync players from challonge to wordpress, fair bit of work, need to refactor signup_tournament_player to make it happen
@@ -231,6 +235,83 @@ class tournamentCPT {
 
     }
 
+    public function signup_custom_confirmation($confirmation, $form, $lead, $ajax){
+
+        $signup_form_id          = get_field('standard_tournament_signup_form', 'option');
+        $tournament_id           = url_to_postid($entry['source_url']);
+
+        if ($tournament_id === 0 || $tournament_closed !== false)
+            return $confirmation;
+
+        foreach( $form['fields'] as $field ) {
+            $values[$field['field_mapField']] = array(
+                'id'    => $field['id'],
+                'label' => $field['label'],
+                'value' => $entry[ $field['id'] ],
+            );
+        }
+
+        $confirmation = 'Great news, your already signed up to this tournament';
+
+        return $confirmation;
+    }
+
+    public function signup_form_validation($validation_result){
+
+        $values = array();
+
+        $signup_form_id          = get_field('standard_tournament_signup_form', 'option');
+        $tournament_id           = url_to_postid($_SERVER['HTTP_REFERER']);
+        $tournament_closed       = get_field('signup_closed', $tournament_id);
+
+        if ($tournament_id === 0 || $tournament_closed !== false)
+            return $validation_result;
+
+        if ($signup_form_id && get_field('signup_form')) {
+            $signup_form_id = get_field('signup_form');
+        }
+
+        if ($signup_form_id != $validation_result['form']['id'])
+            return $validation_result;
+
+        foreach( $validation_result['form']['fields'] as $field ) {
+            $values[$field['field_mapField']] = array(
+                'id'    => $field['id'],
+                'label' => $field['label'],
+                'value' => $_POST[ 'input_' . $field['id'] ],
+            );
+        }
+
+        $player = DW_Helper::get_post_by_meta('player_email', $values['email']['value']);
+
+        //is player
+        if(is_object($player)){
+
+            $p2p_id = p2p_type('tournament_players')->get_p2p_id($tournament_id, $player->ID);
+
+            //is linked to tournament
+            if ($p2p_id) {
+
+                $validation_result['is_valid'] = false;
+                $validation_result['form']['cssClass'] = 'already-in-tournament';
+
+            }
+
+        }
+
+        return $validation_result;
+
+    }
+
+    public function signup_form_validation_message($message, $form){
+
+        if(strpos($form['cssClass'], 'already-in-tournament') !== false)
+            $message = '<span class="positive-message">Great news, your already signed up to this tournament!. No need to signup again.</span>';
+
+        return $message;
+
+    }
+
     public function signup_tournament_player($entry, $form) {
 
         global $wpdb;
@@ -253,12 +334,11 @@ class tournamentCPT {
             return false;
 
         //todo move out to general function file as this is a useful snippit
-        foreach( $form['fields'] as $field ) {
-
+        foreach ($form['fields'] as $field) {
             $values[$field['field_mapField']] = array(
                 'id'    => $field['id'],
                 'label' => $field['label'],
-                'value' => $entry[ $field['id'] ],
+                'value' => $entry[$field['id']],
             );
         }
 
@@ -281,16 +361,25 @@ class tournamentCPT {
 
             $player_id = $players[0]->ID;
 
+            //check to make sure they are not aleady in tournament
+            $p2p_id = p2p_type('tournament_players')->get_p2p_id($tournament_id, $player_id);
+
+            if ($p2p_id) {
+
+                return $form;
+
+            }
+
             //add player to current challonge tournament
             $challonge_result = $this->challonge_add_player_to_tournament($challonge_tournament_id, $values['email']['value'], $values['ign']['value']);
 
             //error check
-            if(true){
+            if (true) {
 
                 //player found add player to tornament
                 $p2p_result = $this->action_add_player_to_tournament($player_id, $tournament_id, $challonge_tournament_id, $challonge_result);
 
-                if(!$p2p_result){
+                if (!$p2p_result) {
                     //email admins let them know something went wrong.
                 }
 
@@ -303,8 +392,8 @@ class tournamentCPT {
             //new user accounts have been created to provide features going forward
             $userdata = array(
                 'user_login' => $values['email']['value'],
-                'user_email' =>$values['email']['value'],
-                'user_pass' => wp_generate_password()
+                'user_email' => $values['email']['value'],
+                'user_pass'  => wp_generate_password()
             );
 
             $user_id = wp_insert_user($userdata);
@@ -320,20 +409,21 @@ class tournamentCPT {
             // Insert the post into the database
             $player_id = wp_insert_post($new_player);
 
-            update_post_meta( $player_id, 'player_email', $values['email']['value']);
-            update_post_meta( $player_id, 'user_id', $user_id);
+            update_post_meta($player_id, 'player_email', $values['email']['value']);
+            update_post_meta($player_id, 'user_id', $user_id);
 
-            update_user_meta( $user_id, 'player_id', $player_id);
+            update_user_meta($user_id, 'player_id', $player_id);
+
 
             //add player to current challonge tournament
             $challonge_result = $this->challonge_add_player_to_tournament($challonge_tournament_id, $values['email']['value'], $values['ign']['value']);
 
             //error check, if challonge was correct lets do p2p
-            if(true){
+            if (isset($challonge_result->id)) {
 
                 $p2p_result = $this->action_add_player_to_tournament($player_id, $tournament_id, $challonge_tournament_id, $challonge_result);
 
-                if(!$p2p_result){
+                if (!$p2p_result) {
                     //email admins let them know something went wrong.
                 }
 
@@ -408,10 +498,12 @@ class tournamentCPT {
 
         $c = new ChallongeAPI(Pace_League_Tournament_Manager::fetch_challonge_API());
 
+        $c->verify_ssl = false;
+
         $params = array(
             "participant[email]"              => $email,
             'participant[name]'               => $ign,
-            'participant[challonge_username]' => $ign,
+        //    'participant[challonge_username]' => $ign,
         );
 
         $participant = $c->createParticipant($challonge_tournament_id, $params);
@@ -435,7 +527,7 @@ class tournamentCPT {
         return $result;
     }
 
-    public function action_p2p_add_player_from_tournament($p2p_id){
+    public function action_p2p_new_connection($p2p_id){
 
         $connection = p2p_get_connection( $p2p_id );
 
@@ -443,8 +535,10 @@ class tournamentCPT {
 
             $challonge_tournament_id = $this->get_the_challonge_tournament_id($connection->p2p_from);
 
+            $player = get_post($connection->p2p_to);
+
             $email = get_post_meta($connection->p2p_to, 'player_email', true);
-            $ign   = get_the_title($connection->p2p_to);
+            $ign   = $player->post_title;
 
             //add player to current challonge tournament
             $challonge_result = $this->challonge_add_player_to_tournament($challonge_tournament_id, $email, $ign);
@@ -463,7 +557,7 @@ class tournamentCPT {
 
     }
 
-    public function action_p2p_remove_player_from_tournament($p2p_id){
+    public function action_p2p_delete_connection($p2p_id){
 
         $connection = p2p_get_connection( $p2p_id );
 
