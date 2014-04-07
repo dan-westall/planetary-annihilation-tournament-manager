@@ -13,7 +13,7 @@
  * @wordpress-plugin
  * Plugin Name:       Planetary Annihilation Tournament Manager
  * Plugin URI:        http://www.paceleague.com
- * Description:       Custom plugin for PACE league, that allows management of tournaments
+ * Description:       Custom plugin for Planetary Annihilation, allows tournament management for wordpress
  * Version:           0.0.1
  * Author:            Dan Westall
  * Author URI:        http://www.dan-westall.co.uk

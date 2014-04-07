@@ -351,6 +351,13 @@ class Planetary_Annihilation_Tournament_Manager {
 		wp_enqueue_script( $this->plugin_slug . '-plugin-script', plugins_url( 'assets/js/public.js', __FILE__ ), array( 'jquery' ), self::VERSION );
 	}
 
+    private static function single_activate() {
 
+
+    }
+
+    private static function single_deactivate() {
+
+    }
 
 }
