@@ -1,8 +1,10 @@
 <?php get_header(); ?>
 
+<div class="container">
+
     <div id="content-wrapper"  class="clearfix content-wrapper row">
 
-        <div class="col-lg-2">
+        <div class="col-lg-3">
 
             <div class="container-box">
                 <ul class="content-sub-menu">
@@ -47,13 +49,15 @@
 
         <?php endwhile; ?>
 
-        <aside role="complementary" class="col-lg-4">
+        <aside role="complementary" class="col-lg-3">
 
             <?php get_sidebar('1'); ?>
 
         </aside>
 
     </div>
+
+</div>
 
 <?php get_footer(); ?>
 
