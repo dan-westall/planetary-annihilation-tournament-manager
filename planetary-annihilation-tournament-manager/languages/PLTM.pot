@@ -1,5 +1,5 @@
 # Copyright (C) 2014 TODO
-# This file is distributed under the same license as the Pace_League_Tournament_Manager package.
+# This file is distributed under the same license as the Planetary_Annihilation_Tournament_Manager package.
 msgid ""
 msgstr ""
 "Project-Id-Version: 0.0.1\n"

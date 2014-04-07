@@ -1,17 +1,17 @@
 <?php
 /**
- * Pace League Tournament Manager
+ * Planetary Annihilation Tournament Manager
  *
- * Custom plugin for PACE league, that allows management of tournaments
+ * Custom plugin for managing Planetary Annihilation Tournaments
  *
- * @package   Pace_League_Tournament_Manager
+ * @package   Planetary Annihilation Tournament Manager
  * @author    Dan Westall <dan.westall@googlemail.com>
  * @license   GPL-2.0+
  * @link      http://www.paceleague.com
  * @copyright 2014 Dan Westall
  *
  * @wordpress-plugin
- * Plugin Name:       Pace League Tournament Manager
+ * Plugin Name:       Planetary Annihilation Tournament Manager
  * Plugin URI:        http://www.paceleague.com
  * Description:       Custom plugin for PACE league, that allows management of tournaments
  * Version:           0.0.1
@@ -39,10 +39,10 @@ require_once( plugin_dir_path( __FILE__ ) . 'public/class-PLTM.php' );
  * Register hooks that are fired when the plugin is activated or deactivated.
  * When the plugin is deleted, the uninstall.php file is loaded.
  */
-register_activation_hook( __FILE__, array( 'Pace_League_Tournament_Manager', 'activate' ) );
-register_deactivation_hook( __FILE__, array( 'Pace_League_Tournament_Manager', 'deactivate' ) );
+register_activation_hook( __FILE__, array( 'Planetary_Annihilation_Tournament_Manager', 'activate' ) );
+register_deactivation_hook( __FILE__, array( 'Planetary_Annihilation_Tournament_Manager', 'deactivate' ) );
 
-add_action( 'plugins_loaded', array( 'Pace_League_Tournament_Manager', 'get_instance' ) );
+add_action( 'plugins_loaded', array( 'Planetary_Annihilation_Tournament_Manager', 'get_instance' ) );
 
 /*----------------------------------------------------------------------------*
  * Dashboard and Administrative Functionality
@@ -63,6 +63,6 @@ add_action( 'plugins_loaded', array( 'Pace_League_Tournament_Manager', 'get_inst
 if ( is_admin() && ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) ) {
 
 	require_once( plugin_dir_path( __FILE__ ) . 'admin/class-PLTM-admin.php' );
-	add_action( 'plugins_loaded', array( 'Pace_League_Tournament_Manager_Admin', 'get_instance' ) );
+	add_action( 'plugins_loaded', array( 'Planetary_Annihilation_Tournament_Manager_Admin', 'get_instance' ) );
 
 }

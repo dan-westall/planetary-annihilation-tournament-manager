@@ -1,8 +1,8 @@
 <?php
 /**
- * Pace_League_Tournament_Manager
+ * Planetary_Annihilation_Tournament_Manager
  *
- * @package   Pace_League_Tournament_Manager
+ * @package   Planetary_Annihilation_Tournament_Manager
  * @author    Dan Westall <dan.westall@googlemail.com>
  * @license   GPL-2.0+
  * @link      http://www.paceleague.com
@@ -10,16 +10,16 @@
  */
 
 /**
- * Pace_League_Tournament_Manager class. This class should ideally be used to work with the
+ * Planetary_Annihilation_Tournament_Manager class. This class should ideally be used to work with the
  * public-facing side of the WordPress site.
  *
  * If you're interested in introducing administrative or dashboard
  * functionality, then refer to `class-PLTM-admin.php`
  *
- * @package Pace_League_Tournament_Manager
+ * @package Planetary_Annihilation_Tournament_Manager
  * @author  Dan Westall <dan.westall@googlemail.com>
  */
-class Pace_League_Tournament_Manager {
+class Planetary_Annihilation_Tournament_Manager {
 
 	/**
 	 * Plugin version, used for cache-busting of style and script file references.

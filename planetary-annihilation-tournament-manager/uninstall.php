@@ -2,7 +2,7 @@
 /**
  * Fired when the plugin is uninstalled.
  *
- * @package   Pace_League_Tournament_Manager
+ * @package   Planetary_Annihilation_Tournament_Manager
  * @author    Dan Westall <dan.westall@googlemail.com>
  * @license   GPL-2.0+
  * @link      http://www.paceleague.com

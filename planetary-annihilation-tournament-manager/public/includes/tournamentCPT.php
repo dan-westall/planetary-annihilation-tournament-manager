@@ -135,7 +135,7 @@ class tournamentCPT {
         /* Checks for single template by post type */
         if ($post->post_type == self::$post_type) {
 
-           return PACE_PLUGIN_DIR.'/includes/templates/single-'.self::$post_type.'.php';
+           return PLTM_PLUGIN_DIR.'/includes/templates/single-'.self::$post_type.'.php';
 
         }
 
@@ -145,11 +145,11 @@ class tournamentCPT {
 
         global $wp_query, $post;
 
-        foreach(Pace_League_Tournament_Manager::$endpoints as $endpoint){
+        foreach(Planetary_Annihilation_Tournament_Manager::$endpoints as $endpoint){
 
             if ($post->post_type == 'tournament' && isset( $wp_query->query_vars[$endpoint] )) {
 
-                $template_path = PACE_PLUGIN_DIR . "/includes/templates/single-$post->post_type-$endpoint.php";
+                $template_path = PLTM_PLUGIN_DIR . "/includes/templates/single-$post->post_type-$endpoint.php";
 
                 if(file_exists($template_path)){
                     return $template_path;
@@ -197,7 +197,7 @@ class tournamentCPT {
         if(!is_object($post))
             return $title;
 
-        foreach(Pace_League_Tournament_Manager::$endpoints as $endpoint){
+        foreach(Planetary_Annihilation_Tournament_Manager::$endpoints as $endpoint){
 
             if ($post->post_type == 'tournament' && isset( $wp_query->query_vars[$endpoint] )) {
 
@@ -442,7 +442,7 @@ class tournamentCPT {
 
     public function filter_challonge_tournament_listing($field){
 
-        $c = new ChallongeAPI(Pace_League_Tournament_Manager::fetch_challonge_API());
+        $c = new ChallongeAPI(Planetary_Annihilation_Tournament_Manager::fetch_challonge_API());
 
         $form_listing[] = 'Select Tournament';
         $form_listing[] = 'Custom Tournament ID';
@@ -496,7 +496,7 @@ class tournamentCPT {
 
     public function challonge_add_player_to_tournament($challonge_tournament_id, $email, $ign){
 
-        $c = new ChallongeAPI(Pace_League_Tournament_Manager::fetch_challonge_API());
+        $c = new ChallongeAPI(Planetary_Annihilation_Tournament_Manager::fetch_challonge_API());
 
         $c->verify_ssl = false;
 
@@ -516,7 +516,7 @@ class tournamentCPT {
 
     public function challonge_remove_player_from_tournament($challonge_tournament_id, $challonge_participant_id){
 
-        $c = new ChallongeAPI(Pace_League_Tournament_Manager::fetch_challonge_API());
+        $c = new ChallongeAPI(Planetary_Annihilation_Tournament_Manager::fetch_challonge_API());
 
         $c->verify_ssl = false;
 
@@ -683,7 +683,7 @@ class tournamentCPT {
                 $challonge_tournament_id = get_post_meta($post_id, 'challonge_tournament_link',true);
             }
 
-            $c = new ChallongeAPI(Pace_League_Tournament_Manager::fetch_challonge_API());
+            $c = new ChallongeAPI(Planetary_Annihilation_Tournament_Manager::fetch_challonge_API());
 
             $args = array(
                 'connected_type' => 'tournament_players',

@@ -4,9 +4,9 @@
 
     <?php while ( have_posts() ) : the_post(); ?>
 
-        <article id="post-<?php the_ID(); ?>" <?php post_class('col-lg-12'); ?>  role="main">
+        <article id="post-<?php the_ID(); ?>" <?php post_class('col-lg-5'); ?>  role="main">
 
-            <div class="content-container">
+            <div class="content-container container-box">
 
                 <header class="post-header">
 
@@ -17,6 +17,7 @@
                 <div class="body text">
 
                     <?php the_content(); ?>
+
 
                 </div>
 

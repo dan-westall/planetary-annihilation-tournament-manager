@@ -1,8 +1,8 @@
 <?php
 /**
- * Pace_League_Tournament_Manager
+ * Planetary_Annihilation_Tournament_Manager
  *
- * @package   Pace_League_Tournament_Manager_Admin
+ * @package   Planetary_Annihilation_Tournament_Manager_Admin
  * @author    Dan Westall <dan.westall@googlemail.com>
  * @license   GPL-2.0+
  * @link      http://www.paceleague.com
@@ -10,16 +10,16 @@
  */
 
 /**
- * Pace_League_Tournament_Manager_Admin class. This class should ideally be used to work with the
+ * Planetary_Annihilation_Tournament_Manager_Admin class. This class should ideally be used to work with the
  * administrative side of the WordPress site.
  *
  * If you're interested in introducing public-facing
  * functionality, then refer to `class-plugin-name.php`
  *
- * @package Pace_League_Tournament_Manager_Admin
+ * @package Planetary_Annihilation_Tournament_Manager_Admin
  * @author  Dan Westall <dan.westall@googlemail.com>
  */
-class Pace_League_Tournament_Manager_Admin {
+class Planetary_Annihilation_Tournament_Manager_Admin {
 
 	/**
 	 * Instance of this class.
@@ -59,7 +59,7 @@ class Pace_League_Tournament_Manager_Admin {
 		/*
 		 * Call $plugin_slug from public plugin class.
 		 */
-		$plugin = Pace_League_Tournament_Manager::get_instance();
+		$plugin = Planetary_Annihilation_Tournament_Manager::get_instance();
 		$this->plugin_slug = $plugin->get_plugin_slug();
 
 		// Load admin style sheet and JavaScript.
@@ -221,7 +221,7 @@ class Pace_League_Tournament_Manager_Admin {
 
 		$screen = get_current_screen();
 		if ( $this->plugin_screen_hook_suffix == $screen->id ) {
-			wp_enqueue_style( $this->plugin_slug .'-admin-styles', plugins_url( 'assets/css/admin.css', __FILE__ ), array(), Pace_League_Tournament_Manager::VERSION );
+			wp_enqueue_style( $this->plugin_slug .'-admin-styles', plugins_url( 'assets/css/admin.css', __FILE__ ), array(), Planetary_Annihilation_Tournament_Manager::VERSION );
 		}
 
 	}
@@ -241,7 +241,7 @@ class Pace_League_Tournament_Manager_Admin {
 
 		$screen = get_current_screen();
 		if ( $this->plugin_screen_hook_suffix == $screen->id ) {
-			wp_enqueue_script( $this->plugin_slug . '-admin-script', plugins_url( 'assets/js/admin.js', __FILE__ ), array( 'jquery' ), Pace_League_Tournament_Manager::VERSION );
+			wp_enqueue_script( $this->plugin_slug . '-admin-script', plugins_url( 'assets/js/admin.js', __FILE__ ), array( 'jquery' ), Planetary_Annihilation_Tournament_Manager::VERSION );
 		}
 
 	}

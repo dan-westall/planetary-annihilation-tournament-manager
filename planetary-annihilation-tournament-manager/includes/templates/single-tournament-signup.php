@@ -10,7 +10,7 @@
                 <ul class="content-sub-menu">
                     <?php
 
-                    foreach(Pace_League_Tournament_Manager::$endpoints as $tournament_endpoint): ?>
+                    foreach(Planetary_Annihilation_Tournament_Manager::$endpoints as $tournament_endpoint): ?>
 
                         <li><a href="<?php the_permalink(); ?>/<?php echo $tournament_endpoint; ?>"><?php echo ucwords($tournament_endpoint); ?></a></li>
 
