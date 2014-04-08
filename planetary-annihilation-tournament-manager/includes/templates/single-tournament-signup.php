@@ -2,60 +2,66 @@
 
 <div class="container">
 
-    <div id="content-wrapper"  class="clearfix content-wrapper row">
+    <article>
 
-        <div class="col-lg-3">
+        <div class="row">
 
-            <div class="container-box">
-                <ul class="content-sub-menu">
-                    <?php
+            <div class="col-lg-12">
 
-                    foreach(Planetary_Annihilation_Tournament_Manager::$endpoints as $tournament_endpoint): ?>
+                <header class="post-header container-box">
 
-                        <li><a href="<?php the_permalink(); ?>/<?php echo $tournament_endpoint; ?>"><?php echo ucwords($tournament_endpoint); ?></a></li>
+                    <h1 class="post-title"><?php the_title(); ?></h1>
 
-                    <?php endforeach; ?>
+                    <ul class="page-sub-menu">
+                        <?php
 
-                </ul>
+                        foreach (Planetary_Annihilation_Tournament_Manager::$endpoints as $tournament_endpoint): ?>
+
+                            <li>
+                                <a href="<?php the_permalink(); ?>/<?php echo $tournament_endpoint; ?>"><?php echo ucwords($tournament_endpoint); ?></a>
+                            </li>
+
+                        <?php endforeach; ?>
+
+                    </ul>
+
+                </header>
+
             </div>
 
         </div>
 
+        <div id="content-wrapper" class="clearfix content-wrapper row">
 
-        <?php while ( have_posts() ) : the_post(); ?>
+            <?php while (have_posts()) : the_post(); ?>
 
-            <article id="post-<?php the_ID(); ?>" <?php post_class('col-lg-6'); ?>  role="main">
+                <div id="post-<?php the_ID(); ?>" <?php post_class('col-lg-6'); ?>  role="main">
 
-                <div class="content-container container-box">
+                    <div class="content-container container-box">
 
-                    <header class="post-header">
+                        <div class="body text">
 
-                        <h1 class="post-title"><?php the_title(); ?></h1>
+                            <?php $form_short_code = sprintf('[gravityform id="%s" name="Tournament Signup" title="false" description="false"]', get_field('signup_form'));
 
-                    </header>
+                            echo do_shortcode($form_short_code); ?>
 
-                    <div class="body text">
-
-                        <?php $form_short_code = sprintf('[gravityform id="%s" name="Tournament Signup" title="false" description="false"]', get_field('signup_form'));
-
-                        echo do_shortcode($form_short_code); ?>
-
+                        </div>
 
                     </div>
 
                 </div>
 
-            </article>
+            <?php endwhile; ?>
 
-        <?php endwhile; ?>
+            <aside role="complementary" class="col-lg-6">
 
-        <aside role="complementary" class="col-lg-3">
+                <?php get_sidebar('1'); ?>
 
-            <?php get_sidebar('1'); ?>
+            </aside>
 
-        </aside>
+        </div>
 
-    </div>
+    </article>
 
 </div>
 

@@ -2,60 +2,67 @@
 
 <div class="container">
 
-    <div id="content-wrapper"  class="clearfix content-wrapper row">
+    <article>
 
-        <div class="col-lg-2">
+        <div class="row">
 
-                <div class="container-box">
-                    <ul class="content-sub-menu">
-                    <?php
+            <div class="col-lg-12">
 
-                    foreach(Planetary_Annihilation_Tournament_Manager::$endpoints as $tournament_endpoint): ?>
+                <header class="post-header container-box">
 
-                        <li><a href="<?php the_permalink(); ?>/<?php echo $tournament_endpoint; ?>"><?php echo ucwords($tournament_endpoint); ?></a></li>
+                    <h1 class="post-title"><?php the_title(); ?></h1>
 
-                    <?php endforeach; ?>
+                    <ul class="page-sub-menu">
+                        <?php
+
+                        foreach (Planetary_Annihilation_Tournament_Manager::$endpoints as $tournament_endpoint): ?>
+
+                            <li>
+                                <a href="<?php the_permalink(); ?>/<?php echo $tournament_endpoint; ?>"><?php echo ucwords($tournament_endpoint); ?></a>
+                            </li>
+
+                        <?php endforeach; ?>
 
                     </ul>
-                </div>
+
+                </header>
+
+            </div>
 
         </div>
 
+        <div id="content-wrapper" class="clearfix content-wrapper row">
 
-        <?php while ( have_posts() ) : the_post(); ?>
+            <?php while (have_posts()) : the_post(); ?>
 
-            <article id="post-<?php the_ID(); ?>" <?php post_class('col-lg-6'); ?>  role="main">
+                <div id="post-<?php the_ID(); ?>" <?php post_class('col-lg-6'); ?>  role="main">
 
-                <div class="content-container container-box">
+                    <div class="content-container container-box">
 
-                    <header class="post-header">
 
-                        <h1 class="post-title"><?php the_title(); ?></h1>
+                        <div class="body text">
 
-                    </header>
+                            <?php the_content(); ?>
 
-                    <div class="body text">
 
-                        <?php the_content(); ?>
+                        </div>
 
 
                     </div>
 
-
-
                 </div>
 
-            </article>
+            <?php endwhile; ?>
 
-        <?php endwhile; ?>
+            <aside role="complementary" class="col-lg-6">
 
-        <aside role="complementary" class="col-lg-4">
+                <?php get_sidebar('1'); ?>
 
-            <?php get_sidebar('1'); ?>
+            </aside>
 
-        </aside>
+        </div>
 
-    </div>
+    </article>
 
 </div>
 

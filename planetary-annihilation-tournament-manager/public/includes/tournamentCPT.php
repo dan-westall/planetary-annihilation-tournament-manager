@@ -27,7 +27,7 @@ class tournamentCPT {
 
 
         add_filter( 'tournament_rounds', array( $this, 'filter_tournament_rounds' ) );
-        add_filter( 'the_title', array( $this, 'filter_endpoint_titles') );
+        add_filter( 'the_title', array( $this, 'filter_endpoint_titles'), 10, 2 );
         add_filter( 'single_template', array( $this, 'single_tournament_template') );
         add_filter( 'post_updated_messages', array( $this, 'filter_post_type_feedback_messages') );
 
@@ -145,6 +145,8 @@ class tournamentCPT {
 
         global $wp_query, $post;
 
+        //if(){
+
         foreach(Planetary_Annihilation_Tournament_Manager::$endpoints as $endpoint){
 
             if ($post->post_type == 'tournament' && isset( $wp_query->query_vars[$endpoint] )) {
@@ -194,7 +196,7 @@ class tournamentCPT {
 
         global $post, $wp_query;
 
-        if(!is_object($post) && $id == null || (is_admin() || !in_the_loop()))
+        if(!is_object($post) && !isset($id) || (is_admin() || !in_the_loop()))
             return $title;
 
         foreach(Planetary_Annihilation_Tournament_Manager::$endpoints as $endpoint){
