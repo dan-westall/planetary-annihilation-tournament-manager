@@ -80,6 +80,9 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
         add_filter( 'manage_tournament_posts_columns', array( $this, 'admin_columns' ) );
         add_filter( 'gform_tooltips', array( $this, 'filter_gravity_forms_tooltips') );
 
+        add_filter( 'manage_users_columns', array( $this, 'modify_user_table') );
+        add_filter( 'manage_users_custom_column', array( $this, 'modify_user_table_row'), 10, 3 );
+
     }
 
     public function admin_columns( $columns ) {
@@ -98,6 +101,28 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
         return $columns;
 
     }
+
+    public function modify_user_table( $column ) {
+        $column['clan'] = __('Clan');
+
+        return $column;
+    }
+
+    public function modify_user_table_row( $val, $column_name, $user_id ) {
+        $user = get_userdata( $user_id );
+
+        switch ($column_name) {
+            case 'clan' :
+
+                return get_user_meta($user_id, 'clan', true);
+
+                break;
+
+        }
+
+    }
+
+
 
     public function custom_columns( $column, $post_id ) {
 
