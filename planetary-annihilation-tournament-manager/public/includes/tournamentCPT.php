@@ -11,8 +11,8 @@ class tournamentCPT {
         add_action( 'widgets_init', array( $this, 'register_tournament_sidebar') );
 
         add_action( 'p2p_init', array( $this, 'register_p2p_connections' ) );
-        //add_action( 'p2p_created_connection', array( $this, 'action_p2p_new_connection' ) );
-        //add_action( 'p2p_delete_connections', array( $this, 'action_p2p_delete_connection' ) );
+        add_action( 'p2p_created_connection', array( $this, 'action_p2p_new_connection' ) );
+        add_action( 'p2p_delete_connections', array( $this, 'action_p2p_delete_connection' ) );
         add_filter( 'p2p_connectable_args', array( $this, 'filter_p2p_tournament_player_requirements' ) );
 
         add_action( 'gform_after_submission', array( $this, 'signup_tournament_player'), 10, 2);
@@ -505,7 +505,7 @@ class tournamentCPT {
         $params = array(
             "participant[email]"              => $email,
             'participant[name]'               => $ign,
-        //    'participant[challonge_username]' => $ign,
+            'participant[challonge_username]' => $ign,
         );
 
         $participant = $c->createParticipant($challonge_tournament_id, $params);
@@ -533,7 +533,7 @@ class tournamentCPT {
 
         $connection = p2p_get_connection( $p2p_id );
 
-        if ( 'tournament_players' == $connection->p2p_type ) {
+        if ( 'tournament_players' == $connection->p2p_type && is_admin()) {
 
             $challonge_tournament_id = $this->get_the_challonge_tournament_id($connection->p2p_from);
 
@@ -563,7 +563,7 @@ class tournamentCPT {
 
         $connection = p2p_get_connection( $p2p_id );
 
-        if ( 'tournament_players' == $connection->p2p_type ) {
+        if ( 'tournament_players' == $connection->p2p_type && is_admin()) {
 
             //todo tournament remove reason and history will be to be done.
 
