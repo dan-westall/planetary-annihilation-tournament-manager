@@ -30,16 +30,9 @@
 
                 <div id="post-<?php the_ID(); ?>" <?php post_class('col-lg-6'); ?>  role="main">
 
-                    <div class="content-container container-box">
+                    <div class="content-container container-box text">
 
-
-                        <div class="body text">
-
-                            <?php the_content(); ?>
-
-
-                        </div>
-
+                        <?php tournamentCPT::tournament_endpoint_sections(); ?>
 
                     </div>
 

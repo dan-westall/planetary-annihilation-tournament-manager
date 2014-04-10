@@ -21,7 +21,7 @@ class tournament_staff extends WP_Widget {
 
         <div class="tournament-widget-info">
 
-            <section class="staff tournament-meta-block text">
+            <section class="staff tournament-meta-block">
                 <h3>Staff Members</h3>
 
                 <?php
@@ -45,36 +45,43 @@ class tournament_staff extends WP_Widget {
 
                 ?>
 
-                <ul style="margin-left: 10px;">
+                <table>
 
                     <?php
 
-
                     foreach($staff as $staff_member):
+
+                        echo '<tr>';
 
                         if(get_user_meta($staff_member->ID, 'twitch_url', true)) : ?>
 
-                            <li class="has-twitch staff-member"><?php echo $staff_member->display_name; ?> <strong>(<?php echo p2p_get_meta( $staff_member->data->p2p_id, 'role', true ); ?>)</strong><a class="twitch-link" href="<?php echo get_user_meta($staff_member->ID, 'twitch_url', true); ?>"></a><br />
-
-                                <small><strong><?php echo p2p_get_meta( $staff_member->data->p2p_id, 'job', true ); ?></strong></small>
+                            <td class="has-twitch staff-member"><?php echo $staff_member->display_name; ?> <a class="twitch-link" href="<?php echo get_user_meta($staff_member->ID, 'twitch_url', true); ?>"></a><br />
 
 
 
-                            </li>
+                            </td>
+
+                            <td>
+                                <strong>(<?php echo p2p_get_meta( $staff_member->data->p2p_id, 'role', true ); ?>)</strong>
+                            </td>
 
                         <?php else : ?>
 
-                            <li class=" staff-member"><?php echo $staff_member->display_name; ?> <strong>(<?php echo p2p_get_meta( $staff_member->data->p2p_id, 'role', true ); ?>)</strong><br />
+                            <td class=" staff-member"><?php echo $staff_member->display_name; ?>
 
-                                <small><strong><?php echo p2p_get_meta( $staff_member->data->p2p_id, 'job', true ); ?></strong></small></li>
+                                </td>
+
+                            <td>
+                                <strong>(<?php echo p2p_get_meta( $staff_member->data->p2p_id, 'role', true ); ?>)</strong>
+                            </td>
 
                         <?php endif; ?>
 
-
+                        </tr>
 
                     <?php endforeach; ?>
 
-                </ul>
+                </table>
 
             </section>
 

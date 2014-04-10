@@ -33,52 +33,78 @@ class tournament_info extends WP_Widget {
 
             <section class="format tournament-meta-block text">
                 <h3>Tournament Format</h3>
-                <dl>
+
+                <div class="row">
+
+                <dl class="col-lg-6">
                     <?php if(get_field('rounds')) : ?>
                         <dt>Rounds</dt>
                         <dd><?php the_field('rounds'); ?></dd>
                     <?php endif; ?>
-                    <?php if(get_field('slots')) : ?>
-                        <dt>Player Slots/Taken/Remaining</dt>
-                        <dd><?php the_field('slots'); ?>/<?php echo count($players); ?>/<?php echo ( get_field('slots') - count($players) ) ?></dd>
-                    <?php endif; ?>
+
                     <?php if(get_field('tournament_type')) : ?>
                         <dt>Type</dt>
                         <dd><?php the_field('tournament_type'); ?></dd>
                     <?php endif; ?>
                 </dl>
+
+                <dl class="col-lg-6">
+                    <?php if(get_field('slots')) : ?>
+                        <dt>Player Slots/Taken/Remaining</dt>
+                        <dd><?php the_field('slots'); ?>/<?php echo count($players); ?>/<?php echo ( get_field('slots') - count($players) ) ?></dd>
+                    <?php endif; ?>
+                </dl>
+
+                </div>
             </section>
 
             <section class="prize-tiers tournament-meta-block text">
                 <h3>Tournament Prizes</h3>
-                <dl>
 
                     <?php if( have_rows('prize_tiers') ):
 
+                        $price_count = count(get_field('prize_tiers'));
+
+                        $html = '<ul>';
+
+                        $column = 100;
+
+                        $height = 100;
+
                         // loop through the rows of data
-                        while ( have_rows('prize_tiers') ) : the_row(); ?>
+                        while ( have_rows('prize_tiers') ) : the_row();
 
-                            <dt><?php the_sub_field('place'); ?></dt>
-                            <dd><?php the_sub_field('prize'); ?></dd>
+                            $height -= (int) ( $column / $price_count );
 
-                        <?php endwhile;
+                            $html .= sprintf('<li style="width:%s;"><div class="prize-container"><span class="the-prize" style="bottom:%s">%s</span><div class="prize" style="height:%s"></div></div><div class="place">%s</div></li>', ((int)( $column / $price_count)).'%', ($height).'%', get_sub_field('prize'), ($height).'%', get_sub_field('place'));
 
-                    endif; ?>
+                            $column ++;
 
-                </dl>
+                        endwhile;
+
+                        $html .= '</ul>';
+
+                    endif; echo $html;?>
+
             </section>
 
             <section class="staff tournament-meta-block text ">
                 <h3>Other Information</h3>
-                <dl>
 
-                    <dt>Forum Link</dt>
-                    <dd><a href="<?php the_field('forum_link'); ?>"><?php the_field('forum_link'); ?></a></dd>
-                    <dt>Bracket Link</dt>
-                    <dd><a href="<?php the_field('brackets'); ?>"><?php the_field('brackets'); ?></a></dd>
-                    <dt>IRC</dt>
-                    <dd><a href="<?php the_field('irc'); ?>"><?php the_field('irc'); ?></a></dd>
-                </dl>
+                <ul class="row">
+                    <li class="col-lg-4">
+                        <a href="<?php the_field('forum_link'); ?>">Form Link</a>
+                    </li>
+
+                    <li class="col-lg-4">
+                        <a href="<?php the_field('brackets'); ?>">Bracket Link</a>
+                    </li>
+
+                    <li class="col-lg-4">
+                        <a href="<?php the_field('irc'); ?>">IRC</a>
+                    </li>
+
+                </ul>
             </section>
 
 
