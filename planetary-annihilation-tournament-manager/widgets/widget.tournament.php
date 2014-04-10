@@ -34,12 +34,18 @@ class tournament_info extends WP_Widget {
             <section class="format tournament-meta-block text">
                 <h3>Tournament Format</h3>
                 <dl>
-                    <dt>Rounds</dt>
-                    <dd><?php the_field('rounds'); ?></dd>
-                    <dt>Player Slots/Taken/Remaining</dt>
-                    <dd><?php the_field('slots'); ?>/<?php echo count($players); ?>/<?php echo ( get_field('slots') - count($players) ) ?></dd>
-                    <dt>Type</dt>
-                    <dd><?php the_field('tournament_type'); ?></dd>
+                    <?php if(get_field('rounds')) : ?>
+                        <dt>Rounds</dt>
+                        <dd><?php the_field('rounds'); ?></dd>
+                    <?php endif; ?>
+                    <?php if(get_field('slots')) : ?>
+                        <dt>Player Slots/Taken/Remaining</dt>
+                        <dd><?php the_field('slots'); ?>/<?php echo count($players); ?>/<?php echo ( get_field('slots') - count($players) ) ?></dd>
+                    <?php endif; ?>
+                    <?php if(get_field('tournament_type')) : ?>
+                        <dt>Type</dt>
+                        <dd><?php the_field('tournament_type'); ?></dd>
+                    <?php endif; ?>
                 </dl>
             </section>
 
@@ -61,7 +67,6 @@ class tournament_info extends WP_Widget {
 
                 </dl>
             </section>
-
 
             <section class="staff tournament-meta-block text ">
                 <h3>Other Information</h3>
@@ -107,7 +112,5 @@ class tournament_info extends WP_Widget {
         </p>
     <?php
     }
-
-
 }
 add_action('widgets_init', create_function('', 'return register_widget("tournament_info");'));
