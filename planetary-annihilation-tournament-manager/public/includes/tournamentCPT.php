@@ -20,7 +20,7 @@ class tournamentCPT {
         add_filter( 'gform_validation_message', array( $this, 'signup_form_validation_message'), 10, 2);
         //add_action( 'gform_confirmation', array( $this, 'signup_custom_confirmation'), 10, 2);
 
-        add_action( 'template_include', array( $this, 'load_endpoint_template')  );
+        //add_action( 'template_include', array( $this, 'load_endpoint_template')  );
 
         //todo sync players from challonge to wordpress, fair bit of work, need to refactor signup_tournament_player to make it happen
         //add_action( 'save_post', array( $this, 'action_challonge_sync_check') );
@@ -86,7 +86,7 @@ class tournamentCPT {
                 'role' => array(
                     'title' => 'Role',
                     'type' => 'select',
-                    'values' => apply_filters('tournament_staff_roles', array( 'Caster - Lead', 'Caster', 'Official', 'Director' ) )
+                    'values' => apply_filters('tournament_staff_roles', array( 'Lead Caster', 'Dual Caster', 'Administrator', 'Assistant', 'Director' ) )
                 ),
                 'job' => array(
                     'title' => 'Job',
@@ -163,6 +163,28 @@ class tournamentCPT {
         return $template_path;
     }
 
+    public static function tournament_endpoint_sections(){
+
+        global $wp_query, $post;
+
+        $template_path = PLTM_PLUGIN_DIR . "/includes/templates/section-content.php";
+
+        foreach(Planetary_Annihilation_Tournament_Manager::$endpoints as $endpoint){
+
+            if ($post->post_type == 'tournament' && isset( $wp_query->query_vars[$endpoint] )) {
+
+                if(file_exists(PLTM_PLUGIN_DIR . "/includes/templates/single-$post->post_type-$endpoint.php")){
+
+                    $template_path = PLTM_PLUGIN_DIR . "/includes/templates/single-$post->post_type-$endpoint.php";
+
+                }
+
+            }
+        }
+
+        include($template_path);
+
+    }
 
     public function filter_tournament_rounds($rounds){
 
@@ -711,6 +733,45 @@ class tournamentCPT {
             }
 
         }
+
+    }
+
+    public static function tournament_menu($post_id = 0){
+
+        $html = '';
+
+        $tournament        = get_post($post_id);
+        $tournament_closed = get_field('signup_closed', $tournament->ID);
+
+        $html .= sprintf('<li><a href="%1$s">%2$s</a></li>', get_permalink(), 'Home');
+
+        foreach (Planetary_Annihilation_Tournament_Manager::$endpoints as $tournament_endpoint):
+
+            switch($tournament_endpoint){
+
+                case "signup":
+
+                    if($tournament_closed !== false){
+
+                    } else {
+
+                        $html .= sprintf('<li><a href="%1$s/%2$s">%3$s</a></li>', get_permalink(), $tournament_endpoint, ucwords($tournament_endpoint));
+
+                    }
+
+                    break;
+
+                default :
+
+                    $html .= sprintf('<li><a href="%1$s/%2$s">%3$s</a></li>', get_permalink(), $tournament_endpoint, ucwords($tournament_endpoint));
+
+                    break;
+
+            }
+
+        endforeach;
+
+        return $html;
 
     }
 }

@@ -10,18 +10,11 @@
 
                 <header class="post-header container-box">
 
-                    <h1 class="post-title"><?php the_title(); ?></h1>
+                    <h1 class="post-title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h1>
 
                     <ul class="page-sub-menu">
-                        <?php
 
-                        foreach (Planetary_Annihilation_Tournament_Manager::$endpoints as $tournament_endpoint): ?>
-
-                            <li>
-                                <a href="<?php the_permalink(); ?>/<?php echo $tournament_endpoint; ?>"><?php echo ucwords($tournament_endpoint); ?></a>
-                            </li>
-
-                        <?php endforeach; ?>
+                        <?php echo tournamentCPT::tournament_menu(); ?>
 
                     </ul>
 
