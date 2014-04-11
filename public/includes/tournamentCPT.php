@@ -139,6 +139,8 @@ class tournamentCPT {
 
         }
 
+        return $single;
+
     }
 
     public function load_endpoint_template($template_path){
