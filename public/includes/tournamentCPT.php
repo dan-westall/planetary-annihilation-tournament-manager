@@ -86,7 +86,7 @@ class tournamentCPT {
                 'role' => array(
                     'title' => 'Role',
                     'type' => 'select',
-                    'values' => apply_filters('tournament_staff_roles', array( 'Lead Caster', 'Dual Caster', 'Administrator', 'Assistant', 'Director' ) )
+                    'values' => apply_filters('tournament_staff_roles', array( 'Caster', 'Assistant', 'Director' ) )
                 ),
                 'job' => array(
                     'title' => 'Job',
