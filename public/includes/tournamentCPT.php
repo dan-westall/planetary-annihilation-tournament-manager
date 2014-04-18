@@ -639,6 +639,8 @@ class tournamentCPT {
 
     public function get_the_challonge_tournament_id($post_id){
 
+
+        //todo move into a single id this is a pain to reverse from challonge id -> tournament id
         if(get_post_meta($post_id, 'challonge_tournament_link',true) == "Custom Tournament ID"){
             $challonge_tournament_id = get_post_meta($post_id, 'custom_tournament_id',true);
         } else {
@@ -646,6 +648,44 @@ class tournamentCPT {
         }
 
         return $challonge_tournament_id;
+
+    }
+
+    public static function get_tournament_id_by($id, $switch = 'challonge_tournament_id'){
+
+        $tournament_id = false;
+
+        switch($switch){
+
+            case "challonge_tournament_id" :
+
+                $args = array(
+                    'post_type' => 'tournament',
+                    'meta_query'     => array(
+                        'relation' => 'OR',
+                        array(
+                            'key'   => 'custom_tournament_id',
+                            'value' => $id
+                        ),
+                        array(
+                            'key'   => 'challonge_tournament_link',
+                            'value' => $id
+                        )
+                    ),
+                    'posts_per_page' => 1
+                );
+
+                $tournament = get_posts($args);
+
+                //if tournament is empty return false.
+                if(!empty($tournament))
+                    $tournament_id = $tournament->ID;
+
+                break;
+
+        }
+
+        return $tournament_id;
 
     }
 
