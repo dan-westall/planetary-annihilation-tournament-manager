@@ -6,13 +6,13 @@ class playerCPT {
 
     function __construct() {
 
-        add_action('init', array($this, 'pace_register_cpt_player'));
+        add_action('init', array($this, 'register_cpt_player'));
 
         add_action( 'user_register', array( $this, 'action_new_player_profile' ) );
 
     }
 
-    function pace_register_cpt_player() {
+    function register_cpt_player() {
 
         $playerLabel = array(
             'name'               => __('Players'),

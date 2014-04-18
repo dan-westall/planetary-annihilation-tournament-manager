@@ -6,7 +6,7 @@ class tournamentCPT {
 
     function __construct() {
 
-        add_action( 'init', array( $this, 'pace_register_cpt_tournament') );
+        add_action( 'init', array( $this, 'register_cpt_tournament') );
 
         add_action( 'widgets_init', array( $this, 'register_tournament_sidebar') );
 
@@ -36,7 +36,7 @@ class tournamentCPT {
 
     }
 
-    function pace_register_cpt_tournament(){
+    function register_cpt_tournament(){
 
         $tournamentLabel = array(
             'name'               => __('Tournaments'),

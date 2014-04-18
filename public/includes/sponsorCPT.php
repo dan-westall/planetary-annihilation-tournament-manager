@@ -5,12 +5,12 @@ class sponsorCPT {
 
     function __construct() {
 
-        add_action( 'init', array( $this, 'pace_register_cpt_sponsor') );
+        add_action( 'init', array( $this, 'register_cpt_sponsor') );
 
     }
 
 
-    function pace_register_cpt_sponsor(){
+    function register_cpt_sponsor(){
 
 
         $planetLabel = array(

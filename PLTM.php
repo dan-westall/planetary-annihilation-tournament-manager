@@ -7,12 +7,12 @@
  * @package   Planetary Annihilation Tournament Manager
  * @author    Dan Westall <dan.westall@googlemail.com>
  * @license   GPL-2.0+
- * @link      http://www.paceleague.com
+ * @link      http://www.dan-westall.co.uk
  * @copyright 2014 Dan Westall
  *
  * @wordpress-plugin
  * Plugin Name:       Planetary Annihilation Tournament Manager
- * Plugin URI:        http://www.paceleague.com
+ * Plugin URI:        http://www.dan-westall.co.uk
  * Description:       Custom plugin for Planetary Annihilation, allows tournament management for wordpress
  * Version:           0.0.1
  * Author:            Dan Westall

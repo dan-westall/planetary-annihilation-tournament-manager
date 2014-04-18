@@ -6,11 +6,11 @@ class planetCPT {
 
     function __construct() {
 
-        add_action( 'init', array( $this, 'pace_register_cpt_planet') );
+        add_action( 'init', array( $this, 'register_cpt_planet') );
 
     }
 
-    function pace_register_cpt_planet(){
+    function register_cpt_planet(){
 
         $planetLabel = array(
             'name'               => __('Planets'),

@@ -5,7 +5,7 @@
  * @package   Planetary_Annihilation_Tournament_Manager_Admin
  * @author    Dan Westall <dan.westall@googlemail.com>
  * @license   GPL-2.0+
- * @link      http://www.paceleague.com
+ * @link      http://www.dan-westall.co.uk
  * @copyright 2014 Dan Westall
  */
 
@@ -291,8 +291,8 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
 		 *   For reference: http://codex.wordpress.org/Roles_and_Capabilities
 		 */
 		$this->plugin_screen_hook_suffix = add_options_page(
-			__( 'Pace League Tournament Manager Settings', $this->plugin_slug ),
-			__( 'Pace League Tournament Manager', $this->plugin_slug ),
+			__( 'Planetary Annihilation Tournament Manager Settings', $this->plugin_slug ),
+			__( 'Planetary Annihilation Tournament Manager', $this->plugin_slug ),
 			'manage_options',
 			$this->plugin_slug,
 			array( $this, 'display_plugin_admin_page' )

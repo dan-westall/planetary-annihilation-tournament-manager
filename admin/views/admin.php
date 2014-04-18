@@ -8,7 +8,7 @@
  * @package   Planetary_Annihilation_Tournament_Manager
  * @author    Dan Westall <dan.westall@googlemail.com>
  * @license   GPL-2.0+
- * @link      http://www.paceleague.com
+ * @link      http://www.dan-westall.co.uk
  * @copyright 2014 Dan Westall
  */
 ?>

@@ -6,11 +6,11 @@ class matchCPT {
 
     function __construct() {
 
-        add_action( 'init', array( $this, 'pace_register_cpt_match') );
+        add_action( 'init', array( $this, 'register_cpt_match') );
 
     }
 
-    function pace_register_cpt_match(){
+    function register_cpt_match(){
 
         $matchLabel = array(
             'name'               => __('Matchs'),
