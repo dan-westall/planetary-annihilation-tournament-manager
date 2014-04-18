@@ -10,6 +10,8 @@ class playerCPT {
 
         add_action( 'user_register', array( $this, 'action_new_player_profile' ) );
 
+        add_action( 'p2p_init', array( $this, 'register_p2p_connections' ) );
+
     }
 
     function register_cpt_player() {
@@ -44,10 +46,40 @@ class playerCPT {
 
     }
 
+    public function register_p2p_connections() {
+
+        p2p_register_connection_type( array(
+            'name' => 'match_players',
+            'from' => self::$post_type,
+            'to' => playerCPT::$post_type,
+            'admin_box' => array(
+                'show' => 'from',
+                'context' => 'advanced'
+            )
+        ) );
+
+    }
+
     public function action_new_player_profile($user_id){
 
 
 
+
+    }
+
+    public static function get_player_by($id, $switch = 'pastat_player_id'){
+
+        switch($switch){
+
+            case "pastat_player_id":
+
+                $player_id = DW_Helper::get_post_by_meta('pastat_player_id', $id);
+
+                break;
+
+        }
+
+        return $player_id;
 
     }
 }

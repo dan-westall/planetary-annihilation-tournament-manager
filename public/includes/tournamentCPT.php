@@ -127,6 +127,17 @@ class tournamentCPT {
             )
         ) );
 
+
+        p2p_register_connection_type( array(
+            'name' => 'tournament_matches',
+            'from' => self::$post_type,
+            'to' => matchCPT::$post_type,
+            'admin_box' => array(
+                'show' => 'from',
+                'context' => 'advanced'
+            )
+        ) );
+
     }
 
     function single_tournament_template($single) {
