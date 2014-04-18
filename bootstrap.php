@@ -8,6 +8,8 @@ if($_SERVER['SERVER_NAME'] != 'exodus-esports.dev'){
 
 require_once( PLTM_PLUGIN_DIR.'/includes/functions.php');
 
+require_once( PLTM_PLUGIN_DIR.'/includes/xmlrpc_function.php');
+
 //3rd party library
 require_once( PLTM_PLUGIN_DIR.'/includes/challonge.class.php');
 
