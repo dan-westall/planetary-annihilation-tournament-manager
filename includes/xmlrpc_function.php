@@ -54,8 +54,8 @@ function add_match($params){
 
     //any other meta we need to attach to matches?????
     update_post_meta($match_id, 'challonge_match_id', $args['challonge_match_id']);
-    update_post_meta($match_id, 'challonge_tournament_id', $args['challonge_match_id']);
-    update_post_meta($match_id, 'pa_stats_match_id', $args['challonge_match_id']);
+    update_post_meta($match_id, 'challonge_tournament_id', $args['challonge_tournament_id']);
+    update_post_meta($match_id, 'pa_stats_match_id', $args['pa_stats_match_id']);
 
     //todo might be wise to add round? or should we write a function to work it out
     $connection_meta = array(
