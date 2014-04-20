@@ -48,15 +48,7 @@ class playerCPT {
 
     public function register_p2p_connections() {
 
-        p2p_register_connection_type( array(
-            'name' => 'match_players',
-            'from' => self::$post_type,
-            'to' => playerCPT::$post_type,
-            'admin_box' => array(
-                'show' => 'from',
-                'context' => 'advanced'
-            )
-        ) );
+
 
     }
 

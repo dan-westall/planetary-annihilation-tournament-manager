@@ -133,8 +133,8 @@ class tournamentCPT {
             'from' => self::$post_type,
             'to' => matchCPT::$post_type,
             'admin_box' => array(
-                'show' => 'from',
-                'context' => 'advanced'
+                'show' => 'any',
+                'context' => 'side'
             )
         ) );
 

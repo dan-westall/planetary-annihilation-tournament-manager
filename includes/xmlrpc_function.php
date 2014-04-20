@@ -4,11 +4,13 @@ add_filter( 'xmlrpc_methods', 'add_xml_rpc_methods' );
 
 function add_xml_rpc_methods( $methods ) {
 
+
     $methods['frs.helloWorld'] = 'hello_world';
     $methods['pltm.addMatch'] = 'pltm_add_match';
 
     return $methods;
 }
+
 
 function hello_world( $params ) {
 
@@ -37,9 +39,6 @@ function hello_world( $params ) {
     // return success
     return "Hello " . $args['name'] . "!";
 }
-
-
-
 
 function pltm_add_match( $data ){
     global $wp_xmlrpc_server;
@@ -98,6 +97,3 @@ function pltm_add_match( $data ){
     return "match added";
 
 }
-
-
-
