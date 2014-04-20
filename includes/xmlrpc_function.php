@@ -47,6 +47,7 @@ function add_match($params){
     $new_match = array(
         'post_type'  => matchCPT::$post_type,
         'post_title' => $match_name,
+        'post_status' => 'publish',
         'post_name'  => $args['pa_stats_match_id']
     );
 
