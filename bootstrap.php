@@ -2,7 +2,7 @@
 
 define( 'PLTM_PLUGIN_DIR' , dirname(__FILE__) );
 
-if($_SERVER['SERVER_NAME'] != 'exodus-esports.dev'){
+if($_SERVER['SERVER_NAME'] == 'exodusesports.com'){
     require_once ( PLTM_PLUGIN_DIR.'/includes/acf.fields.php' );
 }
 
