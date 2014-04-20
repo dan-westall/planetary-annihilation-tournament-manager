@@ -59,10 +59,10 @@ function add_match($params){
     if ( ! current_user_can( 'edit_posts' ) )
         return new IXR_Error( 403, __( 'You are not allowed access to details about orders.' ) );
 
-    do_action( 'xmlrpc_call', 'frs.helloWorld' ); // patterned on the core XML-RPC actions
+    do_action( 'xmlrpc_call', 'pltm.addMatch' ); // patterned on the core XML-RPC actions
 
     // required parameter
-    if ( ! isset( $args['name'] ) ) return new IXR_Error( 500, __( "Missing parameter 'name'" ) );
+    //if ( ! isset( $args['name'] ) ) return new IXR_Error( 500, __( "Missing parameter 'name'" ) );
 
 
     $challonge_tournament_id = $args['challonge_tournament_id'];
