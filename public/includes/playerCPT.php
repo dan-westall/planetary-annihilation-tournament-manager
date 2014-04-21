@@ -59,13 +59,13 @@ class playerCPT {
 
     }
 
-    public static function get_player_by($id, $switch = 'pastat_player_id'){
+    public static function get_player_by($id, $switch = 'pastats_player_id'){
 
         switch($switch){
 
-            case "pastat_player_id":
+            case "pastats_player_id":
 
-                $player_id = DW_Helper::get_post_by_meta('pastat_player_id', $id);
+                $player_id = DW_Helper::get_post_by_meta('pastats_player_id', $id);
 
                 break;
 
