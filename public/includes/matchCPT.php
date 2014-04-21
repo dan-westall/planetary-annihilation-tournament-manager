@@ -66,44 +66,26 @@ class matchCPT {
 
     }
 
-    public function match_listing($attr) {
+    public function get_match_results($attr) {
 
         extract(shortcode_atts(array(
             'tournament_id' => ''
         ), $attr));
 
+        $matches = array();
+
+        $row = 0;
+
         $args = array(
             'post_type'       => self::$post_type,
             'connected_type'  => 'posts_to_pages',
             'connected_items' => $tournament_id,
-            'nopaging'        => true,
+            'nopaging'        => true
         );
 
-        $connected = new WP_Query($args);
+        p2p_update_meta();
 
-        if ($connected->have_posts()) :
-
-            while ($connected->have_posts()) : $connected->the_post();
-
-                $title = '';
-
-            printf('
-            <tr>
-                <td>%1$s</td>
-                <td>%1$s</td>
-            </tr>',
-                $title
-
-
-
-            );
-
-            endwhile;
-
-            wp_reset_postdata();
-
-        endif;
-
+        wp_send_json_success($data);
 
     }
 
