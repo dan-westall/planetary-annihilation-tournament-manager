@@ -30,7 +30,7 @@ function pltm_add_match( $data ){
 
     //some times i find it easier to use get_posts for simple looks like this.
     $match = get_posts($qargs);
-
+    //return Count($match);
     if (!empty($match)) {
 
         //because we are limiting to 1 and because name or aka post_name is unique
@@ -69,6 +69,38 @@ function pltm_add_match( $data ){
 
         //todo should be be able to link matches to matches so we can create chains? in future.
         $p2p_result = p2p_type('tournament_matches')->connect($args["wp_post_id"], $match_id, $connection_meta);
+        $wp_player_id1  = get_player_by($args['player_1_pastats_id']);
+        $wp_player_id2  = get_player_by($args['player_2_pastats_id']);
+        //team is simple int, for example if its a ffa each player team would just be a int in a series, if team play, 2 players would be team int 1 and 2 team int 2
+        $connection_meta1 = array(
+            'date'                     => current_time('mysql'),
+            'challonge_tournament_id'  => $challonge_tournament_id,
+            'team'                     => 1
+        );
+        $connection_meta2 = array(
+            'date'                     => current_time('mysql'),
+            'challonge_tournament_id'  => $challonge_tournament_id,
+            'team'                     => 2
+        );
+        $p2p_result = p2p_type('match_players')->connect($match_id, $wp_player_id1, $connection_meta1);
+        $p2p_result = p2p_type('match_players')->connect($match_id, $wp_player_id2, $connection_meta2);        
+    }
+  
+    //todo add error if $wp_player_id comes back false or empty take steps either add the play to the system or return error message
+
+    if($player['winner']){
+        $connection_meta['winner'] = true;
+    }
+
+    $p2p_result = p2p_type('match_players')->connect($match_id, $wp_player_id, $connection_meta);
+
+    foreach($args["pastatsmatches"] as $key => $pamatch){
+        update_post_meta($match_id, 'pa_stats_match_id', $args["gameId"]);
+        update_post_meta($match_id, 'pa_stats_match_id', $args["gameId"]);
+        update_post_meta($match_id, 'pa_stats_start', $args["start"]);
+        update_post_meta($match_id, 'winner', $args["winner"]);
+
+        break;
     }
 
     //any other meta we need to attach to matches?????
