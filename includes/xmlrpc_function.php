@@ -14,34 +14,70 @@ function pltm_add_match( $data ){
     $args = json_decode($data,true);
 
     //todo added more complex naming, for more than 1v1 and teams.. not sure on limit
-    $match_name = sprintf('%s vs %s', $args["player_1"], $args["player_2"]);
+    //$match_name = sprintf('%s vs %s', $args["player_1"], $args["player_2"]);
+    $match_name = "Match " . $args["match_letter"];
 
-    $new_match = array(
+    //find if an existing Match exists ? 
+    $match_id = 0;
+    $qargs = array(
+            'post_title'      => $match_name,
+            'post_type'       => matchCPT::$post_type,
+            'connected_type'  => 'posts_to_pages',
+            'connected_items' => $args["wp_post_id"],
+            'nopaging'        => true,
+    );
+
+    $connected = new WP_Query($qargs);
+
+    if ($connected->have_posts()){
+        while ( $connected->have_posts() ){
+            $post = $connected->the_post();
+            $match_id = $post->ID;
+            break;
+        }
+        //update existing
+        $update_match = array(
+            'ID' => $match_id,
+            'post_content' => 'This an Update'
+            );
+        wp_update_post( $update_match );
+    }
+    else{
+        //create match 
+        $new_match = array(
         'post_type'  => matchCPT::$post_type,
         'post_title' => $match_name,
-        'post_name'  => $args["challonge_match_id"]
-    );
+        'post_name'  => $args["challonge_match_id"],
+        'post_status' => 'publish',
+        'post_content' => 'start'
+        );
+        $match_id = wp_insert_post($new_match);
 
-    $match_id = wp_insert_post($new_match);
+        update_post_meta($match_id, 'challonge_match_id', $args["challonge_match_id"]);
+        update_post_meta($match_id, 'challonge_tournament_id', $args["challonge_tournament_id"]);
+        //update_post_meta($match_id, 'match_round', $args["match_round"]);
+        
+        $connection_meta = array(
+            'date'                     => current_time('mysql'),
+            'challonge_tournament_id'  => $args["challonge_tournament_id"]
+        );
+
+        //todo should be be able to link matches to matches so we can create chains? in future.
+        $p2p_result = p2p_type('tournament_matches')->connect($args["wp_post_id"], $match_id, $connection_meta);        
+    }
 
     //any other meta we need to attach to matches?????
-    update_post_meta($match_id, 'challonge_match_id', $args["challonge_match_id"]);
-    update_post_meta($match_id, 'challonge_tournament_id', $args["challonge_tournament_id"]);
-    update_post_meta($match_id, 'pa_stats_match_id', $args["pa_stats_match_id"]);
+    
+    //update_post_meta($match_id, 'challonge_tournament_id', $args["challonge_tournament_id"]);
+    //update_post_meta($match_id, 'pa_stats_match_id', $args["pa_stats_match_id"]);
 
-    //todo might be wise to add round? or should we write a function to work it out
-    $connection_meta = array(
-        'date'                     => current_time('mysql'),
-        'challonge_tournament_id'  => $args["challonge_tournament_id"]
-    );
+    
 
-    //todo should be be able to link matches to matches so we can create chains? in future.
-    $p2p_result = p2p_type('tournament_matches')->connect($args["wp_post_id"], $match_id, $connection_meta);
 
     //todo should planets from the planetCPT be attach so on the match page we can show the planet....
 
     //attach players to this match
-
+    /*
     foreach($args["players"] as $key => $player ){
 
         //team is simple int, for example if its a ffa each player team would just be a int in a series, if team play, 2 players would be team int 1 and 2 team int 2
@@ -62,7 +98,8 @@ function pltm_add_match( $data ){
         $p2p_result = p2p_type('match_players')->connect($match_id, $wp_player_id, $connection_meta);
 
     }
+    */
 
-    return "match added";
+    return "match ". $args["match_letter"] ." added and got wp-id ". $match_id;
 
 }
