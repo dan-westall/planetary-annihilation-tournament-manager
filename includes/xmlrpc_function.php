@@ -19,51 +19,56 @@ function pltm_add_match( $data ){
 
     //find if an existing Match exists ? 
     $match_id = 0;
+
+    //name is unique
     $qargs = array(
-            'post_title'      => $match_name,
-            'post_type'       => matchCPT::$post_type,
-            'connected_type'  => 'posts_to_pages',
-            'connected_items' => $args["wp_post_id"],
-            'nopaging'        => true,
+        'name'           => $args["challonge_match_id"],
+        'post_type'      => matchCPT::$post_type,
+        'posts_per_page' => 1
+
     );
 
-    $connected = new WP_Query($qargs);
+    //some times i find it easier to use get_posts for simple looks like this.
+    $match = get_posts($qargs);
 
-    if ($connected->have_posts()){
-        while ( $connected->have_posts() ){
-            $post = $connected->the_post();
-            $match_id = $post->ID;
-            break;
-        }
+    if (!empty($match)) {
+
+        //because we are limiting to 1 and because name or aka post_name is unique
+
+        $post     = $match[0];
+        $match_id = $match[0]->ID;
+
         //update existing
         $update_match = array(
-            'ID' => $match_id,
+            'ID'           => $match_id,
             'post_content' => 'This an Update'
-            );
-        wp_update_post( $update_match );
-    }
-    else{
+        );
+        wp_update_post($update_match);
+
+    } else {
+
         //create match 
         $new_match = array(
-        'post_type'  => matchCPT::$post_type,
-        'post_title' => $match_name,
-        'post_name'  => $args["challonge_match_id"],
-        'post_status' => 'publish',
-        'post_content' => 'start'
+            'post_type'    => matchCPT::$post_type,
+            'post_title'   => $match_name,
+            'post_name'    => $args["challonge_match_id"],
+            'post_status'  => 'publish',
+            'post_content' => 'start'
         );
-        $match_id = wp_insert_post($new_match);
+
+        $match_id  = wp_insert_post($new_match);
 
         update_post_meta($match_id, 'challonge_match_id', $args["challonge_match_id"]);
         update_post_meta($match_id, 'challonge_tournament_id', $args["challonge_tournament_id"]);
         //update_post_meta($match_id, 'match_round', $args["match_round"]);
-        
+
         $connection_meta = array(
-            'date'                     => current_time('mysql'),
-            'challonge_tournament_id'  => $args["challonge_tournament_id"]
+            'date'                    => current_time('mysql'),
+            'challonge_tournament_id' => $args["challonge_tournament_id"]
         );
 
         //todo should be be able to link matches to matches so we can create chains? in future.
-        $p2p_result = p2p_type('tournament_matches')->connect($args["wp_post_id"], $match_id, $connection_meta);        
+        $p2p_result = p2p_type('tournament_matches')->connect($args["wp_post_id"], $match_id, $connection_meta);
     }
 
     //any other meta we need to attach to matches?????
