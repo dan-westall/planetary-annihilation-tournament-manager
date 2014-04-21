@@ -7,10 +7,14 @@ class matchCPT {
     function __construct() {
 
         add_action( 'init', array( $this, 'register_cpt_match') );
+        //add_action( 'template_include', array( $this, 'get_match_results') );
 
         add_action( 'p2p_init', array( $this, 'register_p2p_connections' ) );
 
         add_shortcode('tournament-matches', array( $this, 'match_listing') );
+
+        add_action('wp_ajax_pltm_get_match_results',  array( $this, 'get_match_results') );
+        add_action('wp_ajax_nopriv_pltm_get_match_results',  array( $this, 'get_match_results') );
 
     }
 
@@ -57,7 +61,7 @@ class matchCPT {
                 'context' => 'side'
             ),
             'fields' => array(
-                'special' => array(
+                'winner' => array(
                     'title' => 'Winner',
                     'type' => 'checkbox'
                 )
@@ -72,18 +76,38 @@ class matchCPT {
             'tournament_id' => ''
         ), $attr));
 
-        $matches = array();
-
-        $row = 0;
-
         $args = array(
             'post_type'       => self::$post_type,
-            'connected_type'  => 'posts_to_pages',
-            'connected_items' => $tournament_id,
+            'connected_type'  => 'tournament_matches',
+            'connected_items' => $_GET['tournament_id'],
             'nopaging'        => true
         );
 
-        p2p_update_meta();
+        $matches = get_posts($args);
+
+        for ($row = 0; $row < count($matches); $row++) {
+
+            $tournament_players = array();
+            $players            = p2p_type('match_players')->get_connected($matches[$row]);
+
+            foreach ($players->posts as $player) {
+
+                $tournament_players[] = array(
+                    'player_name'        => $player->post_title,
+                    'pa_stats_player_id' => get_post_meta($player->ID, 'pastats_player_id', true),
+                    'winner'             => p2p_get_meta($player->p2p_id, 'winner', true)
+                );
+
+            }
+
+            $data[$row]['title']   = $matches[$row]->post_title;
+            $data[$row]['players'] = $tournament_players;
+
+            $data[$row]['pa_stats_match_id']       = get_post_meta($matches[$row]->ID, 'pa_stats_match_id', true);
+            $data[$row]['challonge_tournament_id'] = get_post_meta($matches[$row]->ID, 'challonge_tournament_id', true);
+            $data[$row]['status'] = ''; //todo to be played, in progress, completed??
+
+        }
 
         wp_send_json_success($data);
 

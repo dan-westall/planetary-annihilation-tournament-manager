@@ -3,6 +3,78 @@
 if(function_exists("register_field_group"))
 {
     register_field_group(array (
+        'id' => 'acf_match-meta',
+        'title' => 'Match Meta',
+        'fields' => array (
+            array (
+                'key' => 'field_53557b83039b7',
+                'label' => 'Challonge Match ID',
+                'name' => 'challonge_match_id',
+                'type' => 'text',
+                'default_value' => '',
+                'placeholder' => '',
+                'prepend' => '',
+                'append' => '',
+                'formatting' => 'html',
+                'maxlength' => '',
+            ),
+            array (
+                'key' => 'field_53557b9b039b8',
+                'label' => 'Challonge Tournament ID',
+                'name' => 'challonge_tournament_id',
+                'type' => 'text',
+                'default_value' => '',
+                'placeholder' => '',
+                'prepend' => '',
+                'append' => '',
+                'formatting' => 'html',
+                'maxlength' => '',
+            ),
+            array (
+                'key' => 'field_53557ba6039b9',
+                'label' => 'PA Stats match ID',
+                'name' => 'pa_stats_match_id',
+                'type' => 'text',
+                'default_value' => '',
+                'placeholder' => '',
+                'prepend' => '',
+                'append' => '',
+                'formatting' => 'html',
+                'maxlength' => '',
+            ),
+            array (
+                'key' => 'field_53557bca039ba',
+                'label' => 'PA Stats start',
+                'name' => 'pa_stats_start',
+                'type' => 'text',
+                'default_value' => '',
+                'placeholder' => '',
+                'prepend' => '',
+                'append' => '',
+                'formatting' => 'html',
+                'maxlength' => '',
+            ),
+        ),
+        'location' => array (
+            array (
+                array (
+                    'param' => 'post_type',
+                    'operator' => '==',
+                    'value' => 'match',
+                    'order_no' => 0,
+                    'group_no' => 0,
+                ),
+            ),
+        ),
+        'options' => array (
+            'position' => 'normal',
+            'layout' => 'default',
+            'hide_on_screen' => array (
+            ),
+        ),
+        'menu_order' => 0,
+    ));
+    register_field_group(array (
         'id' => 'acf_player-profile-admin',
         'title' => 'Player profile admin',
         'fields' => array (
