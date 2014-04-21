@@ -103,16 +103,16 @@ function pltm_add_match( $data ){
         if($pamatch["winner"] != ''){
             $winner_id = playerCPT::get_player_by($pamatch["winner"])->ID;
             $p2pwinner = p2p_type('match_players')->get_p2p_id($match_id, $winner_id); 
-            p2p_update_meta($p2pwinner, 'winner', true);
-            if($args["winner"] === $args["player_1_pastats_id"]){
+            p2p_update_meta($p2pwinner, 'winner', 1);
+            if($pamatch["winner"] == $args["player_1_pastats_id"]){
                 $loser_id = playerCPT::get_player_by($args["player_2_pastats_id"])->ID;
                 $p2ploser = p2p_type('match_players')->get_p2p_id($match_id, $loser_id); 
-                p2p_update_meta($p2ploser, 'winner', false);
+                p2p_update_meta($p2ploser, 'winner', 0);
             }
             else{
                 $loser_id = playerCPT::get_player_by($args["player_1_pastats_id"])->ID;
                 $p2ploser = p2p_type('match_players')->get_p2p_id($match_id, $loser_id); 
-                p2p_update_meta($p2ploser, 'winner', false);
+                p2p_update_meta($p2ploser, 'winner', 0);
             }
 
         }
