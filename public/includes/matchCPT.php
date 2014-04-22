@@ -121,6 +121,9 @@ class matchCPT {
 
             case "html" :
 
+                $this->match_listing_js_deps();
+
+                return $this->match_listing_template($tournament_id);
 
                 break;
         }
@@ -144,17 +147,5 @@ class matchCPT {
         wp_register_script('match_listing',plugins_url('/public/assets/js/matchlisting.js',__FILE__) );
         wp_enqueue_script('match_listing');
     }
-
-    public function get_match_result($attr) {
-
-        extract(shortcode_atts(array(
-            'tournament_id' => ''
-        ), $attr));
-      
-        $this->match_listing_js_deps();
-
-        return $this->match_listing_template($tournament_id);
-
-    }    
 
 }
