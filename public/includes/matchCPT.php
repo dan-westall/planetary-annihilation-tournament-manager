@@ -7,7 +7,7 @@ class matchCPT {
     function __construct() {
 
         add_action( 'init', array( $this, 'register_cpt_match') );
-        //add_action( 'template_include', array( $this, 'get_match_results') );
+        add_action( 'template_include', array( $this, 'get_match_results') );
 
         add_action( 'p2p_init', array( $this, 'register_p2p_connections' ) );
 
@@ -121,9 +121,9 @@ class matchCPT {
 
             case "html" :
 
-                $this->match_listing_js_deps();
+                self::match_listing_js_deps();
 
-                return $this->match_listing_template($tournament_id);
+                return self::match_listing_template($tournament_id);
 
                 break;
         }
@@ -133,13 +133,14 @@ class matchCPT {
     }
 
 
-    public function match_listing_template($vars = array()) {
+    public static function match_listing_template($vars = array()) {
         ob_start();
-        include(plugins_url('/views/matchlisting_shortcode.php',__FILE__));
+
+        include(dirname(__FILE__) . '/views/matchlisting_shortcode.php');
         return ob_get_clean();
     }
 
-    public function match_listing_js_deps() {
+    public static function match_listing_js_deps() {
         //wp_register_script('knockout',plugins_url('/public/js/ko.min.js',__FILE__) );
         wp_enqueue_script('knockout');
         wp_register_script('socketio',"http://exodusesports.com:5000/socket.io/socket.io.js");
