@@ -14,7 +14,7 @@
   <div class="panel-body">
   </div>
 
-<table class="table table-striped table-hover" id="tblmatches">
+<table class="table" id="tblmatches">
     <thead>
         <tr>
             <th>Match</th>
