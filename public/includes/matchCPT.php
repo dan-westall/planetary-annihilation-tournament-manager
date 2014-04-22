@@ -127,18 +127,12 @@ class matchCPT {
 
                 break;
         }
-
-
-
     }
 
 
     public static function match_listing_template($vars = array()) {
-
         ob_start();
-
-        include(dirname(__FILE__) . '/views/matchlisting_shortcode.php');
-
+        include($PLTM_PLUGIN_DIR . '/views/matchlisting_shortcode.php');
         return ob_get_clean();
     }
 
