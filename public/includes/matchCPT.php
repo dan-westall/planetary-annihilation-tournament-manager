@@ -70,16 +70,17 @@ class matchCPT {
 
     }
 
-    public function get_match_results($attr) {
+    public static function get_match_results($attr) {
 
         extract(shortcode_atts(array(
-            'tournament_id' => ''
+            'tournament_id' => '',
+            'output'    => 'html'
         ), $attr));
 
         $args = array(
             'post_type'       => self::$post_type,
             'connected_type'  => 'tournament_matches',
-            'connected_items' => $_GET['tournament_id'],
+            'connected_items' => $tournament_id,
             'nopaging'        => true
         );
 
@@ -109,7 +110,21 @@ class matchCPT {
 
         }
 
-        wp_send_json_success($data);
+        switch($output){
+
+            case "json":
+
+                wp_send_json_success($data);
+
+                break;
+
+            case "html" :
+
+
+                break;
+        }
+
+
 
     }
 

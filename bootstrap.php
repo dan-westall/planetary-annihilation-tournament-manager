@@ -9,6 +9,8 @@ if($_SERVER['SERVER_NAME'] == 'exodusesports.com' || $_SERVER['SERVER_NAME'] == 
 require_once( PLTM_PLUGIN_DIR.'/includes/functions.php');
 
 require_once( PLTM_PLUGIN_DIR.'/includes/xmlrpc_function.php');
+require_once( PLTM_PLUGIN_DIR.'/includes/api.php');
+
 
 //3rd party library
 require_once( PLTM_PLUGIN_DIR.'/includes/challonge.class.php');
