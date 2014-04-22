@@ -11,10 +11,10 @@ class matchCPT {
 
         add_action( 'p2p_init', array( $this, 'register_p2p_connections' ) );
 
-        add_shortcode('tournament-matches', array( $this, 'match_listing') );
+        add_shortcode('tournament-matches', array( $this, 'get_match_results') );
 
-        add_action('wp_ajax_pltm_get_match_results',  array( $this, 'get_match_results') );
-        add_action('wp_ajax_nopriv_pltm_get_match_results',  array( $this, 'get_match_results') );
+        add_action('wp_ajax_pltm_get_match_results',  array( $this, 'get_match_json') );
+        add_action('wp_ajax_nopriv_pltm_get_match_results',  array( $this, 'get_match_json') );
 
     }
 
@@ -70,7 +70,7 @@ class matchCPT {
 
     }
 
-    public function get_match_results($attr) {
+    public function get_match_json($attr) {
 
         extract(shortcode_atts(array(
             'tournament_id' => ''
@@ -112,5 +112,33 @@ class matchCPT {
         wp_send_json_success($data);
 
     }
+
+
+    public function match_listing_template($vars = array()) {
+        ob_start();
+        include(plugins_url('/views/matchlisting_shortcode.php',__FILE__));
+        return ob_get_clean();
+    }
+
+    public function match_listing_js_deps() {
+        //wp_register_script('knockout',plugins_url('/public/js/ko.min.js',__FILE__) );
+        wp_enqueue_script('knockout');
+        wp_register_script('socketio',"http://exodusesports.com:5000/socket.io/socket.io.js");
+        wp_enqueue_script('socketio');
+        wp_register_script('match_listing',plugins_url('/public/assets/js/matchlisting.js',__FILE__) );
+        wp_enqueue_script('match_listing');
+    }
+
+    public function get_match_result($attr) {
+
+        extract(shortcode_atts(array(
+            'tournament_id' => ''
+        ), $attr));
+      
+        $this->match_listing_js_deps();
+
+        return $this->match_listing_template($tournament_id);
+
+    }    
 
 }
