@@ -7,7 +7,7 @@ class matchCPT {
     function __construct() {
 
         add_action( 'init', array( $this, 'register_cpt_match') );
-        add_action( 'template_include', array( $this, 'get_match_results') );
+        //add_action( 'template_include', array( $this, 'get_match_results') );
 
         add_action( 'p2p_init', array( $this, 'register_p2p_connections' ) );
 
@@ -134,9 +134,11 @@ class matchCPT {
 
 
     public static function match_listing_template($vars = array()) {
+
         ob_start();
 
         include(dirname(__FILE__) . '/views/matchlisting_shortcode.php');
+
         return ob_get_clean();
     }
 
