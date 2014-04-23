@@ -300,6 +300,7 @@ class tournamentCPT {
         $signup_form_id          = get_field('standard_tournament_signup_form', 'option');
         $tournament_id           = url_to_postid($_SERVER['HTTP_REFERER']);
         $tournament_closed       = get_field('signup_closed', $tournament_id);
+        $players = p2p_type( 'tournament_players' )->get_connected( $tournament_id );
 
         if ($tournament_id === 0 || $tournament_closed !== false)
             return $validation_result;
@@ -309,6 +310,9 @@ class tournamentCPT {
         }
 
         if ($signup_form_id != $validation_result['form']['id'])
+            return $validation_result;
+
+        if (count($players->posts) >= get_field('slots'))
             return $validation_result;
 
         foreach( $validation_result['form']['fields'] as $field ) {
