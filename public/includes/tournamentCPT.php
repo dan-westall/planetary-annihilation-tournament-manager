@@ -484,7 +484,7 @@ class tournamentCPT {
         $form_listing[] = 'Select Tournament';
         $form_listing[] = 'Custom Tournament ID';
 
-        $args = array('subdomain' => 'api-test');
+        $args = array('subdomain' => 'exodusesports');
 
         $tournaments = $c->getTournaments($args);
 
@@ -538,9 +538,8 @@ class tournamentCPT {
         $c->verify_ssl = false;
 
         $params = array(
-            "participant[email]"              => $email,
-            'participant[name]'               => $ign,
-            'participant[challonge_username]' => $ign,
+//            "participant[email]"              => $email,
+            'participant[name]'               => $ign
         );
 
         $participant = $c->createParticipant($challonge_tournament_id, $params);
