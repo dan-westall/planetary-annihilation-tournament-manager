@@ -125,7 +125,7 @@ class matchCPT {
             $data[$row]['pa_stats_match_id']       = get_post_meta($matches[$row]->ID, 'pa_stats_match_id', true);
             $data[$row]['pa_stats_start'] = get_post_meta($matches[$row]->ID, 'pa_stats_start', true);
             $data[$row]['pa_stats_stop'] = get_post_meta($matches[$row]->ID, 'pa_stats_stop', true);
-            $data[$row]['status'] = ''; //todo to be played, in progress, completed??
+            $data[$row]['last_update'] = get_post_meta($matches[$row]->ID, 'last_update', true); //todo to be played, in progress, completed??
 
         }
 

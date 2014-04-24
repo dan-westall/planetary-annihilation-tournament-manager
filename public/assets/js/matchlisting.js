@@ -9,7 +9,7 @@ var MatchModel = function(data){
     	}
     });
     self.player2 = ko.computed(function(){
-    	if(self.players().length > 0){
+    	if(self.players().length > 1){
       		return self.players()[1].player_name();
   		}
     });
@@ -50,18 +50,36 @@ var MatchListing = function() {
 		self.matches([]);
 		//CORRECT URL !
 		$.getJSON(self.restendpoint(),function(data){
-    		//console.log(data.data);
-			for(var i = 0; i < data.data.length; i++)
-			{
-				self.matches.push(new MatchModel(data.data[i]));
+			//ko.mapping.fromJS(data.data,mapping,self.matches);
+    		
+    		if(data.data !== undefined){
+    			console.log(data.data);
+				for(var i = 0; i < data.data.length; i++){
+					self.matches.push(new MatchModel(data.data[i]));
+				}
 			}
+			
 		});
 	};
 
 	self.UpdateMatch = function(match){
 		console.log("updating match " + match);
-		$.getJSON(self.restendpoint(),function(data){
+		$.getJSON("/api/tournament-match/" + match,function(data){
 			console.log(data);
+			if(data.data.length > 0){
+				var updatedmatch = new MatchModel(data.data[0]);
+				var oldMatch = ko.utils.arrayFirst(self.matches(), function(item) {
+				    return item.challonge_match_id() == updatedmatch.challonge_match_id();
+				});				
+				if(oldMatch === null){
+					self.matches.push(updatedmatch);
+				}
+				else{
+					self.matches.replace(oldMatch, updatedmatch);	
+				}
+				
+
+			}
 		});
 	};
 

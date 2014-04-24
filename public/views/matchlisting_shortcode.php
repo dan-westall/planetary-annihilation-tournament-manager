@@ -5,6 +5,7 @@
             <th>Player 1</th>
             <th>Player 2</th>
             <th>Duration</th>
+            <th>Last update</th>
         </tr>
     </thead>
 <tbody data-bind="template: { name:  function() { return selectedView(); }, foreach: matches }">
@@ -19,6 +20,7 @@
     <td data-bind="text: player1"></td>
     <td data-bind="text: player2"></td>
     <td><a data-bind="attr: {href: paslink}" target="_blank"><span data-bind="text:pasduration"></span></a></td>
+    <td data-bind="text: last_update"></td>
 </tr>
 </script>
 
@@ -28,6 +30,7 @@
     <td>Turn off Spoiler</td>
     <td>Turn off Spoiler</td>
     <td><a data-bind="attr: {href: paslink}" target="_blank"><span data-bind="text:pasduration"></span></a></td>
+    <td data-bind="text: last_update"></td>
 </tr>
 </script>
 <script type="text/javascript">

@@ -96,11 +96,12 @@ function pltm_add_match( $data ){
         $p2p_result1 = p2p_type('match_players')->connect($match_id, $wp_player_id1, $connection_meta1);
         $p2p_result2 = p2p_type('match_players')->connect($match_id, $wp_player_id2, $connection_meta2);        
     }
-  
+    update_post_meta($match_id, 'last_update', $pamatch["last_update"]);
     foreach($args["pastatsmatches"] as $key => $pamatch){
         update_post_meta($match_id, 'pa_stats_match_id', $pamatch["gameId"]);
         update_post_meta($match_id, 'pa_stats_start', $pamatch["start"]);
         update_post_meta($match_id, 'pa_stats_stop', $pamatch["end"]);
+
         if($pamatch["winner"] != ''){
             $winner_id = playerCPT::get_player_by($pamatch["winner"])->ID;
             $p2pwinner = p2p_type('match_players')->get_p2p_id($match_id, $winner_id); 
