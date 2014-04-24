@@ -19,11 +19,6 @@ class tournament_info extends WP_Widget {
         ?>
         <?php echo $before_widget; ?>
 
-        <?php
-
-        $players = p2p_type( 'tournament_players' )->get_connected( $post->ID );
-
-        ?>
         <div class="tournament-widget-info">
 
             <section class="format tournament-meta-block text">
@@ -46,7 +41,7 @@ class tournament_info extends WP_Widget {
                 <dl class="col-lg-6">
                     <?php if(get_field('slots')) : ?>
                         <dt>Player Slots/Taken/Remaining</dt>
-                        <dd><?php the_field('slots'); ?>/<?php echo count($players->posts); ?>/<?php echo ( get_field('slots') - count($players->posts) ) ?></dd>
+                        <dd><?php the_field('slots'); ?>/<?php echo count(get_tournament_players($post->ID)); ?>/<?php echo ( get_field('slots') - count(get_tournament_players($post->ID)) ) ?></dd>
                     <?php endif; ?>
                 </dl>
 
@@ -60,7 +55,7 @@ class tournament_info extends WP_Widget {
 
                         $price_count = count(get_field('prize_tiers'));
 
-                        $html = '<ul style="margin-top:20px;">';
+                        $html = '<ul style="margin-top:40px;">';
 
                         $column = 100;
 

@@ -1,5 +1,18 @@
 <?php
 
+function get_tournament_players($tournament_id){
+
+    $players = get_posts(array(
+        'connected_type'   => 'tournament_players',
+        'connected_items'  => $tournament_id,
+        'nopaging'         => true,
+        'suppress_filters' => false
+    ));
+
+    return $players;
+
+}
+
 class DW_Helper {
 
     public static function get_post_by_meta($meta_key, $meta_value){
