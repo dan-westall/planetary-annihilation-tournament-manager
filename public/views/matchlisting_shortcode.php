@@ -1,4 +1,4 @@
-<table class="table" id="tblmatches">
+<table class="table match-live-reload" id="tblmatches">
     <thead>
         <tr>
             <th>Match</th>

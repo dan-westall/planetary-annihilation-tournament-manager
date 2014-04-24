@@ -312,8 +312,10 @@ class tournamentCPT {
         if ($signup_form_id != $validation_result['form']['id'])
             return $validation_result;
 
-        if (count($players->posts) >= get_field('slots'))
-            return $validation_result;
+        if (count(get_tournament_players($tournament_id)) >= get_field('slots')){
+            $validation_result['is_valid'] = false;
+        }
+
 
         foreach( $validation_result['form']['fields'] as $field ) {
             $values[$field['field_mapField']] = array(
@@ -372,6 +374,9 @@ class tournamentCPT {
         }
 
         if ($signup_form_id != $entry['form_id'])
+            return false;
+
+        if (count(get_tournament_players($tournament_id)) >= get_field('slots'))
             return false;
 
         //todo move out to general function file as this is a useful snippit

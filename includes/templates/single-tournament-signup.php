@@ -1,10 +1,7 @@
 <?php
 
 
-//todo move this into a is_tournament_full() function and get_tournament_players()
-$players = p2p_type( 'tournament_players' )->get_connected( get_queried_object() );
-
-if (count($players->posts) >= get_field('slots')) {
+if (count(get_tournament_players($post->ID)) >= get_field('slots')) {
 
     _e('Sorry tournament is full');
 
