@@ -28,11 +28,12 @@ class PLTM_API_Endpoint{
      */
     public function add_endpoint(){
         add_rewrite_rule('^api/tournament-matches/?([0-9]+)?/?','index.php?__api=1&tournament-matches=$matches[1]','top');
+        add_rewrite_rule('^api/tournament-match/?([0-9]+)?/?','index.php?__api=1&tournament-match=$matches[1]','top');
     }
 
     /**	Sniff Requests
      *	This is where we hijack all API requests
-     * 	If $_GET['__api'] is set, we kill WP and serve up pug bomb awesomeness
+     * 	If $_GET['__api'] is set, we kill WP
      *	@return die if API request
      */
     public function sniff_requests(){
@@ -44,18 +45,39 @@ class PLTM_API_Endpoint{
     }
 
     /** Handle Requests
-     *	This is where we send off for an intense pug bomb package
+     *
      *	@return void
      */
     protected function handle_request(){
         global $wp;
-        $tournament_id = $wp->query_vars['tournament-matches'];
-        if(!$tournament_id)
-            $this->send_response('Tournament id is missing');
 
+        if(isset($wp->query_vars['tournament-matches'])){
 
-        matchCPT::get_match_results(array('tournament_id' => $tournament_id, 'output' => 'json'));
+            $tournament_id = $wp->query_vars['tournament-matches'];
 
+            if(!$tournament_id)
+                $this->send_response('Tournament id is missing');
+
+            matchCPT::get_match_results(array('tournament_id' => $tournament_id, 'output' => 'json'));
+
+        } else if(isset($wp->query_vars['tournament-match'])){
+
+            $match_id = $wp->query_vars['tournament-match'];
+
+            if(!$match_id)
+                $this->send_response('Match id is missing');
+
+            matchCPT::get_match_results(array('match_id' => $match_id, 'output' => 'json'));
+
+        }
+
+    }
+
+    protected function send_response($msg){
+        $response['message'] = $msg;
+        header('content-type: application/json; charset=utf-8');
+        echo json_encode($response)."\n";
+        exit;
     }
 
 }

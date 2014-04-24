@@ -75,15 +75,30 @@ class matchCPT {
 
         extract(shortcode_atts(array(
             'tournament_id' => '',
-            'output'    => 'html'
+            'output'        => 'html',
+            'match_id'      => ''
         ), $attr));
 
         $args = array(
             'post_type'       => self::$post_type,
-            'connected_type'  => 'tournament_matches',
-            'connected_items' => $tournament_id,
-            'nopaging'        => true
         );
+
+        //if tournament id is set then do linking to matches
+        if(!empty($tournament_id)){
+
+            $args['connected_type']  = 'tournament_matches';
+            $args['connected_items'] = $tournament_id;
+            $args['nopaging']        = true;
+
+        } else if(!empty($match_id)){
+
+            //if match_id is set then get the wp id by default challnonge match id is used.
+
+            $wp_match_id = self::get_match_by($match_id);
+
+            $arg['post__in'] = array($wp_match_id);
+
+        }
 
         $matches = get_posts($args);
 
@@ -149,5 +164,21 @@ class matchCPT {
         wp_register_script('match_listing',PLTM_PLUGIN_URI . 'public/assets/js/matchlisting.js', array('custom.knockout') );
         wp_enqueue_script('match_listing');
     }
+
+    public static function get_match_by($id, $switch = 'challonge_match_id'){
+
+        switch($switch) {
+
+            case "challonge_match_id" :
+
+                $match = DW_Helper::get_post_by_meta('challonge_match_id', $id);
+
+                break;
+
+        }
+
+        return $match;
+
+}
 
 }
