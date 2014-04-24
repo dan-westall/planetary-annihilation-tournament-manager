@@ -105,8 +105,9 @@ class matchCPT {
             $data[$row]['title']   = $matches[$row]->post_title;
             $data[$row]['players'] = $tournament_players;
 
-            $data[$row]['pa_stats_match_id']       = get_post_meta($matches[$row]->ID, 'pa_stats_match_id', true);
             $data[$row]['challonge_tournament_id'] = get_post_meta($matches[$row]->ID, 'challonge_tournament_id', true);
+            $data[$row]['challonge_match_id'] = get_post_meta($matches[$row]->ID, 'challonge_match_id', true);
+            $data[$row]['pa_stats_match_id']       = get_post_meta($matches[$row]->ID, 'pa_stats_match_id', true);
             $data[$row]['pa_stats_start'] = get_post_meta($matches[$row]->ID, 'pa_stats_start', true);
             $data[$row]['pa_stats_stop'] = get_post_meta($matches[$row]->ID, 'pa_stats_stop', true);
             $data[$row]['status'] = ''; //todo to be played, in progress, completed??
@@ -143,9 +144,9 @@ class matchCPT {
     public static function match_listing_js_deps() {
         //wp_register_script('knockout',plugins_url('/public/js/ko.min.js',__FILE__) );
         wp_enqueue_script('custom.knockout');
-        wp_register_script('socketio',"/challongelinker/socket.io/socket.io.js");
+        wp_register_script('socketio',":5000/socket.io/socket.io.js");
         wp_enqueue_script('socketio');
-        wp_register_script('match_listing',PLTM_PLUGIN_URI . '/public/assets/js/matchlisting.js', array('custom.knockout') );
+        wp_register_script('match_listing',PLTM_PLUGIN_URI . 'public/assets/js/matchlisting.js', array('custom.knockout') );
         wp_enqueue_script('match_listing');
     }
 

@@ -2,7 +2,7 @@ var MatchModel = function(data){
 	var self = this;
 	ko.mapping.fromJS(data,{},self);
 	//console.log(self.players()[0]);
-	console.log(self.players());
+	console.log(self);
     self.player1 = ko.computed(function(){
     	if(self.players().length > 0){
     		return self.players()[0].player_name();		
@@ -25,7 +25,7 @@ var MatchModel = function(data){
 
 var MatchListing = function() {
 	var self = this;
-	self.spoiler = ko.observable(true);
+	self.spoiler = ko.observable(false);
 	self.matches = ko.observableArray([]);
 	self.wptourneyid = ko.observable();
 	
@@ -57,11 +57,18 @@ var MatchListing = function() {
 			}
 		});
 	};
+
+	self.UpdateMatch = function(match){
+		console.log("updating match " + match);
+		$.getJSON(self.restendpoint(),function(data){
+			console.log(data);
+		});
+	};
+
 			
-	var socket = io.connect('/challongelinker/');
+	var socket = io.connect(':5000');
       socket.on('updatedMatch', function (data) {
-      console.log(data);
-      self.Start();
+      self.UpdateMatch(data);
 	  //socket.emit('my other event', { my: 'data' });
 	});
 
