@@ -16,9 +16,9 @@
 
 <script type="text/html" id="matchTemplate">
 <tr>
-    <td data-bind="text: title"></td>
-    <td data-bind="text: player1"></td>
-    <td data-bind="text: player2"></td>
+    <td><span data-bind="text: title"></span></td>
+    <td><span data-bind="text: player1"></span></td>
+    <td><span data-bind="text: player2"></span></td>
     <td><a data-bind="attr: {href: paslink}" target="_blank"><span data-bind="text:pasduration"></span></a></td>
     <td data-bind="text: last_update"></td>
 </tr>
