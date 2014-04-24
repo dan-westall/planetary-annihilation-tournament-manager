@@ -141,7 +141,7 @@ class matchCPT {
     public static function match_listing_js_deps() {
         //wp_register_script('knockout',plugins_url('/public/js/ko.min.js',__FILE__) );
         wp_enqueue_script('custom.knockout');
-        wp_register_script('socketio',"http://exodusesports.com:5000/socket.io/socket.io.js");
+        wp_register_script('socketio',"/challongelinker/socket.io/socket.io.js");
         wp_enqueue_script('socketio');
         wp_register_script('match_listing',PLTM_PLUGIN_URI . '/public/assets/js/matchlisting.js', array('custom.knockout') );
         wp_enqueue_script('match_listing');

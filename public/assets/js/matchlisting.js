@@ -2,12 +2,16 @@ var MatchModel = function(data){
 	var self = this;
 	ko.mapping.fromJS(data,{},self);
 	//console.log(self.players()[0]);
-
+	console.log(self.players());
     self.player1 = ko.computed(function(){
-      return self.players()[0].player_name();
+    	if(self.players().length > 0){
+    		return self.players()[0].player_name();		
+    	}
     });
     self.player2 = ko.computed(function(){
-      return self.players()[1].player_name();
+    	if(self.players().length > 0){
+      		return self.players()[1].player_name();
+  		}
     });
 	self.paslink = ko.computed(function(){
 		return "http://pastats.com/chart?gameId=" + self.pa_stats_match_id();
@@ -54,7 +58,7 @@ var MatchListing = function() {
 		});
 	};
 			
-	var socket = io.connect('http://exodusesports.com:5000');
+	var socket = io.connect('/challongelinker/');
       socket.on('updatedMatch', function (data) {
       console.log(data);
       self.Start();
