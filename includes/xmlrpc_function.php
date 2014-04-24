@@ -100,6 +100,7 @@ function pltm_add_match( $data ){
     foreach($args["pastatsmatches"] as $key => $pamatch){
         update_post_meta($match_id, 'pa_stats_match_id', $pamatch["gameId"]);
         update_post_meta($match_id, 'pa_stats_start', $pamatch["start"]);
+        update_post_meta($match_id, 'pa_stats_stop', $pamatch["end"]);
         if($pamatch["winner"] != ''){
             $winner_id = playerCPT::get_player_by($pamatch["winner"])->ID;
             $p2pwinner = p2p_type('match_players')->get_p2p_id($match_id, $winner_id); 
