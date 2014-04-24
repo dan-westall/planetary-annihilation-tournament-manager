@@ -19,6 +19,7 @@ class PLTM_API_Endpoint{
     public function add_query_vars($vars){
         $vars[] = '__api';
         $vars[] = 'tournament-matches';
+        $vars[] = 'tournament-match';
         return $vars;
     }
 

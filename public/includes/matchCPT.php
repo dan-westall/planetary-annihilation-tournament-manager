@@ -96,7 +96,7 @@ class matchCPT {
 
             $wp_match_id = self::get_match_by($match_id);
 
-            $arg['post__in'] = array($wp_match_id);
+            $args['post__in'] = array($wp_match_id->ID);
 
         }
 
