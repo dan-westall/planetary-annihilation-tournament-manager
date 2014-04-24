@@ -1,19 +1,3 @@
-<form class="navbar-form navbar-left">
-<div class="panel panel-warning">
-  <div class="panel-heading">Testing</div>
-  <div class="panel-body">
-    <div class="input-group">
-    <span class="input-group-addon">Spoilers ? </span>
-    <input type="text" class="form-control" data-bind="value: spoiler"/>
-    </div>  
-</div>
-</div>
-</form>
-<div class="panel panel-info">
-  <div class="panel-heading">Open Matches</div>
-  <div class="panel-body">
-  </div>
-
 <table class="table" id="tblmatches">
     <thead>
         <tr>
@@ -48,7 +32,7 @@
 </script>
 <script type="text/javascript">
 jQuery(document).ready(function ($) {
-    //console.log("execute ladder");
+    //console.log("execute matchlisting");
     eematchlisting.wptourneyid(<?php echo $vars ?>);
 });
 </script>
