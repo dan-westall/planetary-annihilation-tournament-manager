@@ -17,8 +17,44 @@ var MatchModel = function(data){
 		return "http://pastats.com/chart?gameId=" + self.pa_stats_match_id();
 	});
 
+	var now = new Date().getTime();
+	self.now = ko.observable(now + "000").extend({ throttle: 1000 });
+
+	self.updateNow = function(){
+		var now = new Date().getTime();
+		self.now(now + "000");
+	};
+
+	setInterval(self.updateNow, 1000);
+
 	self.pasduration = ko.computed(function(){
-  		return "10:01";
+  		//return "10:01";
+  		if(self.pa_stats_stop() !== null){
+			var time = (self.pa_stats_stop() - self.pa_stats_start()) / 1000;
+			var minutes = Math.floor(time / 60);
+			var seconds = time - minutes * 60;
+			seconds = seconds.toString().substring(0,2);
+			//console.log(seconds.substring(1,2));
+			if(seconds.substring(1,2) === '.'){
+				seconds = '0' + seconds.substring(0,1);
+			}				
+			return minutes + ":" + seconds;
+		}
+		else
+			{
+				if(self.pa_stats_start() !== null){
+					var time = (parseInt(self.now()) - self.pa_stats_start()) / 1000;
+					var minutes = Math.floor(time / 60);
+					var seconds = time - minutes * 60;
+					seconds = seconds.toString().substring(0,2);
+					//console.log(seconds.substring(1,1));
+					if(seconds.substring(1,2) === '.'){
+						seconds = '0' + seconds.substring(0,1);
+					}
+					return "+" + minutes + ":" + seconds;
+				}
+			}
+
 	});
 
 };
@@ -95,3 +131,4 @@ var MatchListing = function() {
 
 var eematchlisting = new MatchListing();
 ko.applyBindings(eematchlisting);
+
