@@ -13,6 +13,22 @@ var MatchModel = function(data){
       		return self.players()[1].player_name();
   		}
     });
+
+    self.winner = ko.computed(function(){
+		if(self.players().length > 0){
+			if(self.players()[0].winner() === 1){
+				return self.players()[0].player_name();
+			}
+			else{
+		    	if(self.players().length > 1){
+		    		if(self.players()[1].winner() === 1){
+		      			return self.players()[1].player_name();
+		      		}
+		  		}			
+			}
+		}
+    });
+
 	self.paslink = ko.computed(function(){
 		return "http://pastats.com/chart?gameId=" + self.pa_stats_match_id();
 	});
@@ -64,10 +80,6 @@ var MatchListing = function() {
 	self.spoiler = ko.observable(false);
 	self.matches = ko.observableArray([]);
 	self.wptourneyid = ko.observable();
-	
-	self.selectedView = ko.computed(function(){
-        return "matchTemplate";
-	});
 
 	self.restendpoint = ko.computed(function(){
 		return "/api/tournament-matches/" + self.wptourneyid();
@@ -87,6 +99,7 @@ var MatchListing = function() {
     			console.log(data.data);
 				for(var i = 0; i < data.data.length; i++){
 					self.matches.push(new MatchModel(data.data[i]));
+					self.SortMatches();
 				}
 			}
 			
@@ -104,6 +117,7 @@ var MatchListing = function() {
 				});				
 				if(oldMatch === null){
 					self.matches.push(updatedmatch);
+					self.SortMatches();
 				}
 				else{
 					self.matches.replace(oldMatch, updatedmatch);	
@@ -114,12 +128,28 @@ var MatchListing = function() {
 		});
 	};
 
-			
+	self.SortMatches = function(){
+  		self.matches.sort(
+		function(left, right) { 
+			return right.title() < left.title() ? 1 : -1
+		});
+	};
+
+	/*		
 	var socket = io.connect(':5000');
-      socket.on('updatedMatch', function (data) {
+    
+    socket.on('updatedMatch', function (data) {
       self.UpdateMatch(data);
 	  //socket.emit('my other event', { my: 'data' });
 	});
+	socket.on('error', function() {
+    //here i change options
+    	socket = io.connect(':5000', {
+  			'force new connection': true
+		});
+	});
+	*/
+	setInterval(self.Start,6000);
 
 
 };

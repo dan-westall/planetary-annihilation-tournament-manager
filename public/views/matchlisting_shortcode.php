@@ -5,10 +5,10 @@
             <th>Player 1</th>
             <th>Player 2</th>
             <th>Duration</th>
-            <th>Last update</th>
+            <!--<th>Last update</th>-->
         </tr>
     </thead>
-<tbody data-bind="template: { name:  function() { return selectedView(); }, foreach: matches }">
+<tbody data-bind="template: { name: 'matchTemplate', foreach: matches }">
     
 </tbody>
 </table>
@@ -17,22 +17,13 @@
 <script type="text/html" id="matchTemplate">
 <tr>
     <td><span data-bind="text: title"></span></td>
-    <td><span data-bind="text: player1"></span></td>
-    <td><span data-bind="text: player2"></span></td>
+    <td><span class="spoiler" data-bind="text: player1, css:{ matchwinner: player1() === winner()}"></span></td>
+    <td><span class="spoiler" data-bind="text: player2, css:{ matchwinner: player2() === winner()}"></span></td>
     <td><a data-bind="attr: {href: paslink}" target="_blank"><span data-bind="text:pasduration"></span></a></td>
-    <td data-bind="text: last_update"></td>
+    <!--<td data-bind="text: last_update"></td>-->
 </tr>
 </script>
 
-<script type="text/html" id="matchTemplateSpoiler">
-<tr>
-    <td data-bind="text: title"></td>
-    <td>Turn off Spoiler</td>
-    <td>Turn off Spoiler</td>
-    <td><a data-bind="attr: {href: paslink}" target="_blank"><span data-bind="text:pasduration"></span></a></td>
-    <td data-bind="text: last_update"></td>
-</tr>
-</script>
 <script type="text/javascript">
 jQuery(document).ready(function ($) {
     //console.log("execute matchlisting");
