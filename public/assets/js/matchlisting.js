@@ -82,12 +82,7 @@ var MatchListing = function() {
 	self.wptourneyid = ko.observable();
 	
 	self.selectedView = ko.computed(function(){
-      if(self.spoiler() === true){
-        return "matchTemplateSpoiler";
-      }
-      else{
         return "matchTemplate";
-      }
 	});
 
 	self.restendpoint = ko.computed(function(){
