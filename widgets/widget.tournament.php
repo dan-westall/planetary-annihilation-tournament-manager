@@ -83,7 +83,7 @@ class tournament_info extends WP_Widget {
 
                 <ul class="row">
                     <li class="col-lg-4">
-                        <a href="<?php the_field('forum_link'); ?>">Form Link</a>
+                        <a href="<?php the_field('forum_link'); ?>">Forum Link</a>
                     </li>
 
                     <li class="col-lg-4">
@@ -129,4 +129,5 @@ class tournament_info extends WP_Widget {
     <?php
     }
 }
+
 add_action('widgets_init', create_function('', 'return register_widget("tournament_info");'));
