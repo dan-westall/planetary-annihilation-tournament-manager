@@ -13,6 +13,22 @@ var MatchModel = function(data){
       		return self.players()[1].player_name();
   		}
     });
+
+    self.winner = ko.computed(function(){
+		if(self.players().length > 0){
+			if(self.players()[0].winner() === 1){
+				return self.players()[0].player_name();
+			}
+			else{
+		    	if(self.players().length > 1){
+		    		if(self.players()[1].winner() === 1){
+		      			return self.players()[1].player_name();
+		      		}
+		  		}			
+			}
+		}
+    });
+
 	self.paslink = ko.computed(function(){
 		return "http://pastats.com/chart?gameId=" + self.pa_stats_match_id();
 	});
