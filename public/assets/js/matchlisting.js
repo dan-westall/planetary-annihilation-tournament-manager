@@ -80,10 +80,6 @@ var MatchListing = function() {
 	self.spoiler = ko.observable(false);
 	self.matches = ko.observableArray([]);
 	self.wptourneyid = ko.observable();
-	
-	self.selectedView = ko.computed(function(){
-        return "matchTemplate";
-	});
 
 	self.restendpoint = ko.computed(function(){
 		return "/api/tournament-matches/" + self.wptourneyid();
@@ -139,7 +135,7 @@ var MatchListing = function() {
 		});
 	};
 
-			
+	/*		
 	var socket = io.connect(':5000');
     
     socket.on('updatedMatch', function (data) {
@@ -152,6 +148,8 @@ var MatchListing = function() {
   			'force new connection': true
 		});
 	});
+	*/
+	setInterval(self.Start,6000);
 
 
 };
