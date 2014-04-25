@@ -103,6 +103,7 @@ var MatchListing = function() {
     			console.log(data.data);
 				for(var i = 0; i < data.data.length; i++){
 					self.matches.push(new MatchModel(data.data[i]));
+					self.SortMatches();
 				}
 			}
 			
@@ -120,6 +121,7 @@ var MatchListing = function() {
 				});				
 				if(oldMatch === null){
 					self.matches.push(updatedmatch);
+					self.SortMatches();
 				}
 				else{
 					self.matches.replace(oldMatch, updatedmatch);	
@@ -130,11 +132,25 @@ var MatchListing = function() {
 		});
 	};
 
+	self.SortMatches = function(){
+  		self.matches.sort(
+		function(left, right) { 
+			return right.title() < left.title() ? 1 : -1
+		});
+	};
+
 			
 	var socket = io.connect(':5000');
-      socket.on('updatedMatch', function (data) {
+    
+    socket.on('updatedMatch', function (data) {
       self.UpdateMatch(data);
 	  //socket.emit('my other event', { my: 'data' });
+	});
+	socket.on('error', function() {
+    //here i change options
+    	socket = io.connect(':5000', {
+  			'force new connection': true
+		});
 	});
 
 
