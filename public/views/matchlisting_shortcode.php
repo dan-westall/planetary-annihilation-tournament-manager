@@ -6,6 +6,7 @@
             <th>Player 2</th>
             <th>Duration</th>
             <!--<th>Last update</th>-->
+            <!--<th>Now</th>-->
         </tr>
     </thead>
 <tbody data-bind="template: { name: 'matchTemplate', foreach: matches }">
@@ -21,6 +22,7 @@
     <td><span class="spoiler" data-bind="text: player2, css:{ matchwinner: player2() === winner()}"></span></td>
     <td><a data-bind="attr: {href: paslink}" target="_blank"><span data-bind="text:pasduration"></span></a></td>
     <!--<td data-bind="text: last_update"></td>-->
+    <!--<td data-bind="text: now"></td>-->
 </tr>
 </script>
 

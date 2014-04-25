@@ -34,7 +34,7 @@ var MatchModel = function(data){
 	});
 
 	var now = new Date().getTime();
-	self.now = ko.observable(now + "000").extend({ throttle: 1000 });
+	self.now = ko.observable(now + "000").extend({ throttle: 900 });
 
 	self.updateNow = function(){
 		var now = new Date().getTime();
@@ -149,7 +149,7 @@ var MatchListing = function() {
 		});
 	});
 	*/
-	setInterval(self.Start,6000);
+	setInterval(self.Start,60000);
 
 
 };
