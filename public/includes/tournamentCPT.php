@@ -822,6 +822,16 @@ class tournamentCPT {
 
                     break;
 
+                case "matches":
+
+                    if(get_tournament_matches($tournament->ID)) {
+
+                        $html .= sprintf('<li><a href="%1$s/%2$s">%3$s</a></li>', get_permalink(), $tournament_endpoint, ucwords($tournament_endpoint));
+
+                    }
+
+                    break;
+
                 default :
 
                     $html .= sprintf('<li><a href="%1$s/%2$s">%3$s</a></li>', get_permalink(), $tournament_endpoint, ucwords($tournament_endpoint));

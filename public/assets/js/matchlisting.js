@@ -2,7 +2,7 @@ var MatchModel = function(data){
 	var self = this;
 	ko.mapping.fromJS(data,{},self);
 	//console.log(self.players()[0]);
-	console.log(self);
+//	console.log(self);
     self.player1 = ko.computed(function(){
     	if(self.players().length > 0){
     		return self.players()[0].player_name();		
@@ -98,7 +98,7 @@ var MatchListing = function() {
 			//ko.mapping.fromJS(data.data,mapping,self.matches);
     		
     		if(data.data !== undefined){
-    			console.log(data.data);
+//    			console.log(data.data);
 				for(var i = 0; i < data.data.length; i++){
 					self.matches.push(new MatchModel(data.data[i]));
 					self.SortMatches();
@@ -109,9 +109,9 @@ var MatchListing = function() {
 	};
 
 	self.UpdateMatch = function(match){
-		console.log("updating match " + match);
+//		console.log("updating match " + match);
 		$.getJSON("/api/tournament-match/" + match,function(data){
-			console.log(data);
+//			console.log(data);
 			if(data.data.length > 0){
 				var updatedmatch = new MatchModel(data.data[0]);
 				var oldMatch = ko.utils.arrayFirst(self.matches(), function(item) {

@@ -13,6 +13,18 @@ function get_tournament_players($tournament_id){
 
 }
 
+function get_tournament_matches($tournament_id){
+    $matches = get_posts(array(
+        'connected_type'   => 'tournament_matches',
+        'connected_items'  => $tournament_id,
+        'nopaging'         => true,
+        'suppress_filters' => false
+    ));
+
+    return $matches;
+
+}
+
 class DW_Helper {
 
     public static function get_post_by_meta($meta_key, $meta_value){

@@ -40,7 +40,7 @@ class tournament_info extends WP_Widget {
 
                 <dl class="col-lg-6">
                     <?php if(get_field('slots')) : ?>
-                        <dt>Player Slots/Taken/Remaining</dt>
+                        <dt>Slots/Taken/Remaining</dt>
                         <dd><?php the_field('slots'); ?>/<?php echo count(get_tournament_players($post->ID)); ?>/<?php echo ( get_field('slots') - count(get_tournament_players($post->ID)) ) ?></dd>
                     <?php endif; ?>
                 </dl>

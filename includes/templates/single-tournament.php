@@ -28,7 +28,7 @@
 
             <?php while (have_posts()) : the_post(); ?>
 
-                <div id="post-<?php the_ID(); ?>" <?php post_class('col-lg-6'); ?>  role="main">
+                <div id="post-<?php the_ID(); ?>" <?php post_class('col-lg-7'); ?>  role="main">
 
                     <div class="content-container container-box text">
 
@@ -40,7 +40,7 @@
 
             <?php endwhile; ?>
 
-            <aside role="complementary" class="col-lg-6">
+            <aside role="complementary" class="col-lg-5">
 
                 <?php get_sidebar('1'); ?>
 
