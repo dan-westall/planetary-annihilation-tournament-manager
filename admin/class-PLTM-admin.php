@@ -77,15 +77,18 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
         add_action( 'gform_editor_js', array( $this, 'action_add_gravity_forms_map_field_setting') );
         add_action( 'manage_posts_custom_column', array( $this, 'custom_columns'), 10, 2 );
 
-        add_filter( 'manage_tournament_posts_columns', array( $this, 'admin_columns' ) );
         add_filter( 'gform_tooltips', array( $this, 'filter_gravity_forms_tooltips') );
 
         add_filter( 'manage_users_columns', array( $this, 'modify_user_table') );
         add_filter( 'manage_users_custom_column', array( $this, 'modify_user_table_row'), 10, 3 );
 
+        add_filter( 'manage_edit-match_columns', array( $this, 'match_columns' ) );
+        add_filter( 'manage_edit-tournament_columns', array( $this, 'tournament_column' ) );
+
+
     }
 
-    public function admin_columns( $columns ) {
+    public function tournament_column( $columns ) {
 
         global $post, $current_user; get_currentuserinfo();
 
@@ -102,6 +105,23 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
 
     }
 
+    public function match_columns( $columns ) {
+
+        global $post, $current_user; get_currentuserinfo();
+
+        $columns = array(
+            'cb'         => '<input type="checkbox" />',
+            'title'  => __('Title'),
+            'tournament'     => __('Tournament'),
+            'players' => __('Players'),
+            'format' => __('Format')
+
+        );
+
+        return $columns;
+
+    }
+
     public function modify_user_table( $column ) {
         $column['clan'] = __('Clan');
 
@@ -109,6 +129,7 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
     }
 
     public function modify_user_table_row( $val, $column_name, $user_id ) {
+
         $user = get_userdata( $user_id );
 
         switch ($column_name) {
@@ -157,6 +178,50 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
             case 'status';
 
                 echo get_post_meta($post_id, 'tournament_status', true);
+
+                break;
+
+            case "tournament":
+
+                $tournament_id = tournamentCPT::get_tournament_id_by(get_post_meta($post_id, 'challonge_tournament_id', true));
+
+                //Cheap way if fail fail back to p2p
+                if(!$tournament_id){
+
+                    $tournament = p2p_type( 'tournament_matches' )->set_direction( 'to' )->get_connected( $post_id );
+
+                    if(isset($tournament->posts[0]->ID)){
+
+                        $tournament_id = $tournament->posts[0]->ID;
+
+                    }
+
+                }
+
+                if($tournament_id){
+
+                    $title = get_the_title($tournament_id);
+                    $url   = admin_url( 'post.php?post='.$tournament_id.'&action=edit');
+
+                    printf('<a href="%s">%s</a>', $url, $title);
+
+                } else {
+                    echo 'No tournament link found';
+                }
+
+                break;
+
+            case "players":
+
+                $players = p2p_type( 'match_players' )->get_connected( $post_id );
+
+                foreach($players->posts As $player){
+
+                    $players_array[] = sprintf('<a href="%s">%s</a>', admin_url( 'post.php?post='.$player->ID.'&action=edit'), $player->post_title);
+
+                }
+
+                echo implode(', ', $players_array);
 
                 break;
 

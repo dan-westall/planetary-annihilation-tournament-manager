@@ -13,6 +13,7 @@
     
 </tbody>
 </table>
+<div class="text-toggle" data-function="spoiler">Show Spoilers: <a href="javascript:void(0);" data-true="Yes" data-false="No">No</a></div>
 </div>
 
 <script type="text/html" id="matchTemplate">
