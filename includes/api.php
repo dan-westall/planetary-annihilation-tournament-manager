@@ -23,6 +23,7 @@ class PLTM_API_Endpoint{
         $vars[] = 'return';
         $vars[] = 'match';
         $vars[] = 'player';
+        $vars[] = 'id_type';
 
         return $vars;
     }
@@ -40,10 +41,11 @@ class PLTM_API_Endpoint{
 
 
 
-        add_rewrite_rule('^api/match/?([0-9]+)?/?','index.php?__api=1&match_id=$matches[1]','top');
+        add_rewrite_rule('^api/match/?([0-9]+)?/?([^/]*)?/?','index.php?__api=1&match_id=$matches[1]&id_type=$matches[2]','top');
         add_rewrite_rule('^api/player/?([0-9]+)?/?','index.php?__api=1&player=$matches[1]','top');
 
         add_rewrite_tag('%tournaments%','([^&]+)');
+        add_rewrite_tag('%id_type%','([^&]+)');
 
 
 
@@ -92,7 +94,7 @@ class PLTM_API_Endpoint{
 
                         break;
 
-                    case "player":
+                    case "players":
 
                         tournamentCPT::get_tournament_players(array('tournament_id' => $tournament_id, 'output' => 'json'));
 
@@ -114,21 +116,28 @@ class PLTM_API_Endpoint{
 
         } else if(isset($wp->query_vars['tournaments'])){
 
-            $match_id = $wp->query_vars['tournaments'];
+            $tournament_status = $wp->query_vars['tournaments'];
 
-            if(!$match_id)
-                $this->send_response('Match id is missing');
-
-            matchCPT::get_match_results(array('match_id' => $match_id, 'output' => 'json'));
+            tournamentCPT::get_tournaments(array('output' => 'json', 'status' => $tournament_status));
 
         } else if(isset($wp->query_vars['match'])){
 
             $match_id = $wp->query_vars['match'];
+            $id_type  = $wp->query_vars['id_type'];
 
             if(!$match_id)
                 $this->send_response('Match id is missing');
 
-            matchCPT::get_match_results(array('match_id' => $match_id, 'output' => 'json'));
+            matchCPT::get_match_results(array('match_id' => $match_id, 'by' => $id_type, 'output' => 'json'));
+
+        } else if(isset($wp->query_vars['player'])){
+
+            $player_id = $wp->query_vars['player'];
+
+            if(!$player_id)
+                $this->send_response('player id is missing');
+
+            playerCPT::get_player(array('player_id' => $player_id, 'output' => 'json'));
 
         }
 

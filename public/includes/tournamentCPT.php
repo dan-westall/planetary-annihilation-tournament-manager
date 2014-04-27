@@ -890,10 +890,8 @@ class tournamentCPT {
             $array = '';
 
             $data[$row]['name'] = $players[$row]->post_title;
-            $data[$row]['name'] = get_post_meta($players[$row]->ID, 'pastats_player_id', true);
+            $data[$row]['pa_stats_player_id'] = get_post_meta($players[$row]->ID, 'pastats_player_id', true);
             $data[$row]['stats'] = '';
-            $data[$row]['name'] = '';
-            $data[$row]['name'] = '';
 
         }
 
@@ -929,30 +927,7 @@ class tournamentCPT {
 
         $tournament = get_post($tournament_id);
 
-        $prizes_array = get_post_meta($tournament_id, 'prize_tiers', true);
-
-        foreach($prizes_array as $prize){
-
-            $prizes[] = array('place' => $prize['place'], 'prize' => $prize['prize']);
-
-        }
-
-        $signup_status = 'Open';
-
-        if(!self::is_tournament_signup_open($tournament->ID)){
-            $signup_status = 'Closed';
-        }
-
-        $data['name']          = $tournament->post_title;
-        $data['description']   = $tournament->post_title;
-        $data['date']          = get_post_meta($tournament->ID, 'run_date', true);
-        $data['time']          = get_post_meta($tournament->ID, 'run_time', true);
-        $data['prize']         = $prizes;
-        $data['slots']         = get_post_meta($tournament->ID, 'slots', true);
-        $data['slots_taken']   = count(get_tournament_players($tournament->ID));
-        $data['signup_status'] = $signup_status;
-        $data['signup_url']    = get_permalink($tournament->ID) . '/signup';
-        $data['url']           = get_permalink($tournament->ID);
+        $data = self::tournament_return_format($tournament, $data);
 
         //turned off because they should be doing /api/tournament/345533/players if they want this, same with matches, also limits overhead
         //$data['players']       = self::get_tournament_players(array('tournament_id' => $tournament->ID, 'output' => 'raw'));
@@ -969,6 +944,12 @@ class tournamentCPT {
 
 
                 break;
+
+            case "raw" :
+
+                return $data;
+
+                break;
         }
 
     }
@@ -980,9 +961,76 @@ class tournamentCPT {
             'output'        => 'html'
         ), $attr));
 
+        //todo strong definiton of tournament status
+        $args = array(
+            'post_type' => self::$post_type,
+        );
+
+        $tournaments = get_posts($args);
+
+        foreach($tournaments as $tournament){
+
+            $data[] = self::tournament_return_format($tournament);
+
+        }
+
+        switch($output){
+
+            case "json":
+
+                wp_send_json_success($data);
+
+                break;
+
+            case "html" :
 
 
-        $tournaments = get_posts();
+                break;
+
+            case "raw" :
+
+                return $data;
+
+                break;
+        }
+    }
+
+    public static function tournament_return_format($tournament, $data = array()){
+
+        $signup_status = 'Open';
+
+        if(!self::is_tournament_signup_open($tournament->ID)){
+            $signup_status = 'Closed';
+        }
+
+        $data['name']          = $tournament->post_title;
+        $data['description']   = $tournament->post_title;
+        $data['date']          = get_post_meta($tournament->ID, 'run_date', true);
+        $data['time']          = get_post_meta($tournament->ID, 'run_time', true);
+        $data['slots']         = get_post_meta($tournament->ID, 'slots', true);
+        $data['slots_taken']   = count(get_tournament_players($tournament->ID));
+        $data['signup_url']    = get_permalink($tournament->ID) . '/signup';
+        $data['url']           = get_permalink($tournament->ID);
+        $data['signup_status'] = $signup_status;
+        $data['prize']         = self::get_tournament_prizes($tournament->ID);
+
+        return $data;
 
     }
+
+    public static function get_tournament_prizes($tournament_id){
+
+        $prizes_array = get_post_meta($tournament_id, 'prize_tiers', true);
+
+        foreach($prizes_array as $prize){
+
+            $prizes[] = array('place' => $prize['place'], 'prize' => $prize['prize']);
+
+        }
+
+        return $prizes;
+
+    }
+
+
 }
