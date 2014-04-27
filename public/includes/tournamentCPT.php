@@ -953,7 +953,9 @@ class tournamentCPT {
         $data['signup_status'] = $signup_status;
         $data['signup_url']    = get_permalink($tournament->ID) . '/signup';
         $data['url']           = get_permalink($tournament->ID);
-        $data['players']       = self::get_tournament_players(array('tournament_id' => $tournament->ID, 'output' => 'raw'));
+
+        //turned off because they should be doing /api/tournament/345533/players if they want this, same with matches, also limits overhead
+        //$data['players']       = self::get_tournament_players(array('tournament_id' => $tournament->ID, 'output' => 'raw'));
 
         switch($output){
 
