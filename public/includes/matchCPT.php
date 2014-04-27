@@ -104,12 +104,12 @@ class matchCPT {
 
         for ($row = 0; $row < count($matches); $row++) {
 
-            $tournament_players = array();
+            $match_players = array();
             $players            = p2p_type('match_players')->get_connected($matches[$row]);
 
             foreach ($players->posts as $player) {
 
-                $tournament_players[] = array(
+                $match_players[] = array(
                     'player_name'        => $player->post_title,
                     'pa_stats_player_id' => get_post_meta($player->ID, 'pastats_player_id', true),
                     'winner'             => p2p_get_meta($player->p2p_id, 'winner', true)
@@ -118,7 +118,7 @@ class matchCPT {
             }
 
             $data[$row]['title']   = $matches[$row]->post_title;
-            $data[$row]['players'] = $tournament_players;
+            $data[$row]['players'] = $match_players;
 
             $data[$row]['challonge_tournament_id'] = get_post_meta($matches[$row]->ID, 'challonge_tournament_id', true);
             $data[$row]['challonge_match_id'] = get_post_meta($matches[$row]->ID, 'challonge_match_id', true);
@@ -146,7 +146,6 @@ class matchCPT {
                 break;
         }
     }
-
 
     public static function match_listing_template($vars = array()) {
         ob_start();
@@ -179,6 +178,8 @@ class matchCPT {
 
         return $match;
 
-}
+    }
+
+
 
 }
