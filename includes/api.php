@@ -19,10 +19,11 @@ class PLTM_API_Endpoint{
     public function add_query_vars($vars){
         $vars[] = '__api';
         $vars[] = 'tournament';
+        $vars[] = 'tournaments';
         $vars[] = 'return';
         $vars[] = 'match';
         $vars[] = 'player';
-        $vars[] = 'tournaments';
+
         return $vars;
     }
 
@@ -34,14 +35,15 @@ class PLTM_API_Endpoint{
         //add_rewrite_rule('^api/tournament-matches/?([0-9]+)?/?','index.php?__api=1&tournament-matches=$matches[1]','top');
 
         // /api/tournament/345333/matches || /api/tournament/345333/players
-        add_rewrite_rule('^api/tournament/([^/]*)/([^/]*)/?','index.php?__api=1&tournament_id=$matches[1]&return=$matches[2]','top');
+        add_rewrite_rule('^api/tournaments/?([^/]*)?/?','index.php?__api=1&tournaments=$matches[1]','top');
+        add_rewrite_rule('^api/tournament/?([^/]*)?/?([^/]*)?/?','index.php?__api=1&tournament=$matches[1]&return=$matches[2]','top');
 
 
 
         add_rewrite_rule('^api/match/?([0-9]+)?/?','index.php?__api=1&match_id=$matches[1]','top');
         add_rewrite_rule('^api/player/?([0-9]+)?/?','index.php?__api=1&player=$matches[1]','top');
-        add_rewrite_rule('^api/tournaments/?([0-9]+)?/?','index.php?__api=1&status=$matches[1]','top');
 
+        add_rewrite_tag('%tournaments%','([^&]+)');
 
 
 
@@ -73,17 +75,6 @@ class PLTM_API_Endpoint{
 
         global $wp;
 
-        if(isset($wp->query_vars['tournament-matches'])){
-
-            $tournament_id = $wp->query_vars['tournament-matches'];
-
-            if(!$tournament_id)
-                $this->send_response('Tournament id is missing');
-
-            matchCPT::get_match_results(array('tournament_id' => $tournament_id, 'output' => 'json'));
-
-        } else
-
         if(isset($wp->query_vars['tournament'])){
 
             $tournament_id = $wp->query_vars['tournament'];
@@ -91,7 +82,7 @@ class PLTM_API_Endpoint{
             if(!$tournament_id)
                 $this->send_response('Tournament id is missing');
 
-            if(isset($wp->query_vars['return'])){
+            if(isset($wp->query_vars['return']) && !empty($wp->query_vars['return'])){
 
                 switch($wp->query_vars['return']){
 
@@ -120,6 +111,15 @@ class PLTM_API_Endpoint{
                 tournamentCPT::get_tournament(array('tournament_id' => $tournament_id, 'output' => 'json'));
 
             }
+
+        } else if(isset($wp->query_vars['tournaments'])){
+
+            $match_id = $wp->query_vars['tournaments'];
+
+            if(!$match_id)
+                $this->send_response('Match id is missing');
+
+            matchCPT::get_match_results(array('match_id' => $match_id, 'output' => 'json'));
 
         } else if(isset($wp->query_vars['match'])){
 

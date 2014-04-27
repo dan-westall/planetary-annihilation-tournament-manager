@@ -947,7 +947,7 @@ class tournamentCPT {
         $data['description']   = $tournament->post_title;
         $data['date']          = get_post_meta($tournament->ID, 'run_date', true);
         $data['time']          = get_post_meta($tournament->ID, 'run_time', true);
-        $data['price']         = $prizes;
+        $data['prize']         = $prizes;
         $data['slots']         = get_post_meta($tournament->ID, 'slots', true);
         $data['slots_taken']   = count(get_tournament_players($tournament->ID));
         $data['signup_status'] = $signup_status;
@@ -970,6 +970,19 @@ class tournamentCPT {
 
                 break;
         }
+
+    }
+
+    public static function get_tournaments($attr) {
+
+        extract(shortcode_atts(array(
+            'status' => '',
+            'output'        => 'html'
+        ), $attr));
+
+
+
+        $tournaments = get_posts();
 
     }
 }
