@@ -54,6 +54,18 @@ if(function_exists("register_field_group"))
                 'formatting' => 'html',
                 'maxlength' => '',
             ),
+            array (
+                'key' => 'field_535d564f29924',
+                'label' => 'PA Stats Stop',
+                'name' => 'pa_stats_stop',
+                'type' => 'text',
+                'default_value' => '',
+                'placeholder' => '',
+                'prepend' => '',
+                'append' => '',
+                'formatting' => 'html',
+                'maxlength' => '',
+            ),
         ),
         'location' => array (
             array (
@@ -499,7 +511,10 @@ if(function_exists("register_field_group"))
                 'choices' => array (
                     0 => 'Select Tournament',
                     1 => 'Custom Tournament ID',
-                    880499 => 'I am test',
+                    922929 => 'supernovashowdown',
+                    948036 => 'prelim',
+                    950890 => 'test',
+                    948029 => 'prelimtest',
                 ),
                 'default_value' => '',
                 'allow_null' => 0,
