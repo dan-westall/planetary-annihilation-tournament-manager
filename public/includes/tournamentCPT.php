@@ -889,9 +889,8 @@ class tournamentCPT {
 
             $array = '';
 
-            $data[$row]['name'] = $players[$row]->post_title;
-            $data[$row]['pa_stats_player_id'] = get_post_meta($players[$row]->ID, 'pastats_player_id', true);
-            $data[$row]['stats'] = '';
+            $data[$row] = playerCPT::player_return_format($players[$row]);
+
 
         }
 
@@ -1007,6 +1006,7 @@ class tournamentCPT {
         $data['description']   = $tournament->post_title;
         $data['date']          = get_post_meta($tournament->ID, 'run_date', true);
         $data['time']          = get_post_meta($tournament->ID, 'run_time', true);
+        $data['format']          = get_post_meta($tournament->ID, 'tournament_type', true);
         $data['slots']         = get_post_meta($tournament->ID, 'slots', true);
         $data['slots_taken']   = count(get_tournament_players($tournament->ID));
         $data['signup_url']    = get_permalink($tournament->ID) . '/signup';

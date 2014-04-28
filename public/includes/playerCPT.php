@@ -117,6 +117,9 @@ class playerCPT {
         $data['clan']               = get_post_meta($player->ID, 'clan', true);
         $data['pa_stats_player_id'] = get_post_meta($player->ID, 'pa_stats_player_id', true);
 
+
+
+
         return $data;
 
     }
