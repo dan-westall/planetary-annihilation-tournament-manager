@@ -1022,9 +1022,9 @@ class tournamentCPT {
 
         $prizes_array = get_post_meta($tournament_id, 'prize_tiers', true);
 
-        foreach($prizes_array as $prize){
+        for($row = 0; $row < $prizes_array; $row ++){
 
-            $prizes[] = array('place' => $prize['place'], 'prize' => $prize['prize']);
+            $prizes[] = array('place' => get_post_meta($tournament_id, 'prize_tiers_'.$row.'_place', true), 'prize' => get_post_meta($tournament_id, 'prize_tiers_'.$row.'_prize', true));
 
         }
 
