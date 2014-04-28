@@ -93,7 +93,7 @@ class playerCPT {
 
             case "json":
 
-                wp_send_json_success($data);
+                wp_send_json($data);
 
                 break;
 
