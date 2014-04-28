@@ -74,4 +74,53 @@ class playerCPT {
         return $player_id;
 
     }
+
+    public static function get_player($attr) {
+
+        extract(shortcode_atts(array(
+            'player_id' => '',
+            'by' => '',
+            'output'        => 'html'
+        ), $attr));
+
+        $player_id = self::get_player_by($player_id, $by);
+
+        $player = get_post($player_id);
+
+        $data = self::player_return_format($player);
+
+        switch($output){
+
+            case "json":
+
+                wp_send_json_success($data);
+
+                break;
+
+            case "html" :
+
+
+                break;
+
+            case "raw" :
+
+                return $data;
+
+                break;
+        }
+
+    }
+
+    public static function player_return_format($player, $data = array()){
+
+        $data['name']               = $player->post_title;
+        $data['clan']               = get_post_meta($player->ID, 'clan', true);
+        $data['pa_stats_player_id'] = get_post_meta($player->ID, 'pa_stats_player_id', true);
+
+
+
+
+        return $data;
+
+    }
 }

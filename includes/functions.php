@@ -25,6 +25,12 @@ function get_tournament_matches($tournament_id){
 
 }
 
+function is_tournament_signup_open($tournament_id){
+
+    return tournamentCPT::is_tournament_signup_open($tournament_id);
+
+}
+
 class DW_Helper {
 
     public static function get_post_by_meta($meta_key, $meta_value){

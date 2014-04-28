@@ -486,6 +486,27 @@ class tournamentCPT {
 
     }
 
+    public static function is_tournament_signup_open($tournament_id){
+
+        $tournament_closed = get_post_meta($tournament_id, 'signup_closed', true);
+
+
+        if(count(get_tournament_players($tournament_id)) >= get_post_meta($tournament_id, 'slots', true)){
+
+            return false;
+
+        }
+
+        if($tournament_closed === true){
+
+            return false;
+
+        }
+
+        return true;
+
+    }
+
     public function filter_challonge_tournament_listing($field){
 
         $c = new ChallongeAPI(Planetary_Annihilation_Tournament_Manager::fetch_challonge_API());
@@ -802,7 +823,7 @@ class tournamentCPT {
         $html = '';
 
         $tournament        = get_post($post_id);
-        $tournament_closed = get_field('signup_closed', $tournament->ID);
+        $tournament_closed = get_post_meta($tournament->ID, 'signup_closed', true);
 
         $html .= sprintf('<li><a href="%1$s">%2$s</a></li>', get_permalink(), 'Home');
 
@@ -845,4 +866,171 @@ class tournamentCPT {
         return $html;
 
     }
+
+    public static function get_tournament_players($attr) {
+
+        extract(shortcode_atts(array(
+            'tournament_id' => '',
+            'output'        => 'html'
+        ), $attr));
+
+        $data = array();
+
+        $args = array(
+            'connected_type'   => 'tournament_players',
+            'connected_items'  => $tournament_id,
+            'nopaging'         => true,
+            'suppress_filters' => false
+        );
+
+        $players = get_posts($args);
+
+        for ($row = 0; $row < count($players); $row++) {
+
+            $array = '';
+
+            $data[$row] = playerCPT::player_return_format($players[$row]);
+
+
+        }
+
+        switch($output){
+
+            case "json":
+
+                wp_send_json_success($data);
+
+                break;
+
+            case "html" :
+
+
+
+                break;
+
+            case "raw" :
+
+                return $data;
+
+                break;
+        }
+
+    }
+
+    public static function get_tournament($attr) {
+
+        extract(shortcode_atts(array(
+            'tournament_id' => '',
+            'output'        => 'html'
+        ), $attr));
+
+        $tournament = get_post($tournament_id);
+
+        $data = self::tournament_return_format($tournament, $data);
+
+        //turned off because they should be doing /api/tournament/345533/players if they want this, same with matches, also limits overhead
+        //$data['players']       = self::get_tournament_players(array('tournament_id' => $tournament->ID, 'output' => 'raw'));
+
+        switch($output){
+
+            case "json":
+
+                wp_send_json_success($data);
+
+                break;
+
+            case "html" :
+
+
+                break;
+
+            case "raw" :
+
+                return $data;
+
+                break;
+        }
+
+    }
+
+    public static function get_tournaments($attr) {
+
+        extract(shortcode_atts(array(
+            'status' => '',
+            'output'        => 'html'
+        ), $attr));
+
+        //todo strong definiton of tournament status
+        $args = array(
+            'post_type' => self::$post_type,
+        );
+
+        $tournaments = get_posts($args);
+
+        foreach($tournaments as $tournament){
+
+            $data[] = self::tournament_return_format($tournament);
+
+        }
+
+        switch($output){
+
+            case "json":
+
+                wp_send_json_success($data);
+
+                break;
+
+            case "html" :
+
+
+                break;
+
+            case "raw" :
+
+                return $data;
+
+                break;
+        }
+    }
+
+    public static function tournament_return_format($tournament, $data = array()){
+
+        $signup_status = 'Open';
+
+        if(!self::is_tournament_signup_open($tournament->ID)){
+            $signup_status = 'Closed';
+        }
+
+        $data['name']          = $tournament->post_title;
+        $data['description']   = $tournament->post_title;
+        $data['date']          = get_post_meta($tournament->ID, 'run_date', true);
+        $data['time']          = get_post_meta($tournament->ID, 'run_time', true);
+        $data['format']          = get_post_meta($tournament->ID, 'tournament_type', true);
+        $data['slots']         = get_post_meta($tournament->ID, 'slots', true);
+        $data['slots_taken']   = count(get_tournament_players($tournament->ID));
+        $data['signup_url']    = get_permalink($tournament->ID) . '/signup';
+        $data['url']           = get_permalink($tournament->ID);
+        $data['signup_status'] = $signup_status;
+        $data['prize']         = self::get_tournament_prizes($tournament->ID);
+
+        return $data;
+
+    }
+
+    public static function get_tournament_prizes($tournament_id){
+
+        $prizes_array = get_post_meta($tournament_id, 'prize_tiers', true);
+
+        foreach($prizes_array as $prize){
+
+            $prizes[] = array('place' => $prize['place'], 'prize' => $prize['prize']);
+
+        }
+
+        return $prizes;
+
+    }
+
+
 }

@@ -18,8 +18,13 @@ class PLTM_API_Endpoint{
      */
     public function add_query_vars($vars){
         $vars[] = '__api';
-        $vars[] = 'tournament-matches';
-        $vars[] = 'tournament-match';
+        $vars[] = 'tournament';
+        $vars[] = 'tournaments';
+        $vars[] = 'return';
+        $vars[] = 'match';
+        $vars[] = 'player';
+        $vars[] = 'id_type';
+
         return $vars;
     }
 
@@ -28,8 +33,27 @@ class PLTM_API_Endpoint{
      *	@return void
      */
     public function add_endpoint(){
-        add_rewrite_rule('^api/tournament-matches/?([0-9]+)?/?','index.php?__api=1&tournament-matches=$matches[1]','top');
-        add_rewrite_rule('^api/tournament-match/?([0-9]+)?/?','index.php?__api=1&tournament-match=$matches[1]','top');
+        //add_rewrite_rule('^api/tournament-matches/?([0-9]+)?/?','index.php?__api=1&tournament-matches=$matches[1]','top');
+
+        // /api/tournament/345333/matches || /api/tournament/345333/players
+        add_rewrite_rule('^api/tournaments/?([^/]*)?/?','index.php?__api=1&tournaments=$matches[1]','top');
+        add_rewrite_rule('^api/tournament/?([^/]*)?/?([^/]*)?/?','index.php?__api=1&tournament=$matches[1]&return=$matches[2]','top');
+
+
+
+        add_rewrite_rule('^api/match/?([0-9]+)?/?([^/]*)?/?','index.php?__api=1&match_id=$matches[1]&id_type=$matches[2]','top');
+        add_rewrite_rule('^api/player/?([0-9]+)?/?','index.php?__api=1&player=$matches[1]','top');
+
+        add_rewrite_tag('%tournaments%','([^&]+)');
+        add_rewrite_tag('%id_type%','([^&]+)');
+
+
+
+        //add_rewrite_rule('^nutrition/([^/]*)/([^/]*)/?','index.php?page_id=12&food=$matches[1]&variety=$matches[2]','top');
+//        This example would match a requested URL like this:
+//example.com/nutrition/milkshakes/strawberry/
+//...and interpret it to actually mean...
+//example.com/index.php?page_id=12&food=milkshake&variety=strawberry
     }
 
     /**	Sniff Requests
@@ -50,25 +74,70 @@ class PLTM_API_Endpoint{
      *	@return void
      */
     protected function handle_request(){
+
         global $wp;
 
-        if(isset($wp->query_vars['tournament-matches'])){
+        if(isset($wp->query_vars['tournament'])){
 
-            $tournament_id = $wp->query_vars['tournament-matches'];
+            $tournament_id = $wp->query_vars['tournament'];
 
             if(!$tournament_id)
                 $this->send_response('Tournament id is missing');
 
-            matchCPT::get_match_results(array('tournament_id' => $tournament_id, 'output' => 'json'));
+            if(isset($wp->query_vars['return']) && !empty($wp->query_vars['return'])){
 
-        } else if(isset($wp->query_vars['tournament-match'])){
+                switch($wp->query_vars['return']){
 
-            $match_id = $wp->query_vars['tournament-match'];
+                    case "matches":
+
+                        matchCPT::get_match_results(array('tournament_id' => $tournament_id, 'output' => 'json'));
+
+                        break;
+
+                    case "players":
+
+                        tournamentCPT::get_tournament_players(array('tournament_id' => $tournament_id, 'output' => 'json'));
+
+                        break;
+
+                }
+
+            } else {
+
+                $tournament_id = $wp->query_vars['tournament'];
+
+                if(!$tournament_id)
+                    $this->send_response('Tournament id is missing');
+
+                //return tournament info
+                tournamentCPT::get_tournament(array('tournament_id' => $tournament_id, 'output' => 'json'));
+
+            }
+
+        } else if(isset($wp->query_vars['tournaments'])){
+
+            $tournament_status = $wp->query_vars['tournaments'];
+
+            tournamentCPT::get_tournaments(array('output' => 'json', 'status' => $tournament_status));
+
+        } else if(isset($wp->query_vars['match'])){
+
+            $match_id = $wp->query_vars['match'];
+            $id_type  = $wp->query_vars['id_type'];
 
             if(!$match_id)
                 $this->send_response('Match id is missing');
 
-            matchCPT::get_match_results(array('match_id' => $match_id, 'output' => 'json'));
+            matchCPT::get_match_results(array('match_id' => $match_id, 'by' => $id_type, 'output' => 'json'));
+
+        } else if(isset($wp->query_vars['player'])){
+
+            $player_id = $wp->query_vars['player'];
+
+            if(!$player_id)
+                $this->send_response('player id is missing');
+
+            playerCPT::get_player(array('player_id' => $player_id, 'output' => 'json'));
 
         }
 
