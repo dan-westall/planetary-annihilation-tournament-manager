@@ -65,13 +65,13 @@ class playerCPT {
 
             case "pastats_player_id":
 
-                $player_id = DW_Helper::get_post_by_meta('pastats_player_id', $id);
+                $player = DW_Helper::get_post_by_meta('pastats_player_id', $id);
 
                 break;
 
         }
 
-        return $player_id;
+        return $player;
 
     }
 
@@ -83,9 +83,7 @@ class playerCPT {
             'output'        => 'html'
         ), $attr));
 
-        $player_id = self::get_player_by($player_id, $by);
-
-        $player = get_post($player_id);
+        $player = self::get_player_by($player_id);
 
         $data = self::player_return_format($player);
 
@@ -116,9 +114,6 @@ class playerCPT {
         $data['name']               = $player->post_title;
         $data['clan']               = get_post_meta($player->ID, 'clan', true);
         $data['pa_stats_player_id'] = get_post_meta($player->ID, 'pa_stats_player_id', true);
-
-
-
 
         return $data;
 
