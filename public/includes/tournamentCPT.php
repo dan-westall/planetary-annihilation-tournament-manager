@@ -1086,8 +1086,7 @@ class tournamentCPT {
             "
                 SELECT
                 (SELECT meta_value FROM $wpdb->postmeta WHERE post_id = p2p.p2p_to AND meta_key = 'pastats_player_id' LIMIT 1 ) AS pastats_player_id,
-                posts.post_title,
-                p2pm.meta_key,
+                posts.post_title AS player_ign,
                 sum(p2pm.meta_value) AS wins
                 FROM wp_p2p as p2p
                     INNER JOIN $wpdb->posts as posts ON posts.ID = p2p.p2p_to
@@ -1100,7 +1099,11 @@ class tournamentCPT {
             $tournament_id
         );
 
-        //todo when match results update delete transient
+        //if user is admin remove cache and serve fresh results.
+        if(DW_Helper::is_site_administrator()){
+            delete_transient('tournament_result_' . $tournament_id);
+        }
+
         $result = get_transient( 'tournament_result_' .$tournament_id );
 
         if ( empty( $result ) ){

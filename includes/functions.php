@@ -54,6 +54,22 @@ class DW_Helper {
 
     }
 
+    public static function is_site_administrator(){
+
+        global $current_user;
+
+        if (!empty($current_user->roles)) {
+            foreach ($current_user->roles as $key => $value) {
+                if ($value == 'administrator') {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+
+    }
+
 }
 
 $DW_helper = new DW_Helper();
