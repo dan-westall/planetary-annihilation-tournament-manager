@@ -975,7 +975,7 @@ class tournamentCPT {
 
         foreach($tournaments as $tournament){
 
-            $data[] = self::tournament_return_format($tournament);
+            $data[] = self::tournament_return_format($tournament, array(), array('results' => false));
 
         }
 
@@ -1000,7 +1000,7 @@ class tournamentCPT {
         }
     }
 
-    public static function tournament_return_format($tournament, $data = array()){
+    public static function tournament_return_format($tournament, $data = array(), $return = array('results' => true)){
 
         $signup_status = 'Open';
 
@@ -1012,7 +1012,7 @@ class tournamentCPT {
         $data['description']   = $tournament->post_title;
         $data['date']          = get_post_meta($tournament->ID, 'run_date', true);
         $data['time']          = get_post_meta($tournament->ID, 'run_time', true);
-        $data['format']          = get_post_meta($tournament->ID, 'tournament_type', true);
+        $data['format']        = get_post_meta($tournament->ID, 'tournament_type', true);
         $data['slots']         = get_post_meta($tournament->ID, 'slots', true);
         $data['slots_taken']   = count(get_tournament_players($tournament->ID));
         $data['signup_url']    = get_permalink($tournament->ID) . '/signup';
@@ -1021,7 +1021,7 @@ class tournamentCPT {
         $data['prize']         = self::get_tournament_prizes($tournament->ID);
 
         //tournament completed.
-        if(true){
+        if(true && $return['results']){
             $data['result'] = self::get_tournament_winner_v2($tournament->ID);
         }
 
