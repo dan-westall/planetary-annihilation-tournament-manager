@@ -926,7 +926,13 @@ class tournamentCPT {
 
         $tournament = get_post($tournament_id);
 
-        $data = self::tournament_return_format($tournament, $data);
+        if($tournament == null){
+            $data = array('error', 'Tournament not found, please check the tournament ID');
+        } else {
+            $data = self::tournament_return_format($tournament, $data);
+        }
+
+
 
         //turned off because they should be doing /api/tournament/345533/players if they want this, same with matches, also limits overhead
         //$data['players']       = self::get_tournament_players(array('tournament_id' => $tournament->ID, 'output' => 'raw'));
@@ -1014,6 +1020,11 @@ class tournamentCPT {
         $data['signup_status'] = $signup_status;
         $data['prize']         = self::get_tournament_prizes($tournament->ID);
 
+        //tournament completed.
+        if(true){
+            $data['result'] = self::get_tournament_winner_v2($tournament->ID);
+        }
+
         return $data;
 
     }
@@ -1031,6 +1042,70 @@ class tournamentCPT {
         return $prizes;
 
     }
+
+    public static function get_tournament_winner($tournament_id){
+
+        $result_array = array();
+
+        $matches = new WP_Query( array(
+            'post_type' => matchCPT::$post_type,
+            'connected_type' => 'tournament_matches',
+            'connected_items' => $tournament_id,
+            'nopaging' => true,
+            )
+        );
+
+        p2p_type( 'match_players' )->each_connected( $matches, array(), playerCPT::$post_type );
+
+        while ( $matches->have_posts() ) : $matches->the_post();
+
+            //var_dump($matches->post);
+
+            foreach ( $matches->post->player as $post ) : setup_postdata( $post );
+
+            $result_array[$post->ID] += p2p_get_meta($post->p2p_id, 'winner', true);
+
+            endforeach;
+
+            wp_reset_postdata();
+
+        endwhile;
+
+        wp_reset_postdata();
+
+        arsort($result_array);
+
+    }
+
+
+    public static function get_tournament_winner_v2($tournament_id){
+
+        global $wpdb;
+
+        $statment = $wpdb->prepare(
+            "
+                SELECT
+                (SELECT meta_value FROM $wpdb->postmeta WHERE post_id = p2p.p2p_to AND meta_key = 'pastats_player_id' LIMIT 1 ) AS pastats_player_id,
+                posts.post_title,
+                p2pm.meta_key,
+                sum(p2pm.meta_value) AS wins
+                FROM wp_p2p as p2p
+                    INNER JOIN $wpdb->posts as posts ON posts.ID = p2p.p2p_to
+                    LEFT JOIN $wpdb->p2pmeta as p2pm ON p2pm.p2p_id = p2p.p2p_id
+                WHERE p2p_from IN(SELECT p2p_to
+                FROM $wpdb->p2p
+                WHERE p2p_from = %s AND p2p_type = 'tournament_matches') AND p2p_type = 'match_players' AND p2pm.meta_key = 'winner' GROUP BY p2p_to ORDER BY wins DESC
+
+            ",
+            $tournament_id
+        );
+
+        $result = $wpdb->get_results($statment);
+
+        return $result;
+
+    }
+
 
 
 }
