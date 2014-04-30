@@ -180,6 +180,23 @@ class matchCPT {
 
     }
 
+    public static function get_match_tournament_id($match_id){
 
+        $tournament_id = tournamentCPT::get_tournament_id_by(get_post_meta($match_id, 'challonge_tournament_id', true));
 
+        //Cheap way if fail fail back to p2p
+        if(!$tournament_id){
+
+            $tournament = p2p_type( 'tournament_matches' )->set_direction( 'to' )->get_connected( $match_id );
+
+            if(isset($tournament->posts[0]->ID)){
+
+                $tournament_id = $tournament->posts[0]->ID;
+
+            }
+
+        }
+
+        return $tournament_id;
+    }
 }

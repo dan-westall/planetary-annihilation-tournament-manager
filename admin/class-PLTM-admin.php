@@ -183,20 +183,7 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
 
             case "tournament":
 
-                $tournament_id = tournamentCPT::get_tournament_id_by(get_post_meta($post_id, 'challonge_tournament_id', true));
-
-                //Cheap way if fail fail back to p2p
-                if(!$tournament_id){
-
-                    $tournament = p2p_type( 'tournament_matches' )->set_direction( 'to' )->get_connected( $post_id );
-
-                    if(isset($tournament->posts[0]->ID)){
-
-                        $tournament_id = $tournament->posts[0]->ID;
-
-                    }
-
-                }
+                $tournament_id = matchCPT::get_match_tournament_id($post_id);
 
                 if($tournament_id){
 
