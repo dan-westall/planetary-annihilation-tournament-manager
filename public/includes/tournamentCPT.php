@@ -1082,7 +1082,7 @@ class tournamentCPT {
 
         global $wpdb;
 
-        $statment = $wpdb->prepare(
+        $statement = $wpdb->prepare(
             "
                 SELECT
                 (SELECT meta_value FROM $wpdb->postmeta WHERE post_id = p2p.p2p_to AND meta_key = 'pastats_player_id' LIMIT 1 ) AS pastats_player_id,
@@ -1100,7 +1100,13 @@ class tournamentCPT {
             $tournament_id
         );
 
-        $result = $wpdb->get_results($statment);
+        $result = get_transient( 'tournament_result_' .$tournament_id );
+
+        if ( empty( $result ) ){
+            $result = $wpdb->get_results($statement);
+
+            set_transient( 'tournament_result_' .$tournament_id, $result, 12 * HOUR_IN_SECONDS );
+        }
 
         return $result;
 
