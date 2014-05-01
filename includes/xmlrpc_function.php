@@ -97,6 +97,8 @@ function pltm_add_match( $data ){
         $p2p_result2 = p2p_type('match_players')->connect($match_id, $wp_player_id2, $connection_meta2);        
     }
     update_post_meta($match_id, 'last_update', $args["last_update"]);
+    update_post_meta($match_id, 'favorite', $args["favorite"]);
+    update_post_meta($match_id, 'favoritepercent', $args["favoritepercent"]);
     foreach($args["pastatsmatches"] as $key => $pamatch){
         update_post_meta($match_id, 'pa_stats_match_id', $pamatch["gameId"]);
         update_post_meta($match_id, 'pa_stats_start', $pamatch["start"]);
