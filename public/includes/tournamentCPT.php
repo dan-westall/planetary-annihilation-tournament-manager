@@ -28,7 +28,7 @@ class tournamentCPT {
 
         add_filter( 'tournament_rounds', array( $this, 'filter_tournament_rounds' ) );
         add_filter( 'the_title', array( $this, 'filter_endpoint_titles'), 10, 2 );
-        add_filter( 'single_template', array( $this, 'single_tournament_template') );
+        //add_filter( 'single_template', array( $this, 'single_tournament_template') );
         add_filter( 'post_updated_messages', array( $this, 'filter_post_type_feedback_messages') );
 
 

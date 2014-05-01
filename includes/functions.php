@@ -25,6 +25,22 @@ function get_tournament_matches($tournament_id){
 
 }
 
+function get_the_tournament_endpoint(){
+
+    global $wp_query, $post;
+
+    foreach(Planetary_Annihilation_Tournament_Manager::$endpoints as $endpoint){
+
+        if ($post->post_type == 'tournament' && isset( $wp_query->query_vars[$endpoint] )) {
+
+            return "$post->post_type-$endpoint";
+
+        }
+    }
+
+    return tournamentCPT::$post_type;
+}
+
 function is_tournament_signup_open($tournament_id){
 
     return tournamentCPT::is_tournament_signup_open($tournament_id);
