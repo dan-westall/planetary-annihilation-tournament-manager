@@ -921,7 +921,8 @@ class tournamentCPT {
 
         extract(shortcode_atts(array(
             'tournament_id' => '',
-            'output'        => 'html'
+            'output'        => 'html',
+            'return'        => ''
         ), $attr));
 
         $tournament = get_post($tournament_id);
@@ -929,7 +930,7 @@ class tournamentCPT {
         if($tournament == null){
             $data = array('error', 'Tournament not found, please check the tournament ID');
         } else {
-            $data = self::tournament_return_format($tournament, $data);
+            $data = self::tournament_return_format($tournament, $data, $return);
         }
 
 
@@ -1000,7 +1001,9 @@ class tournamentCPT {
         }
     }
 
-    public static function tournament_return_format($tournament, $data = array(), $return = array('results' => true)){
+    public static function tournament_return_format($tournament, $data = array(), $return = array('results' => true, 'prize' => true)){
+
+        $to = new tournamentCPT();
 
         $signup_status = 'Open';
 
@@ -1018,8 +1021,11 @@ class tournamentCPT {
         $data['signup_url']    = get_permalink($tournament->ID) . '/signup';
         $data['url']           = get_permalink($tournament->ID);
         $data['signup_status'] = $signup_status;
-        $data['prize']         = self::get_tournament_prizes($tournament->ID);
+        $data['challonge_tournament_id'] = $to->get_the_challonge_tournament_id($tournament->ID);
 
+        if(true && $return['prize']){
+            $data['prize']         = self::get_tournament_prizes($tournament->ID);
+        }
         //tournament completed.
         if(true && $return['results']){
             $data['result'] = self::get_tournament_winner_v2($tournament->ID);
@@ -1078,24 +1084,31 @@ class tournamentCPT {
     }
 
 
-    public static function get_tournament_winner_v2($tournament_id){
+    public static function get_tournament_winner_v2($tournament_id, $fields = array(), $Where = array(), $limit = ''){
 
         global $wpdb;
 
-        $statement = $wpdb->prepare(
-            "
-                SELECT
-                (SELECT meta_value FROM $wpdb->postmeta WHERE post_id = p2p.p2p_to AND meta_key = 'pastats_player_id' LIMIT 1 ) AS pastats_player_id,
-                posts.post_title AS player_ign,
-                sum(p2pm.meta_value) AS wins
-                FROM wp_p2p as p2p
-                    INNER JOIN $wpdb->posts as posts ON posts.ID = p2p.p2p_to
-                    LEFT JOIN $wpdb->p2pmeta as p2pm ON p2pm.p2p_id = p2p.p2p_id
-                WHERE p2p_from IN(SELECT p2p_to
-                FROM $wpdb->p2p
-                WHERE p2p_from = %s AND p2p_type = 'tournament_matches') AND p2p_type = 'match_players' AND p2pm.meta_key = 'winner' GROUP BY p2p_to ORDER BY wins DESC
+        $fields[] = "(SELECT meta_value FROM $wpdb->postmeta WHERE post_id = p2p.p2p_to AND meta_key = 'pastats_player_id' LIMIT 1 ) AS pastats_player_id";
+        $fields[] = "posts.post_title AS player_ign";
+        $fields[] = "count(p2pm.meta_value) AS wins";
 
-            ",
+        $from = "FROM wp_p2p as p2p";
+
+        $join = array(
+            "INNER JOIN $wpdb->posts as posts ON posts.ID = p2p.p2p_to",
+            "LEFT JOIN $wpdb->p2pmeta as p2pm ON p2pm.p2p_id = p2p.p2p_id"
+        );
+
+        $where[] = "p2p_from IN(SELECT p2p_to
+                FROM $wpdb->p2p
+                WHERE p2p_from = %s AND p2p_type = 'tournament_matches')";
+        $where[] = "AND p2p_type = 'match_players'";
+        $where[] = "AND p2pm.meta_key = 'winner'";
+
+        $statement_String = sprintf('SELECT %s %s %s WHERE %s GROUP BY p2p_to ORDER BY wins DESC %s', implode(', ', $fields), $from, implode(' ', $join), implode(' ', $where), $limit);
+
+        $statement = $wpdb->prepare(
+            $statement_String,
             $tournament_id
         );
 
