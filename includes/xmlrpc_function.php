@@ -55,10 +55,12 @@ function pltm_add_match( $data ){
             'ID'           => $match_id,
             'post_content' => 'This an Update'
         );
+
         wp_update_post($update_match);
 
         $p2pplayer1 = p2p_type('match_players')->get_p2p_id($match_id, $wp_player_id1);
         $p2pplayer2 = p2p_type('match_players')->get_p2p_id($match_id, $wp_player_id2);
+
         //return $p2pplayer1 . " " . $p2pplayer2;
         if($p2pplayer1 == ""){
             $p2p_result1 = p2p_type('match_players')->connect($match_id, $wp_player_id1, $connection_meta1);
@@ -94,33 +96,53 @@ function pltm_add_match( $data ){
         //team is simple int, for example if its a ffa each player team would just be a int in a series, if team play, 2 players would be team int 1 and 2 team int 2
 
         $p2p_result1 = p2p_type('match_players')->connect($match_id, $wp_player_id1, $connection_meta1);
-        $p2p_result2 = p2p_type('match_players')->connect($match_id, $wp_player_id2, $connection_meta2);        
+        $p2p_result2 = p2p_type('match_players')->connect($match_id, $wp_player_id2, $connection_meta2);
+
     }
+
     update_post_meta($match_id, 'last_update', $args["last_update"]);
+
+    //note dw if you just want to access the first one, as evident by the break at the end of the first loop just do $args["pastatsmatches"][0] then do $args["pastatsmatches"][0]['gameId'] etc, loop not needed
     foreach($args["pastatsmatches"] as $key => $pamatch){
+
         update_post_meta($match_id, 'pa_stats_match_id', $pamatch["gameId"]);
         update_post_meta($match_id, 'pa_stats_start', $pamatch["start"]);
         update_post_meta($match_id, 'pa_stats_stop', $pamatch["end"]);
 
+        // recommend if(!empty($pamatch["winner"]))
         if($pamatch["winner"] != ''){
+
             $winner_id = playerCPT::get_player_by($pamatch["winner"])->ID;
             $p2pwinner = p2p_type('match_players')->get_p2p_id($match_id, $winner_id); 
             p2p_update_meta($p2pwinner, 'winner', 1);
+
+            do_action('match_winner_declared', $match_id, $winner_id);
+
             if($pamatch["winner"] == $args["player_1_pastats_id"]){
+
                 $loser_id = playerCPT::get_player_by($args["player_2_pastats_id"])->ID;
                 $p2ploser = p2p_type('match_players')->get_p2p_id($match_id, $loser_id); 
                 p2p_update_meta($p2ploser, 'winner', 0);
-            }
-            else{
+
+            } else {
+
                 $loser_id = playerCPT::get_player_by($args["player_1_pastats_id"])->ID;
                 $p2ploser = p2p_type('match_players')->get_p2p_id($match_id, $loser_id); 
                 p2p_update_meta($p2ploser, 'winner', 0);
+
             }
 
+            do_action('match_loser_declared', $match_id, $loser_id);
+
         }
+
         //return $key . " " . $pamatch["winner"];
         break;
+
     }
 
+    do_action('match_updated', $match_id);
+
     return "match ". $args["match_letter"] ." added and got wp-id ". $match_id;
+
 }

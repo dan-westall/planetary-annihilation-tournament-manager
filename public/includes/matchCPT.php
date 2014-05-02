@@ -1,4 +1,4 @@
-<?php
+    <?php
 
 class matchCPT {
 
@@ -121,11 +121,11 @@ class matchCPT {
             $data[$row]['players'] = $match_players;
 
             $data[$row]['challonge_tournament_id'] = get_post_meta($matches[$row]->ID, 'challonge_tournament_id', true);
-            $data[$row]['challonge_match_id'] = get_post_meta($matches[$row]->ID, 'challonge_match_id', true);
+            $data[$row]['challonge_match_id']      = get_post_meta($matches[$row]->ID, 'challonge_match_id', true);
             $data[$row]['pa_stats_match_id']       = get_post_meta($matches[$row]->ID, 'pa_stats_match_id', true);
-            $data[$row]['pa_stats_start'] = get_post_meta($matches[$row]->ID, 'pa_stats_start', true);
-            $data[$row]['pa_stats_stop'] = get_post_meta($matches[$row]->ID, 'pa_stats_stop', true);
-            $data[$row]['last_update'] = get_post_meta($matches[$row]->ID, 'last_update', true); //todo to be played, in progress, completed??
+            $data[$row]['pa_stats_start']          = get_post_meta($matches[$row]->ID, 'pa_stats_start', true);
+            $data[$row]['pa_stats_stop']           = get_post_meta($matches[$row]->ID, 'pa_stats_stop', true);
+            $data[$row]['last_update']             = get_post_meta($matches[$row]->ID, 'last_update', true); //todo to be played, in progress, completed??
 
         }
 

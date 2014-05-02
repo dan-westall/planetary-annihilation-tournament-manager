@@ -39,8 +39,6 @@ class PLTM_API_Endpoint{
         add_rewrite_rule('^api/tournaments/?([^/]*)?/?','index.php?__api=1&tournaments=$matches[1]','top');
         add_rewrite_rule('^api/tournament/?([^/]*)?/?([^/]*)?/?','index.php?__api=1&tournament=$matches[1]&return=$matches[2]','top');
 
-
-
         add_rewrite_rule('^api/match/?([0-9]+)?/?([^/]*)?/?','index.php?__api=1&match_id=$matches[1]&id_type=$matches[2]','top');
         add_rewrite_rule('^api/player/?([0-9]+)?/?','index.php?__api=1&player=$matches[1]','top');
 
