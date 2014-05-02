@@ -84,7 +84,7 @@ var MatchListing = function() {
 	self.wptourneyid = ko.observable();
 
 	self.restendpoint = ko.computed(function(){
-		return "/api/tournament-matches/" + self.wptourneyid();
+		return "/api/tournament/" + self.wptourneyid() + "/matches";
 	});
 
 	self.wptourneyid.subscribe(function(newValue){
@@ -97,10 +97,10 @@ var MatchListing = function() {
 		$.getJSON(self.restendpoint(),function(data){
 			//ko.mapping.fromJS(data.data,mapping,self.matches);
     		
-    		if(data.data !== undefined){
+    		if(data !== undefined){
 //    			console.log(data.data);
-				for(var i = 0; i < data.data.length; i++){
-					self.matches.push(new MatchModel(data.data[i]));
+				for(var i = 0; i < data.length; i++){
+					self.matches.push(new MatchModel(data[i]));
 					self.SortMatches();
 				}
 			}
@@ -113,7 +113,7 @@ var MatchListing = function() {
 		$.getJSON("/api/tournament-match/" + match,function(data){
 //			console.log(data);
 			if(data.data.length > 0){
-				var updatedmatch = new MatchModel(data.data[0]);
+				var updatedmatch = new MatchModel(data[0]);
 				var oldMatch = ko.utils.arrayFirst(self.matches(), function(item) {
 				    return item.challonge_match_id() == updatedmatch.challonge_match_id();
 				});				
@@ -151,7 +151,10 @@ var MatchListing = function() {
 		});
 	});
 	*/
-	setInterval(self.Start,60000);
+	
+	self.AutoReload = function(){
+		setInterval(self.Start,60000);
+	};
 
 
 };

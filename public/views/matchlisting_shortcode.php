@@ -31,5 +31,6 @@
 jQuery(document).ready(function ($) {
     //console.log("execute matchlisting");
     eematchlisting.wptourneyid(<?php echo $vars ?>);
+    eematchlisting.AutoReload();
 });
 </script>

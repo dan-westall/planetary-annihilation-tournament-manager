@@ -101,6 +101,9 @@ function pltm_add_match( $data ){
     }
 
     update_post_meta($match_id, 'last_update', $args["last_update"]);
+    update_post_meta($match_id, 'favorite', $args["favorite"]);
+    update_post_meta($match_id, 'favoritepercent', $args["favoritepercent"]);
+    
 
     //note dw if you just want to access the first one, as evident by the break at the end of the first loop just do $args["pastatsmatches"][0] then do $args["pastatsmatches"][0]['gameId'] etc, loop not needed
     foreach($args["pastatsmatches"] as $key => $pamatch){
