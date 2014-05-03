@@ -46,7 +46,7 @@ class PLTM_API_Endpoint{
         add_rewrite_tag('%tournaments%','([^&]+)');
         add_rewrite_tag('%id_type%','([^&]+)');
 
-        add_rewrite_rule('^api/videos/?([^/]*)?/?','index.php?__api=1&videos=$videos[1]','top');
+        //add_rewrite_rule('^api/videos/?([^/]*)?/?','index.php?__api=1&videos=$videos[1]','top');
 
 
         //add_rewrite_rule('^nutrition/([^/]*)/([^/]*)/?','index.php?page_id=12&food=$matches[1]&variety=$matches[2]','top');
@@ -139,10 +139,14 @@ class PLTM_API_Endpoint{
 
             playerCPT::get_player(array('player_id' => $player_id, 'output' => 'json'));
 
-        } else if(isset($wp->query_vars['videos'])){
-
-           wp_exodus_functionality::get_videos(array('output' => 'json'));
         }
+
+//        else if(isset($wp->query_vars['videos'])){
+//
+//           //TODO needs to be moved out into a seperate api for exodus functionality because this creates a plugin depenancy currently no way to auto load plugin depeancies within wordpress and not happening soon, last time i looked
+//           wp_exodus_functionality::get_videos(array('output' => 'json'));
+//        }
+
 
     }
 
