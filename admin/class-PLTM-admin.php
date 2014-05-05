@@ -123,7 +123,18 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
     }
 
     public function modify_user_table( $column ) {
-        $column['clan'] = __('Clan');
+
+        $column = array(
+            'cb'        => '<input type="checkbox" />',
+            'username'  => __('Username'),
+            'nickname' => __('Nickname'),
+            'displayname' => __('Display Name'),
+            'clan'      => __('Clan'),
+            'role'      => __('Role'),
+            'email'     => __('email')
+
+
+        );
 
         return $column;
     }
@@ -133,9 +144,24 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
         $user = get_userdata( $user_id );
 
         switch ($column_name) {
+
             case 'clan' :
 
                 return get_user_meta($user_id, 'clan', true);
+
+                break;
+
+
+            case 'nickname' :
+
+                return get_user_meta($user_id, 'nickname', true);
+
+                break;
+
+
+            case 'displayname' :
+
+                return $user->display_name;
 
                 break;
 

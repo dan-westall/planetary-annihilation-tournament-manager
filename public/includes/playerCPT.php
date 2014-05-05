@@ -13,6 +13,16 @@ class playerCPT {
 
         add_action( 'p2p_init', array( $this, 'register_p2p_connections' ) );
 
+//        //admin menu removed create new player for non admins
+        add_action( 'admin_head',  array( $this, 'hide_new_player') );
+        add_action( 'load-post-new.php',  array( $this, 'disable_new_player') );
+
+//      change labels
+        add_action( 'admin_init',   array( $this, 'change_player_object_label') );
+
+        add_action( 'admin_menu', array( $this, 'prefix_remove_menu_pages') );
+
+
     }
 
     function register_cpt_player() {
@@ -41,7 +51,7 @@ class playerCPT {
             'menu_position'       => 10,
             'menu_icon'           => 'dashicons-id',
             'supports'            => array('title'),
-            'capability_type'     => array('profile','profiles'),
+            'capability_type'     => array(self::$post_type,self::$post_type.'s'),
             'map_meta_cap'        => true,
         );
 
@@ -221,17 +231,17 @@ class playerCPT {
 
         $caps  = array(
             'read',
-            'read_profile',
-            'read_private_profiles',
-            'edit_profiles',
-            'edit_private_profiles',
-            'edit_published_profiles',
-            'edit_others_profiles',
-            'publish_profiles',
-            'delete_profiles',
-            'delete_private_profiles',
-            'delete_published_profiles',
-            'delete_others_profiles',
+            'read_player',
+            'read_private_players',
+            'edit_players',
+            'edit_private_players',
+            'edit_published_players',
+            'edit_others_players',
+            'publish_players',
+            'delete_players',
+            'delete_private_players',
+            'delete_published_players',
+            'delete_others_players',
         );
 
         foreach ($roles as $role) {
@@ -240,5 +250,88 @@ class playerCPT {
             }
         }
         
+    }
+
+    public function hide_new_player() {
+        // Hide sidebar link
+        global $submenu;
+
+        if(!DW_Helper::is_site_administrator()){
+
+            // Hide link on listing page
+            if ((isset($_GET['post_type']) && $_GET['post_type'] == playerCPT::$post_type) || (isset($_GET['post']) && get_post_type($_GET['post']) == playerCPT::$post_type)) {
+                echo '<style type="text/css"> #favorite-actions, .add-new-h2, .tablenav { display:none; } </style>';
+            }
+
+        }
+    }
+
+    public function disable_new_player(){
+
+        if(!DW_Helper::is_site_administrator()){
+            if ( get_current_screen()->post_type == playerCPT::$post_type )
+                wp_die( "You ain't allowed to do that!" );
+
+        }
+    }
+
+    public function change_player_object_label() {
+        global $wp_post_types, $post;
+
+        if (!DW_Helper::is_site_administrator()) {
+
+            $current_user = wp_get_current_user();
+
+            $player_profile_id = self::get_user_player_profile_id($current_user->ID);
+
+            if ($_GET['post'] == $player_profile_id) {
+
+                $labels = & $wp_post_types[playerCPT::$post_type]->labels;
+
+                $labels->edit_item = 'Edit My Player Profile';
+
+            }
+
+
+        }
+    }
+
+
+    public function prefix_remove_menu_pages() {
+
+        if(!DW_Helper::is_site_administrator()){
+
+            remove_menu_page( 'edit.php?post_type=' . playerCPT::$post_type );
+
+            $current_user = wp_get_current_user();
+
+            $player_profile_id = self::get_user_player_profile_id($current_user->ID);
+
+            if($player_profile_id){
+
+                add_menu_page(
+                    'My Player Profile',
+                    'My Player Profile',
+                    'read',
+                    '/post.php?post='.$player_profile_id.'&action=edit',
+                    '',
+                    'dashicons-nametag',
+                    15
+                );
+
+            }
+        }
+    }
+
+    public static function get_user_player_profile_id($user_id){
+
+        $player_id = get_user_meta($user_id, 'player_id', true);
+
+        if(!empty($player_id)){
+            return $player_id;
+        }
+
+        return false;
+
     }
 }
