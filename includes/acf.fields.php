@@ -3,6 +3,60 @@
 if(function_exists("register_field_group"))
 {
     register_field_group(array (
+        'id' => 'acf_admin-player-profile',
+        'title' => 'ADMIN - Player Profile',
+        'fields' => array (
+            array (
+                'key' => 'field_5353e2a7c221e',
+                'label' => 'User profile link',
+                'name' => 'user_id',
+                'type' => 'user',
+                'role' => array (
+                    0 => 'all',
+                ),
+                'field_type' => 'select',
+                'allow_null' => 1,
+            ),
+            array (
+                'key' => 'field_5367966ccb823',
+                'label' => 'PA Stats player ID',
+                'name' => 'pastats_player_id',
+                'type' => 'text',
+                'default_value' => '',
+                'placeholder' => '',
+                'prepend' => '',
+                'append' => '',
+                'formatting' => 'html',
+                'maxlength' => '',
+            ),
+        ),
+        'location' => array (
+            array (
+                array (
+                    'param' => 'post_type',
+                    'operator' => '==',
+                    'value' => 'player',
+                    'order_no' => 0,
+                    'group_no' => 0,
+                ),
+                array (
+                    'param' => 'user_type',
+                    'operator' => '==',
+                    'value' => 'administrator',
+                    'order_no' => 1,
+                    'group_no' => 0,
+                ),
+            ),
+        ),
+        'options' => array (
+            'position' => 'normal',
+            'layout' => 'default',
+            'hide_on_screen' => array (
+            ),
+        ),
+        'menu_order' => 0,
+    ));
+    register_field_group(array (
         'id' => 'acf_match-meta',
         'title' => 'Match Meta',
         'fields' => array (
@@ -87,19 +141,27 @@ if(function_exists("register_field_group"))
         'menu_order' => 0,
     ));
     register_field_group(array (
-        'id' => 'acf_player-profile-admin',
-        'title' => 'Player profile admin',
+        'id' => 'acf_player-profile',
+        'title' => 'Player Profile',
         'fields' => array (
             array (
-                'key' => 'field_5353e2a7c221e',
-                'label' => 'User profile link',
-                'name' => 'user_id',
-                'type' => 'user',
-                'role' => array (
-                    0 => 'all',
-                ),
-                'field_type' => 'select',
-                'allow_null' => 1,
+                'key' => 'field_5353e38c75c10',
+                'label' => 'Your Email',
+                'name' => 'player_email',
+                'type' => 'email',
+                'default_value' => '',
+                'placeholder' => '',
+                'prepend' => '',
+                'append' => '',
+            ),
+            array (
+                'key' => 'field_5353e3a175c11',
+                'label' => 'Profile text',
+                'name' => 'profile_text',
+                'type' => 'wysiwyg',
+                'default_value' => '',
+                'toolbar' => 'full',
+                'media_upload' => 'yes',
             ),
         ),
         'location' => array (
@@ -108,49 +170,6 @@ if(function_exists("register_field_group"))
                     'param' => 'post_type',
                     'operator' => '==',
                     'value' => 'player',
-                    'order_no' => 0,
-                    'group_no' => 0,
-                ),
-                array (
-                    'param' => 'user_type',
-                    'operator' => '==',
-                    'value' => 'administrator',
-                    'order_no' => 1,
-                    'group_no' => 0,
-                ),
-            ),
-        ),
-        'options' => array (
-            'position' => 'normal',
-            'layout' => 'default',
-            'hide_on_screen' => array (
-            ),
-        ),
-        'menu_order' => 0,
-    ));
-    register_field_group(array (
-        'id' => 'acf_temp-user-profile',
-        'title' => 'Temp User profile',
-        'fields' => array (
-            array (
-                'key' => 'field_53226b3245ed1',
-                'label' => 'Twitch url',
-                'name' => 'twitch_url',
-                'type' => 'text',
-                'default_value' => '',
-                'placeholder' => '',
-                'prepend' => '',
-                'append' => '',
-                'formatting' => 'html',
-                'maxlength' => '',
-            ),
-        ),
-        'location' => array (
-            array (
-                array (
-                    'param' => 'ef_user',
-                    'operator' => '==',
-                    'value' => 'all',
                     'order_no' => 0,
                     'group_no' => 0,
                 ),
@@ -462,6 +481,9 @@ if(function_exists("register_field_group"))
                 'instructions' => 'Will default to the system default signup form, unless a new form is selected here.',
                 'choices' => array (
                     2 => 'Contact',
+                    5 => 'Livestream - Survey',
+                    3 => 'PreLim Feedback',
+                    4 => 'Showdown - Survey',
                     1 => 'Tournament Signup',
                 ),
                 'default_value' => '',
@@ -550,61 +572,6 @@ if(function_exists("register_field_group"))
                     'param' => 'post_type',
                     'operator' => '==',
                     'value' => 'tournament',
-                    'order_no' => 0,
-                    'group_no' => 0,
-                ),
-            ),
-        ),
-        'options' => array (
-            'position' => 'normal',
-            'layout' => 'default',
-            'hide_on_screen' => array (
-            ),
-        ),
-        'menu_order' => 0,
-    ));
-    register_field_group(array (
-        'id' => 'acf_user-profile',
-        'title' => 'User Profile',
-        'fields' => array (
-            array (
-                'key' => 'field_5353e38c75c10',
-                'label' => 'Your Email',
-                'name' => 'player_email',
-                'type' => 'email',
-                'default_value' => '',
-                'placeholder' => '',
-                'prepend' => '',
-                'append' => '',
-            ),
-            array (
-                'key' => 'field_5353e3a175c11',
-                'label' => 'Profile text',
-                'name' => 'profile_text',
-                'type' => 'wysiwyg',
-                'default_value' => '',
-                'toolbar' => 'full',
-                'media_upload' => 'yes',
-            ),
-            array (
-                'key' => 'field_53555eb579656',
-                'label' => 'Pastats player id',
-                'name' => 'pastats_player_id',
-                'type' => 'text',
-                'default_value' => '',
-                'placeholder' => '',
-                'prepend' => '',
-                'append' => '',
-                'formatting' => 'html',
-                'maxlength' => '',
-            ),
-        ),
-        'location' => array (
-            array (
-                array (
-                    'param' => 'post_type',
-                    'operator' => '==',
-                    'value' => 'player',
                     'order_no' => 0,
                     'group_no' => 0,
                 ),
