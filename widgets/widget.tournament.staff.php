@@ -17,6 +17,28 @@ class tournament_staff extends WP_Widget {
         $title 		= apply_filters('widget_title', $instance['title']);
         $message 	= $instance['message'];
         ?>
+        <?php
+
+
+        $args = array(
+            'connected_type' => 'tournament_staff',
+            'connected_items' => $post
+        );
+
+        $staff = get_users( $args );
+
+
+        $args = array(
+            'connected_type' => 'tournament_players',
+            'connected_items' => $post
+        );
+
+        $players = get_posts( $args );
+
+
+        ?>
+
+        <?php  if(!empty($staff)) :?>
         <?php echo $before_widget; ?>
 
         <div class="tournament-widget-info">
@@ -24,26 +46,7 @@ class tournament_staff extends WP_Widget {
             <section class="staff tournament-meta-block">
                 <h3>Staff Members</h3>
 
-                <?php
 
-
-                $args = array(
-                    'connected_type' => 'tournament_staff',
-                    'connected_items' => $post
-                );
-
-                $staff = get_users( $args );
-
-
-                $args = array(
-                    'connected_type' => 'tournament_players',
-                    'connected_items' => $post
-                );
-
-                $players = get_posts( $args );
-
-
-                ?>
 
                 <table>
 
@@ -87,6 +90,7 @@ class tournament_staff extends WP_Widget {
 
         </div>
         <?php echo $after_widget; ?>
+            <?php endif; ?>
     <?php
     }
 
