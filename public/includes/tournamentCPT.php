@@ -436,13 +436,21 @@ class tournamentCPT {
         } else {
 
             //new user accounts have been created to provide features going forward
-            $userdata = array(
-                'user_login' => $values['email']['value'],
-                'user_email' => $values['email']['value'],
-                'user_pass'  => wp_generate_password()
-            );
+            $user = get_user_by( 'email', $values['email']['value'] );
 
-            $user_id = wp_insert_user($userdata);
+            if(!$user){
+
+                $userdata = array(
+                    'user_login' => $values['ign']['value'],
+                    'user_email' => $values['email']['value'],
+                    'user_pass'  => wp_generate_password()
+                );
+
+                $user_id = wp_insert_user($userdata);
+
+            } else {
+                $user_id = $user->ID;
+            }
 
             //create new player post
             $new_player = array(

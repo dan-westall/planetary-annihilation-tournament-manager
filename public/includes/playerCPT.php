@@ -9,6 +9,7 @@ class playerCPT {
         add_action('init', array($this, 'register_cpt_player'));
 
         add_action( 'user_register', array( $this, 'action_new_player_profile' ) );
+        add_action( 'after_setup_theme', array( $this, 'add_news_caps_to_admin') );
 
         add_action( 'p2p_init', array( $this, 'register_p2p_connections' ) );
 
@@ -39,7 +40,9 @@ class playerCPT {
             'show_ui'             => true,
             'menu_position'       => 10,
             'menu_icon'           => 'dashicons-id',
-            'supports'            => array('title')
+            'supports'            => array('title'),
+            'capability_type'     => array('profile','profiles'),
+            'map_meta_cap'        => true,
         );
 
         register_post_type( self::$post_type, $playerArgs );
@@ -208,5 +211,34 @@ class playerCPT {
 
         return $player_tournament_end_place;
 
+    }
+
+    function add_news_caps_to_admin() {
+
+        $roles = array(
+            get_role('administrator')
+        );
+
+        $caps  = array(
+            'read',
+            'read_profile',
+            'read_private_profiles',
+            'edit_profiles',
+            'edit_private_profiles',
+            'edit_published_profiles',
+            'edit_others_profiles',
+            'publish_profiles',
+            'delete_profiles',
+            'delete_private_profiles',
+            'delete_published_profiles',
+            'delete_others_profiles',
+        );
+
+        foreach ($roles as $role) {
+            foreach ($caps as $cap) {
+                $role->add_cap($cap);
+            }
+        }
+        
     }
 }
