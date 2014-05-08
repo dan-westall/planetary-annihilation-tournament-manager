@@ -44,7 +44,7 @@ class matchCPT {
                 'show_ui'             => true,
                 'menu_position'       => 10,
                 'menu_icon'           => 'dashicons-video-alt3',
-                'supports'            => array('title', 'thumbnail')
+                'supports'            => array('title', 'thumbnail', 'comments')
             );
 
         register_post_type( self::$post_type, $matchArgs );
@@ -160,7 +160,7 @@ class matchCPT {
         wp_enqueue_script('custom.knockout');
         //wp_register_script('socketio',":5000/socket.io/socket.io.js");
         //wp_enqueue_script('socketio');
-        wp_register_script('match_listing',PLTM_PLUGIN_URI . 'public/assets/js/matchlisting.js', array('custom.knockout') );
+        wp_register_script('match_listing', PLTM_PLUGIN_URI . 'public/assets/js/matchlisting.js', array('defaults.knockout') );
         wp_enqueue_script('match_listing');
     }
 
