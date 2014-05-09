@@ -76,7 +76,8 @@ class matchCPT {
         extract(shortcode_atts(array(
             'tournament_id' => '',
             'output'        => 'html',
-            'match_id'      => ''
+            'match_id'      => '',
+            'autoreload'    => false
         ), $attr));
 
         $args = array(
@@ -143,7 +144,9 @@ class matchCPT {
 
                 self::match_listing_js_deps();
 
-                return self::match_listing_template($tournament_id);
+                $matchopts = array($tournament_id,$autoreload);
+
+                return self::match_listing_template($matchopts);
 
                 break;
         }

@@ -30,7 +30,8 @@
 <script type="text/javascript">
 jQuery(document).ready(function ($) {
     //console.log("execute matchlisting");
-    eematchlisting.wptourneyid(<?php echo $vars ?>);
-    eematchlisting.AutoReload();
+    eematchlisting.wptourneyid(<?php echo $vars[0] ?>);
+    <?php if($vars[1]) echo 'eematchlisting.AutoReload();'?>
+    
 });
 </script>
