@@ -18,7 +18,7 @@
 
 <script type="text/html" id="matchTemplate">
 <tr>
-    <td><span data-bind="text: title"></span></td>
+    <td><a data-bind="attr: {href: match_url}"><span data-bind="text: title"></span></a></td>
     <td><span class="spoiler" data-bind="text: player1, css:{ matchwinner: player1() === winner()}"></span></td>
     <td><span class="spoiler" data-bind="text: player2, css:{ matchwinner: player2() === winner()}"></span></td>
     <td><a data-bind="attr: {href: paslink}" target="_blank"><span data-bind="text:pasduration"></span></a></td>
