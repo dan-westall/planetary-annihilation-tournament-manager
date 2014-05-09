@@ -251,8 +251,8 @@ class tournamentCPT {
     function register_tournament_sidebar(){
 
         register_sidebar( array(
-            'name'          => __( 'Single Tournament Widgets', 'pace' ),
-            'description'   => __( 'Used for single tournament widgets', 'pace' ),
+            'name'          => __( 'Single Tournament Widgets', 'PLTM' ),
+            'description'   => __( 'Used for single tournament widgets', 'PLTM' ),
             'before_widget' => '<section id="%1$s" class="widget container-box %2$s">',
             'after_widget'  => '</section>',
             'before_title'  => '<h1 class="widget-title">',
@@ -260,9 +260,9 @@ class tournamentCPT {
         ) );
 
         register_sidebar( array(
-            'name'          => __( 'Archive Tournament Widgets', 'pace' ),
+            'name'          => __( 'Archive Tournament Widgets', 'PLTM' ),
             'id'            => 'sidebar-5',
-            'description'   => __( 'Used for archive tournament widgets', 'pace' ),
+            'description'   => __( 'Used for archive tournament widgets', 'PLTM' ),
             'before_widget' => '<section id="%1$s" class="widget %2$s">',
             'after_widget'  => '</section>',
             'before_title'  => '<h1 class="widget-title">',
@@ -749,33 +749,33 @@ class tournamentCPT {
 
             $messages[self::$post_type] = array(
                 0  => '', // Unused. Messages start at index 1.
-                1  => __( 'Tournament updated.', 'pace-tournament-cpt' ),
-                2  => __( 'Custom field updated.', 'pace-tournament-cpt' ),
-                3  => __( 'Custom field deleted.', 'pace-tournament-cpt' ),
-                4  => __( 'Tournament updated.', 'pace-tournament-cpt' ),
+                1  => __( 'Tournament updated.', 'PLTM' ),
+                2  => __( 'Custom field updated.', 'PLTM' ),
+                3  => __( 'Custom field deleted.', 'PLTM' ),
+                4  => __( 'Tournament updated.', 'PLTM' ),
                 /* translators: %s: date and time of the revision */
-                5  => isset( $_GET['revision'] ) ? sprintf( __( 'Tournament restored to revision from %s', 'pace-tournament-cpt' ), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
-                6  => __( 'Tournament published.', 'pace-tournament-cpt' ),
-                7  => __( 'Tournament saved.', 'pace-tournament-cpt' ),
-                8  => __( 'Tournament submitted.', 'pace-tournament-cpt' ),
+                5  => isset( $_GET['revision'] ) ? sprintf( __( 'Tournament restored to revision from %s', 'PLTM' ), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
+                6  => __( 'Tournament published.', 'PLTM' ),
+                7  => __( 'Tournament saved.', 'PLTM' ),
+                8  => __( 'Tournament submitted.', 'PLTM' ),
                 9  => sprintf(
-                    __( 'Tournament scheduled for: <strong>%1$s</strong>.', 'pace-tournament-cpt' ),
+                    __( 'Tournament scheduled for: <strong>%1$s</strong>.', 'PLTM' ),
                     // translators: Publish box date format, see http://php.net/date
-                    date_i18n( __( 'M j, Y @ G:i', 'pace-tournament-cpt' ), strtotime( $post->post_date ) )
+                    date_i18n( __( 'M j, Y @ G:i', 'PLTM' ), strtotime( $post->post_date ) )
                 ),
-                10 => __( 'Tournament draft updated.', 'pace-tournament-cpt' ),
+                10 => __( 'Tournament draft updated.', 'PLTM' ),
             );
 
             if ( $post_type_object->publicly_queryable ) {
                 $permalink = get_permalink( $post->ID );
 
-                $view_link = sprintf( ' <a href="%s">%s</a>', esc_url( $permalink ), __( 'View tournament', 'pace-tournament-cpt' ) );
+                $view_link = sprintf( ' <a href="%s">%s</a>', esc_url( $permalink ), __( 'View tournament', 'PLTM' ) );
                 $messages[ $post_type ][1] .= $view_link;
                 $messages[ $post_type ][6] .= $view_link;
                 $messages[ $post_type ][9] .= $view_link;
 
                 $preview_permalink = add_query_arg( 'preview', 'true', $permalink );
-                $preview_link = sprintf( ' <a target="_blank" href="%s">%s</a>', esc_url( $preview_permalink ), __( 'Preview tournament', 'pace-tournament-cpt' ) );
+                $preview_link = sprintf( ' <a target="_blank" href="%s">%s</a>', esc_url( $preview_permalink ), __( 'Preview tournament', 'PLTM' ) );
                 $messages[ $post_type ][8]  .= $preview_link;
                 $messages[ $post_type ][10] .= $preview_link;
             }

@@ -47,6 +47,14 @@ function is_tournament_signup_open($tournament_id){
 
 }
 
+function get_match_player_cards($match_id){
+
+    return matchCPT::match_up(array( 'match_id' => $match_id ));
+
+}
+
+
+
 class DW_Helper {
 
     public static function get_post_by_meta($meta_key, $meta_value){

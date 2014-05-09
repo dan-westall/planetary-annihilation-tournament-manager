@@ -44,7 +44,7 @@ class matchCPT {
                 'show_ui'             => true,
                 'menu_position'       => 10,
                 'menu_icon'           => 'dashicons-video-alt3',
-                'supports'            => array('title', 'thumbnail')
+                'supports'            => array('title', 'thumbnail', 'comments')
             );
 
         register_post_type( self::$post_type, $matchArgs );
@@ -126,6 +126,8 @@ class matchCPT {
             $data[$row]['pa_stats_start']          = get_post_meta($matches[$row]->ID, 'pa_stats_start', true);
             $data[$row]['pa_stats_stop']           = get_post_meta($matches[$row]->ID, 'pa_stats_stop', true);
             $data[$row]['last_update']             = get_post_meta($matches[$row]->ID, 'last_update', true); //todo to be played, in progress, completed??
+            $data[$row]['match_url']               = get_permalink($matches[$row]->ID);
+
 
         }
 
@@ -198,5 +200,59 @@ class matchCPT {
         }
 
         return $tournament_id;
+    }
+
+    public static function match_up($attr){
+
+        extract(shortcode_atts(array(
+            'date' => '',
+            'size' => '',
+            'match_id'
+        ), $attr));
+
+        $title = '';
+
+        $players = p2p_type('match_players')->get_connected($match_id);
+
+        if (get_user_meta($post->post_author, 'title', true)){
+            $title = sprintf('<span>%s</span>', get_user_meta($post->post_author, 'title', true));
+        }
+
+        foreach($players->posts as $player){
+
+            $match_card[] = sprintf(
+                '<div class="col-lg-5">
+                    <div class="player-match-card">
+                        <div class="player-match-card-inner row">
+                            <div class="player-avatar col-lg-4">
+                                %1$s
+                            </div>
+                            <div class="player-details col-lg-8">
+                                <h4 class="player-name"><a href="%2$s">%3$s</a></h4>
+                                %4$s
+                            </div>
+                            <div class="match-result col-lg-1">Winner</div>
+                        </div>
+                    </div>
+                </div>',
+                '<img src="holder.js/150x150/auto/#000:#fff:text:profile"/>',
+                get_permalink($player->ID),
+                $player->post_title,
+                $title
+            );
+
+        }
+
+        $vs = '<div class="vs col-lg-2"><h2>VS</h2></div>';
+
+        $match_cards = implode($vs, $match_card);
+
+        $html = sprintf(
+            '<section class="player-matchup row">%s</section>',
+            $match_cards
+        );
+
+        return $html;
+
     }
 }
