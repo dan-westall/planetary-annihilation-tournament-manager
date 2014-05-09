@@ -210,27 +210,37 @@ class matchCPT {
         extract(shortcode_atts(array(
             'date' => '',
             'size' => '',
-            'match_id'
+            'match_id' => ''
         ), $attr));
-
-        $title = '';
 
         $players = p2p_type('match_players')->get_connected($match_id);
 
-        if (get_user_meta($post->post_author, 'title', true)){
-            $title = sprintf('<span>%s</span>', get_user_meta($post->post_author, 'title', true));
-        }
-
         foreach($players->posts as $player){
+
+            $winner               = $title = '';
+            $player_user_id       = get_post_meta($player->ID, 'user_id', true);
+            $player_profile_image = get_wp_user_avatar(1);;
+
+            if(p2p_get_meta($player->p2p_id, 'winner', true)){
+                $winner = 'winner';
+            }
+
+            if (get_user_meta($player_user_id, 'title', true)){
+                $title = sprintf('<span>%s</span>', get_user_meta($player_user_id, 'title', true));
+            }
+
+            if(has_post_thumbnail($player->ID)){
+                $player_profile_image = get_the_post_thumbnail($player->ID, 'player-profile-thumbnail');
+            }
 
             $match_card[] = sprintf(
                 '<div class="col-lg-5">
-                    <div class="player-match-card">
+                    <div class="player-match-card %5$s">
                         <div class="player-match-card-inner row">
                             <div class="player-avatar col-lg-4">
-                                %1$s
+                                <a href="%2$s">%1$s</a>
                             </div>
-                            <div class="player-details col-lg-8">
+                            <div class="player-details col-lg-7">
                                 <h4 class="player-name"><a href="%2$s">%3$s</a></h4>
                                 %4$s
                             </div>
@@ -238,10 +248,11 @@ class matchCPT {
                         </div>
                     </div>
                 </div>',
-                '<img src="holder.js/150x150/auto/#000:#fff:text:profile"/>',
+                $player_profile_image,
                 get_permalink($player->ID),
                 $player->post_title,
-                $title
+                $title,
+                $winner
             );
 
         }
