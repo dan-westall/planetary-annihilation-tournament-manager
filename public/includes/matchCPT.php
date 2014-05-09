@@ -13,6 +13,8 @@ class matchCPT {
 
         add_shortcode('tournament-matches', array( $this, 'get_match_results') );
 
+        add_filter( 'wp_insert_post_data',  array( $this, 'default_comments_on' ) );
+
         //moved outside to our own api endpoint
 //        add_action('wp_ajax_pltm_get_match_results',  array( $this, 'get_match_json') );
 //        add_action('wp_ajax_nopriv_pltm_get_match_results',  array( $this, 'get_match_json') );
@@ -269,4 +271,13 @@ class matchCPT {
         return $html;
 
     }
+
+    public function default_comments_on( $data ) {
+        if( $data['post_type'] == self::$post_type ) {
+            $data['comment_status'] = 1;
+        }
+
+        return $data;
+    }
+
 }
