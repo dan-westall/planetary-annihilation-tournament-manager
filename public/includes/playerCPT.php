@@ -50,7 +50,7 @@ class playerCPT {
             'show_ui'             => true,
             'menu_position'       => 10,
             'menu_icon'           => 'dashicons-id',
-            'supports'            => array('title'),
+            'supports'            => array('title', 'thumbnail', 'author'),
             'capability_type'     => array(self::$post_type,self::$post_type.'s'),
             'map_meta_cap'        => true,
         );

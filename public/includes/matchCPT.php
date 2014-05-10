@@ -13,6 +13,8 @@ class matchCPT {
 
         add_shortcode('tournament-matches', array( $this, 'get_match_results') );
 
+        add_filter( 'wp_insert_post_data',  array( $this, 'default_comments_on' ) );
+
         //moved outside to our own api endpoint
 //        add_action('wp_ajax_pltm_get_match_results',  array( $this, 'get_match_json') );
 //        add_action('wp_ajax_nopriv_pltm_get_match_results',  array( $this, 'get_match_json') );
@@ -76,7 +78,8 @@ class matchCPT {
         extract(shortcode_atts(array(
             'tournament_id' => '',
             'output'        => 'html',
-            'match_id'      => ''
+            'match_id'      => '',
+            'autoreload'    => false
         ), $attr));
 
         $args = array(
@@ -126,6 +129,8 @@ class matchCPT {
             $data[$row]['pa_stats_start']          = get_post_meta($matches[$row]->ID, 'pa_stats_start', true);
             $data[$row]['pa_stats_stop']           = get_post_meta($matches[$row]->ID, 'pa_stats_stop', true);
             $data[$row]['last_update']             = get_post_meta($matches[$row]->ID, 'last_update', true); //todo to be played, in progress, completed??
+            $data[$row]['match_url']               = get_permalink($matches[$row]->ID);
+
 
         }
 
@@ -141,7 +146,9 @@ class matchCPT {
 
                 self::match_listing_js_deps();
 
-                return self::match_listing_template($tournament_id);
+                $matchopts = array($tournament_id,$autoreload);
+
+                return self::match_listing_template($matchopts);
 
                 break;
         }
@@ -160,7 +167,7 @@ class matchCPT {
         wp_enqueue_script('custom.knockout');
         //wp_register_script('socketio',":5000/socket.io/socket.io.js");
         //wp_enqueue_script('socketio');
-        wp_register_script('match_listing', PLTM_PLUGIN_URI . 'public/assets/js/matchlisting.js', array('defaults.knockout') );
+        wp_register_script('match_listing',PLTM_PLUGIN_URI . 'public/assets/js/matchlisting.js', array('defaults.knockout') );
         wp_enqueue_script('match_listing');
     }
 
@@ -199,4 +206,78 @@ class matchCPT {
 
         return $tournament_id;
     }
+
+    public static function match_up($attr){
+
+        extract(shortcode_atts(array(
+            'date' => '',
+            'size' => '',
+            'match_id' => ''
+        ), $attr));
+
+        $players = p2p_type('match_players')->get_connected($match_id);
+
+        foreach($players->posts as $player){
+
+            $winner               = $title = '';
+            $player_user_id       = get_post_meta($player->ID, 'user_id', true);
+            $player_profile_image = get_wp_user_avatar(1);;
+
+            if(p2p_get_meta($player->p2p_id, 'winner', true)){
+                $winner = 'winner';
+            }
+
+            if (get_user_meta($player_user_id, 'title', true)){
+                $title = sprintf('<span>%s</span>', get_user_meta($player_user_id, 'title', true));
+            }
+
+            if(has_post_thumbnail($player->ID)){
+                $player_profile_image = get_the_post_thumbnail($player->ID, 'player-profile-thumbnail');
+            }
+
+            $match_card[] = sprintf(
+                '<div class="col-lg-5">
+                    <div class="player-match-card %5$s">
+                        <div class="player-match-card-inner row text">
+                            <div class="player-avatar col-lg-4">
+                                <a href="%2$s">%1$s</a>
+                            </div>
+                            <div class="player-details col-lg-7">
+                                <h4 class="player-name"><a href="%2$s">%3$s</a></h4>
+                                %4$s
+                            </div>
+                            <div class="match-result col-lg-1">Winner</div>
+                        </div>
+                    </div>
+                </div>',
+                $player_profile_image,
+                get_permalink($player->ID),
+                $player->post_title,
+                $title,
+                $winner
+            );
+
+        }
+
+        $vs = '<div class="vs col-lg-2"><h2>VS</h2></div>';
+
+        $match_cards = implode($vs, $match_card);
+
+        $html = sprintf(
+            '<section class="player-matchup row">%s</section>',
+            $match_cards
+        );
+
+        return $html;
+
+    }
+
+    public function default_comments_on( $data ) {
+        if( $data['post_type'] == self::$post_type ) {
+            $data['comment_status'] = 'open';
+        }
+
+        return $data;
+    }
+
 }
