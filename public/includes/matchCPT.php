@@ -237,13 +237,13 @@ class matchCPT {
 
             $match_card[] = sprintf(
                 '<div class="col-lg-5">
-                    <div class="player-match-card %5$s spoiler-block">
+                    <div class="player-match-card %5$s">
                         <div class="player-match-card-inner row text">
                             <div class="player-avatar col-lg-4">
                                 <a href="%2$s">%1$s</a>
                             </div>
                             <div class="player-details col-lg-7">
-                                <h4 class="player-name"><a href="%2$s"><span class="spoiler">%3$s</span></a></h4>
+                                <h4 class="player-name"><a href="%2$s">%3$s</a></h4>
                                 %4$s
                             </div>
                             <div class="match-result col-lg-1">Winner</div>
