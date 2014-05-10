@@ -167,7 +167,7 @@ class matchCPT {
         wp_enqueue_script('custom.knockout');
         //wp_register_script('socketio',":5000/socket.io/socket.io.js");
         //wp_enqueue_script('socketio');
-        wp_register_script('match_listing',PLTM_PLUGIN_URI . 'public/assets/js/matchlisting.js', array('defaults.knockout') );
+        wp_register_script('match_listing', PLTM_PLUGIN_URI . 'public/assets/js/matchlisting.js' );
         wp_enqueue_script('match_listing');
     }
 
