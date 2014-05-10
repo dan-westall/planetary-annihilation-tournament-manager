@@ -274,7 +274,7 @@ class matchCPT {
 
     public function default_comments_on( $data ) {
         if( $data['post_type'] == self::$post_type ) {
-            $data['comment_status'] = 1;
+            $data['comment_status'] = 'open';
         }
 
         return $data;
