@@ -91,7 +91,7 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
         add_action('manage_posts_custom_column', array($this, 'custom_columns'), 10, 2);
 
         //admin dashboard widgets
-        add_action('wp_dashboard_setup', array($this, 'tournament_player_management'));
+        //add_action('wp_dashboard_setup', array($this, 'tournament_player_management') );
 
 
     }
