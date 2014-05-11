@@ -380,8 +380,8 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
                     <td>Player Name</td>
                     <td>User account</td>
                     <td>PA Stats Number</td>
-                    <td></td>
-                    <td></td>
+                    <td>Tournament</td>
+                    <td>Status</td>
                     <td></td>
 
                 </tr>
@@ -518,6 +518,5 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
 		);
 
 	}
-
 
 }
