@@ -365,39 +365,7 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
         remove_meta_box('dashboard_activity', 'dashboard', 'normal'); //since 3.8
     }
 
-    function tournament_player_management() {
 
-        wp_add_dashboard_widget(
-            'tournament_player_signup_status', // Widget slug.
-            'Tournament Player signup stats', // Title.
-            array($this, 'tournament_player_signup_status') // Display function.
-        );
-    }
-
-    public function tournament_player_signup_status() {
-
-        ?>
-
-        <table class="widefat">
-            <thead>
-            <tr>
-                <td>Player Name</td>
-                <td>User account</td>
-                <td>PA Stats Number</td>
-                <td>Tournament</td>
-                <td>Status</td>
-                <td></td>
-
-            </tr>
-
-            </thead>
-
-        </table>
-
-
-    <?
-
-    }
 
     /**
      * Return an instance of this class.
