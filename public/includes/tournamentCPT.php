@@ -4,6 +4,8 @@ class tournamentCPT {
 
     public static $post_type = 'tournament';
 
+    public static $endpoints = array('signup', 'rules', 'matches');
+
     function __construct() {
 
         add_action( 'init', array( $this, 'register_cpt_tournament') );
@@ -33,6 +35,7 @@ class tournamentCPT {
 
 
         add_filter( 'acf/load_field/name=challonge_tournament_link', array( $this, 'filter_challonge_tournament_listing') );
+        add_filter( 'acf/load_field/name=tournament_status', array( $this, 'filter_tournament_status') );
 
     }
 
@@ -582,6 +585,26 @@ class tournamentCPT {
 
     }
 
+    public function filter_tournament_status($field){
+
+        if(is_array($tournaments->tournament)){
+
+            foreach($tournaments->tournament as $t){
+
+                $form_listing[$t->id] = $t->name;
+
+            }
+
+        } else {
+            $form_listing[$tournaments->tournament->id] = $tournaments->tournament->name;
+        }
+
+        $field['choices'] = $form_listing;
+
+        return $field;
+
+    }
+
     public function challonge_add_player_to_tournament($challonge_tournament_id, $email, $ign){
 
         $c = new ChallongeAPI(Planetary_Annihilation_Tournament_Manager::fetch_challonge_API());
@@ -991,6 +1014,7 @@ class tournamentCPT {
         //todo strong definiton of tournament status
         $args = array(
             'post_type' => self::$post_type,
+            'posts_per_page' => -1
         );
 
         $tournaments = get_posts($args);
@@ -1032,18 +1056,19 @@ class tournamentCPT {
             $signup_status = 'Closed';
         }
 
-        $data['name']          = $tournament->post_title;
-        $data['description']   = $tournament->post_title;
-        $data['date']          = date('c', strtotime(get_post_meta($tournament->ID, 'run_date', true)));
-        $data['time']          = get_post_meta($tournament->ID, 'run_time', true);
-        $data['format']        = get_post_meta($tournament->ID, 'tournament_type', true);
-        $data['slots']         = get_post_meta($tournament->ID, 'slots', true);
-        $data['slots_taken']   = count(get_tournament_players($tournament->ID));
-        $data['signup_url']    = get_permalink($tournament->ID) . '/signup';
-        $data['url']           = get_permalink($tournament->ID);
-        $data['signup_status'] = $signup_status;
+        $data['ID']                      = $tournament->ID;
+        $data['name']                    = $tournament->post_title;
+        $data['description']             = $tournament->post_title;
+        $data['date']                    = date('c', strtotime(get_post_meta($tournament->ID, 'run_date', true)));
+        $data['time']                    = get_post_meta($tournament->ID, 'run_time', true);
+        $data['format']                  = get_post_meta($tournament->ID, 'tournament_type', true);
+        $data['slots']                   = get_post_meta($tournament->ID, 'slots', true);
+        $data['slots_taken']             = count(get_tournament_players($tournament->ID));
+        $data['signup_url']              = get_permalink($tournament->ID) . '/signup';
+        $data['url']                     = get_permalink($tournament->ID);
+        $data['signup_status']           = $signup_status;
         $data['challonge_tournament_id'] = $to->get_the_challonge_tournament_id($tournament->ID);
-        $data['ID'] = $tournament->ID;
+
 
         if(true && $return['prize']){
             $data['prize']         = self::get_tournament_prizes($tournament->ID);
