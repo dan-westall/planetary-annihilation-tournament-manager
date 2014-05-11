@@ -358,6 +358,14 @@ class tournamentCPT {
 
         }
 
+
+        if (in_array($values['email']['value'], self::player_excluded_from_tournament($tournament_id))){
+
+            $validation_result['is_valid'] = false;
+            $validation_result['form']['cssClass'] = 'player-is-excluded';
+
+        }
+
         return $validation_result;
 
     }
@@ -395,6 +403,8 @@ class tournamentCPT {
         if (count(get_tournament_players($tournament_id)) >= get_field('slots'))
             return false;
 
+
+
         //todo move out to general function file as this is a useful snippit
         foreach ($form['fields'] as $field) {
             $values[$field['field_mapField']] = array(
@@ -404,13 +414,18 @@ class tournamentCPT {
             );
         }
 
+        //if email is in excluded players bin
+        if (in_array($values['email']['value'], self::player_excluded_from_tournament($tournament_id)))
+            return false;
+
+
         //todo email shouldnt be stored with the player profile CTP should be linked either by p2p or meta int
         $find_player = array(
             'post_type'      => playerCPT::$post_type,
             'meta_query'     => array(
                 array(
                     'key'   => 'player_email',
-                    'value' => $entry['3']
+                    'value' => $values['email']['value']
                 )
             ),
             'posts_per_page' => 1
@@ -1176,5 +1191,27 @@ class tournamentCPT {
 
     }
 
+    public static function players_excluded_from_tournament($tournament_id){
+
+        $excluded_players_list = array();
+
+        $args = array(
+            'connected_type'   => 'tournament_excluded_players',
+            'connected_items'  => $tournament_id,
+            'nopaging'         => true,
+            'suppress_filters' => false
+        );
+
+        $excluded_players = get_posts($args);
+
+        foreach($excluded_players as $player){
+
+            $excluded_players_list[] = get_post_meta($player->ID, 'player_email', true);
+
+        }
+
+        return $excluded_players_list;
+
+    }
 
 }
