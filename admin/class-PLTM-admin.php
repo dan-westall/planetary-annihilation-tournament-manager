@@ -361,13 +361,38 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
         remove_meta_box( 'dashboard_activity', 'dashboard', 'normal');//since 3.8
     }
 
-    function example_add_dashboard_widgets() {
+    function tournament_player_management() {
 
         wp_add_dashboard_widget(
             'tournament_player_signup_status',         // Widget slug.
             'Tournament Player signup stats',         // Title.
-            'tournament_player_signup_status' // Display function.
+            array( $this, 'tournament_player_signup_status') // Display function.
         );
+    }
+
+    public function tournament_player_signup_status(){
+
+      ?>
+
+        <table class="widefat">
+            <thead>
+                <tr>
+                    <td>Player Name</td>
+                    <td>User account</td>
+                    <td>PA Stats Number</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+
+                </tr>
+
+            </thead>
+
+        </table>
+
+
+        <?
+
     }
 
 	/**
@@ -409,6 +434,8 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
 			return;
 		}
 
+        wp_enqueue_style( 'default-' . $this->plugin_slug .'-admin-styles', plugins_url( 'assets/css/default.admin.css', __FILE__ ), array(), Planetary_Annihilation_Tournament_Manager::VERSION );
+
 		$screen = get_current_screen();
 		if ( $this->plugin_screen_hook_suffix == $screen->id ) {
 			wp_enqueue_style( $this->plugin_slug .'-admin-styles', plugins_url( 'assets/css/admin.css', __FILE__ ), array(), Planetary_Annihilation_Tournament_Manager::VERSION );
@@ -428,6 +455,8 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
 		if ( ! isset( $this->plugin_screen_hook_suffix ) ) {
 			return;
 		}
+
+        wp_enqueue_script( 'default-' . $this->plugin_slug . '-admin-script', plugins_url( 'assets/js/default.admin.js', __FILE__ ), array( 'jquery' ), Planetary_Annihilation_Tournament_Manager::VERSION );
 
 		$screen = get_current_screen();
 		if ( $this->plugin_screen_hook_suffix == $screen->id ) {
