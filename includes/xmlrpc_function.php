@@ -84,7 +84,7 @@ function pltm_add_match( $data ){
 
         update_post_meta($match_id, 'challonge_match_id', $args["challonge_match_id"]);
         update_post_meta($match_id, 'challonge_tournament_id', $args["challonge_tournament_id"]);
-        //update_post_meta($match_id, 'match_round', $args["match_round"]);
+        
 
         $connection_meta = array(
             'date'                    => current_time('mysql'),
@@ -99,10 +99,11 @@ function pltm_add_match( $data ){
         $p2p_result2 = p2p_type('match_players')->connect($match_id, $wp_player_id2, $connection_meta2);
 
     }
-
+    update_post_meta($match_id, 'match_round', $args["match_round"]);
     update_post_meta($match_id, 'last_update', $args["last_update"]);
     update_post_meta($match_id, 'favorite', $args["favorite"]);
     update_post_meta($match_id, 'favoritepercent', $args["favoritepercent"]);
+    update_post_meta($match_id, 'twitch', $args["twitch"]);
     
 
     //note dw if you just want to access the first one, as evident by the break at the end of the first loop just do $args["pastatsmatches"][0] then do $args["pastatsmatches"][0]['gameId'] etc, loop not needed
