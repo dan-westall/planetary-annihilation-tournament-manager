@@ -376,7 +376,26 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
 
     public function tournament_player_signup_status() {
 
+        ?>
 
+        <table class="widefat">
+            <thead>
+            <tr>
+                <td>Player Name</td>
+                <td>User account</td>
+                <td>PA Stats Number</td>
+                <td>Tournament</td>
+                <td>Status</td>
+                <td></td>
+
+            </tr>
+
+            </thead>
+
+        </table>
+
+
+    <?
 
     }
 
