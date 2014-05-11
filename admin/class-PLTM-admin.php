@@ -140,7 +140,9 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
         $columns = array(
             'cb'                   => '<input type="checkbox" />',
             'title'                => __('Title'),
-            'player_profile_owner' => __('Correct Profile Owner')
+            'player_profile_owner' => __('Correct Profile Owner'),
+            'player_user_account' => __('Player User Acount'),
+            'pa_stats_id'       => __('Player PA Stats ID'),
 
         );
 
@@ -301,6 +303,29 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
                 }
 
                 break;
+
+            case "player_user_account" :
+
+                $player_user_id = get_post_meta($post_id, 'user_id', true);
+
+                $user = get_userdata($player_user_id);
+
+                if($player_user_id){
+                    echo $user->display_name;
+                } else {
+                    echo 'Account not linked';
+                }
+
+                break;
+
+            case "pa_stats_id" :
+
+                if(get_post_meta($post_id, 'pastats_player_id', true)){
+                    echo get_post_meta($post_id, 'pastats_player_id', true);
+                } else {
+                    echo 'Player bas no player PA stats ID set!';
+                }
+
 
 
                 break;
