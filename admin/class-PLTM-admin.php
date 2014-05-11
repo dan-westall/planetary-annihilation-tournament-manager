@@ -395,7 +395,7 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
         </table>
 
 
-    <?
+    <?php
 
     }
 
