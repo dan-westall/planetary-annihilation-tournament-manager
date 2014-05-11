@@ -4,7 +4,7 @@ class tournamentCPT {
 
     public static $post_type = 'tournament';
 
-    public static $endpoints = array('signup', 'rules', 'matches');
+    public static $tournament_status = array('Signup', 'In Progress', 'Cancelled', 'Finished');
 
     function __construct() {
 
@@ -587,19 +587,7 @@ class tournamentCPT {
 
     public function filter_tournament_status($field){
 
-        if(is_array($tournaments->tournament)){
-
-            foreach($tournaments->tournament as $t){
-
-                $form_listing[$t->id] = $t->name;
-
-            }
-
-        } else {
-            $form_listing[$tournaments->tournament->id] = $tournaments->tournament->name;
-        }
-
-        $field['choices'] = $form_listing;
+        $field['choices'] = self::$tournament_status;
 
         return $field;
 
