@@ -25,6 +25,7 @@ class PLTM_API_Endpoint{
         $vars[] = 'player';
         $vars[] = 'id_type';
         $vars[] = 'videos';
+        $vars[] = 'test';
 
         return $vars;
     }
@@ -42,6 +43,8 @@ class PLTM_API_Endpoint{
 
         add_rewrite_rule('^api/match/?([0-9]+)?/?([^/]*)?/?','index.php?__api=1&match_id=$matches[1]&id_type=$matches[2]','top');
         add_rewrite_rule('^api/player/?([0-9]+)?/?','index.php?__api=1&player=$matches[1]','top');
+
+        add_rewrite_rule('^api/test/?([0-9]+)?/?','index.php?__api=1&test=$matches[1]','top');
 
         add_rewrite_tag('%tournaments%','([^&]+)');
         add_rewrite_tag('%id_type%','([^&]+)');
@@ -138,6 +141,10 @@ class PLTM_API_Endpoint{
                 $this->send_response('player id is missing');
 
             playerCPT::get_player(array('player_id' => $player_id, 'output' => 'json'));
+
+        } else if(isset($wp->query_vars['test'])){
+
+            echo '<img src="http://exodusesports.com/wp-content/uploads/forum_banner_new14.png" />';
 
         }
 
