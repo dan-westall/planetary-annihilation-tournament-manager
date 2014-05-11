@@ -77,15 +77,18 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
 
         add_action( 'gform_field_advanced_settings', array( $this, 'action_add_gravity_forms_map_field'), 10, 2);
         add_action( 'gform_editor_js', array( $this, 'action_add_gravity_forms_map_field_setting') );
-        add_action( 'manage_posts_custom_column', array( $this, 'custom_columns'), 10, 2 );
-
         add_filter( 'gform_tooltips', array( $this, 'filter_gravity_forms_tooltips') );
 
+        //user admin columns
         add_filter( 'manage_users_columns', array( $this, 'modify_user_table') );
         add_filter( 'manage_users_custom_column', array( $this, 'modify_user_table_row'), 10, 3 );
 
+        //post type columns
         add_filter( 'manage_edit-match_columns', array( $this, 'match_columns' ) );
-        add_filter( 'manage_edit-tournament_columns', array( $this, 'tournament_column' ) );
+        add_filter( 'manage_edit-tournament_columns', array( $this, 'tournament_columns' ) );
+        add_filter( "manage_edit-player_columns", array( $this, 'player_columns' ) );
+
+        add_action( 'manage_posts_custom_column', array( $this, 'custom_columns'), 10, 2 );
 
         //admin dashboard widgets
         add_action( 'wp_dashboard_setup',  array( $this, 'tournament_player_management') );
@@ -94,7 +97,7 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
 
     }
 
-    public function tournament_column( $columns ) {
+    public function tournament_columns( $columns ) {
 
         global $post, $current_user; get_currentuserinfo();
 
@@ -121,6 +124,21 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
             'tournament'     => __('Tournament'),
             'players' => __('Players'),
             'format' => __('Format')
+
+        );
+
+        return $columns;
+
+    }
+
+    public function player_columns( $columns ) {
+
+        global $post, $current_user; get_currentuserinfo();
+
+        $columns = array(
+            'cb'         => '<input type="checkbox" />',
+            'title'  => __('Title'),
+            'player_profile_owner' => __('Correct Profile Owner')
 
         );
 
@@ -255,6 +273,33 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
                 }
 
                 echo implode(', ', $players_array);
+
+                break;
+
+            case "player_profile_owner" :
+
+                $post = get_post($post_id);
+
+                $user = get_userdata( $post->post_author );
+
+                $player_user_id =  get_post_meta($post_id, 'user_id', true);
+
+                if($user->ID == $player_user_id){
+
+                    printf('Yes (%s)', $user->display_name);
+
+                } else if(empty($player_user_id) || $player_user_id == null){
+
+                    printf('Action Needed: No user id Set');
+
+                } else if($user->ID != $player_user_id) {
+
+                    printf('Action Needed: Incorrect post_author, user_id ');
+
+                }
+
+                break;
+
 
                 break;
 
