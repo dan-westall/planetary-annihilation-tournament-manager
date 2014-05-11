@@ -1030,6 +1030,7 @@ class tournamentCPT {
         $data['url']           = get_permalink($tournament->ID);
         $data['signup_status'] = $signup_status;
         $data['challonge_tournament_id'] = $to->get_the_challonge_tournament_id($tournament->ID);
+        $data['ID'] = $tournament->ID;
 
         if(true && $return['prize']){
             $data['prize']         = self::get_tournament_prizes($tournament->ID);
