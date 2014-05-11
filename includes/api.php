@@ -144,7 +144,15 @@ class PLTM_API_Endpoint{
 
         } else if(isset($wp->query_vars['test'])){
 
-            echo '<img src="http://exodusesports.com/wp-content/uploads/forum_banner_new14.png" />';
+
+            //echo '<img src="http://exodusesports.com/wp-content/uploads/forum_banner_new14.png" />';
+
+            $im = imagecreatefrompng("http://exodusesports.com/wp-content/uploads/forum_banner_new14.png");
+
+            header('Content-Type: image/png');
+
+            imagepng($im);
+            imagedestroy($im);
 
         }
 
