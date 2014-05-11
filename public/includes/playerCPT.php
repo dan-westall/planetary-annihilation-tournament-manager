@@ -357,7 +357,6 @@ class playerCPT {
                     update_user_meta($_meta_value, 'player_id', $object_id);
 
                     //also need to set this to the post author so user can change there player profile.
-
                     wp_update_post(array('ID' => $object_id, 'post_author' => $_meta_value));
                 }
             }
