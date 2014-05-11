@@ -419,7 +419,7 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
             return;
         }
 
-        //wp_enqueue_style( 'default-' . $this->plugin_slug .'-admin-styles', plugins_url( 'assets/css/default.admin.css', __FILE__ ), array(), Planetary_Annihilation_Tournament_Manager::VERSION );
+        wp_enqueue_style( 'default-' . $this->plugin_slug .'-admin-styles', plugins_url( 'assets/css/default.admin.css', __FILE__ ), array(), Planetary_Annihilation_Tournament_Manager::VERSION );
 
         $screen = get_current_screen();
         if ($this->plugin_screen_hook_suffix == $screen->id) {
@@ -441,7 +441,7 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
             return;
         }
 
-        //wp_enqueue_script( 'default-' . $this->plugin_slug . '-admin-script', plugins_url( 'assets/js/default.admin.js', __FILE__ ), array( 'jquery' ), Planetary_Annihilation_Tournament_Manager::VERSION );
+        wp_enqueue_script( 'default-' . $this->plugin_slug . '-admin-script', plugins_url( 'assets/js/default.admin.js', __FILE__ ), array( 'jquery' ), Planetary_Annihilation_Tournament_Manager::VERSION );
 
         $screen = get_current_screen();
         if ($this->plugin_screen_hook_suffix == $screen->id) {
