@@ -5,6 +5,7 @@
             <th>Player 1</th>
             <th>Player 2</th>
             <th>Duration</th>
+            <th></th>
             <!--<th>Last update</th>-->
             <!--<th>Now</th>-->
         </tr>
@@ -21,7 +22,8 @@
     <td><a data-bind="attr: {href: match_url}"><span data-bind="text: title"></span></a></td>
     <td><span class="spoiler" data-bind="text: player1, css:{ matchwinner: player1() === winner()}"></span></td>
     <td><span class="spoiler" data-bind="text: player2, css:{ matchwinner: player2() === winner()}"></span></td>
-    <td><a data-bind="attr: {href: paslink}" target="_blank"><span data-bind="text:pasduration"></span></a></td>
+    <td><a data-bind="if:pasduration, attr: {href: paslink}" target="_blank"><span data-bind="text:pasduration"></span></a></td>
+    <td><a data-bind="if:twitch,attr: {href: twitch}" target="_blank"><img src=""></a></td>
     <!--<td data-bind="text: last_update"></td>-->
     <!--<td data-bind="text: now"></td>-->
 </tr>
