@@ -127,6 +127,19 @@ class tournamentCPT {
             )
         ) );
 
+        p2p_register_connection_type( array(
+            'name' => 'tournament_excluded_players',
+            'from' => self::$post_type,
+            'to' => 'player',
+            'title' => array(
+                'from' => __( 'Excluded Players', 'PLTM' )
+            ),
+            'admin_box' => array(
+                'show' => 'from',
+                'context' => 'side'
+            )
+        ) );
+
 
         p2p_register_connection_type( array(
             'name' => 'tournament_matches',
@@ -1021,7 +1034,7 @@ class tournamentCPT {
 
         $data['name']          = $tournament->post_title;
         $data['description']   = $tournament->post_title;
-        $data['date']          = get_post_meta($tournament->ID, 'run_date', true);
+        $data['date']          = date('c', strtotime(get_post_meta($tournament->ID, 'run_date', true)));
         $data['time']          = get_post_meta($tournament->ID, 'run_time', true);
         $data['format']        = get_post_meta($tournament->ID, 'tournament_type', true);
         $data['slots']         = get_post_meta($tournament->ID, 'slots', true);

@@ -22,6 +22,8 @@ class playerCPT {
 
         add_action( 'admin_menu', array( $this, 'prefix_remove_menu_pages') );
 
+        add_action( 'updated_post_meta', array( $this, 'link_player_to_user'), 10, 4 );
+
 
     }
 
@@ -333,5 +335,17 @@ class playerCPT {
 
         return false;
 
+    }
+
+    public function link_player_to_user($meta_id, $object_id, $meta_key, $_meta_value){
+
+        if(get_post_type($object_id) == self::$post_type){
+
+            if($meta_key == 'user_id'){
+
+                update_user_meta($_meta_value, 'player_id', $object_id);
+
+            }
+        }
     }
 }

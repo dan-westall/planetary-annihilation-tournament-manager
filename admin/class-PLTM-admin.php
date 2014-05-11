@@ -68,6 +68,8 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
 
 		// Add the options page and menu item.
 		add_action( 'admin_menu', array( $this, 'add_plugin_admin_menu' ) );
+        add_action( 'admin_init',  array( $this, 'remove_dashboard_meta') );
+
 
 		// Add an action link pointing to the options page.
 		$plugin_basename = plugin_basename( plugin_dir_path( __DIR__ ) . $this->plugin_slug . '.php' );
@@ -84,6 +86,10 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
 
         add_filter( 'manage_edit-match_columns', array( $this, 'match_columns' ) );
         add_filter( 'manage_edit-tournament_columns', array( $this, 'tournament_column' ) );
+
+        //admin dashboard widgets
+        add_action( 'wp_dashboard_setup',  array( $this, 'tournament_player_management') );
+
 
 
     }
@@ -131,9 +137,8 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
             'displayname' => __('Display Name'),
             'clan'      => __('Clan'),
             'role'      => __('Role'),
-            'email'     => __('email')
-
-
+            'email'     => __('email'),
+            'player_profile' => __('Player Profile')
         );
 
         return $column;
@@ -162,6 +167,21 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
             case 'displayname' :
 
                 return $user->display_name;
+
+                break;
+
+
+            case 'player_profile' :
+
+                if(get_user_meta($user_id, 'player_id', true)){
+
+                    $player_id = get_user_meta($user_id, 'player_id', true);
+
+                    return sprintf('<a href="%s">%s</a>', admin_url( 'post.php?post='.$player_id.'&action=edit'), get_the_title($player_id));
+
+                } else {
+                    return __('No Player profiled linked', 'PLTM');
+                }
 
                 break;
 
@@ -281,6 +301,28 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
     function filter_gravity_forms_tooltips($tooltips){
         $tooltips["form_field_encrypt_value"] = "<h6>Field Map</h6>Check this box to encrypt this field's data";
         return $tooltips;
+    }
+
+    public function remove_dashboard_meta() {
+        remove_meta_box( 'dashboard_incoming_links', 'dashboard', 'normal' );
+        remove_meta_box( 'dashboard_plugins', 'dashboard', 'normal' );
+        remove_meta_box( 'dashboard_primary', 'dashboard', 'normal' );
+        remove_meta_box( 'dashboard_secondary', 'dashboard', 'normal' );
+        remove_meta_box( 'dashboard_incoming_links', 'dashboard', 'normal' );
+        remove_meta_box( 'dashboard_quick_press', 'dashboard', 'side' );
+        remove_meta_box( 'dashboard_recent_drafts', 'dashboard', 'side' );
+        remove_meta_box( 'dashboard_recent_comments', 'dashboard', 'normal' );
+        remove_meta_box( 'dashboard_right_now', 'dashboard', 'normal' );
+        remove_meta_box( 'dashboard_activity', 'dashboard', 'normal');//since 3.8
+    }
+
+    function example_add_dashboard_widgets() {
+
+        wp_add_dashboard_widget(
+            'tournament_player_signup_status',         // Widget slug.
+            'Tournament Player signup stats',         // Title.
+            'tournament_player_signup_status' // Display function.
+        );
     }
 
 	/**
