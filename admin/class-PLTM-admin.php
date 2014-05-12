@@ -93,6 +93,12 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
         //admin dashboard widgets
         add_action('wp_dashboard_setup', array($this, 'tournament_player_management') );
 
+        acf_add_options_sub_page(array(
+            'title' => 'PLTM Signatures',
+            'parent' => 'options-general.php',
+            'capability' => 'manage_options'
+        ));
+
 
     }
 
