@@ -18,6 +18,7 @@ class PLTM_API_Endpoint{
      */
     public function add_query_vars($vars){
         $vars[] = '__api';
+        $vars[] = '__signature';
         $vars[] = 'tournament';
         $vars[] = 'tournaments';
         $vars[] = 'return';
@@ -26,7 +27,6 @@ class PLTM_API_Endpoint{
         $vars[] = 'id_type';
         $vars[] = 'videos';
         $vars[] = 'test';
-
         return $vars;
     }
 
@@ -37,6 +37,9 @@ class PLTM_API_Endpoint{
     public function add_endpoint(){
         //add_rewrite_rule('^api/tournament-matches/?([0-9]+)?/?','index.php?__api=1&tournament-matches=$matches[1]','top');
 
+        //add_rewrite_rule('^signature/tournament/?([^/]*)?/?([^/]*)?/?','index.php?__api=1&tournament=$matches[1]&return=$matches[2]','top');
+        add_rewrite_rule('^signature/?([^/]*)?/?([^/]*)?/?','index.php?__signature=$matches[1]&return=$matches[2]','top');
+
         // /api/tournament/345333/matches || /api/tournament/345333/players
         add_rewrite_rule('^api/tournaments/?([^/]*)?/?','index.php?__api=1&tournaments=$matches[1]','top');
         add_rewrite_rule('^api/tournament/?([^/]*)?/?([^/]*)?/?','index.php?__api=1&tournament=$matches[1]&return=$matches[2]','top');
@@ -44,7 +47,6 @@ class PLTM_API_Endpoint{
         add_rewrite_rule('^api/match/?([0-9]+)?/?([^/]*)?/?','index.php?__api=1&match_id=$matches[1]&id_type=$matches[2]','top');
         add_rewrite_rule('^api/player/?([0-9]+)?/?','index.php?__api=1&player=$matches[1]','top');
 
-        add_rewrite_rule('^api/test/?([0-9]+)?/?','index.php?__api=1&test=$matches[1]','top');
 
         add_rewrite_tag('%tournaments%','([^&]+)');
         add_rewrite_tag('%id_type%','([^&]+)');
@@ -66,7 +68,7 @@ class PLTM_API_Endpoint{
      */
     public function sniff_requests(){
         global $wp;
-        if(isset($wp->query_vars['__api'])){
+        if(isset($wp->query_vars['__api']) || isset($wp->query_vars['__signature'])){
             $this->handle_request();
             exit;
         }
@@ -142,27 +144,57 @@ class PLTM_API_Endpoint{
 
             playerCPT::get_player(array('player_id' => $player_id, 'output' => 'json'));
 
-        } else if(isset($wp->query_vars['test'])){
+        } else if(isset($wp->query_vars['__signature'])){
 
 
-            //echo '<img src="http://exodusesports.com/wp-content/uploads/forum_banner_new14.png" />';
+            if(get_field('site_signatures', 'options')):
 
-            $im = imagecreatefrompng("http://exodusesports.com/wp-content/uploads/forum_banner_new14.png");
+                while(has_sub_field('site_signatures', 'options')):
+
+                    $keyword = get_sub_field('keyword');
+
+                    $image[$keyword] = get_sub_field('signature_image');
+
+                endwhile;
+
+            endif;
+
+            if(is_tournament_in_progress()) {
+
+                $image_url = $image['in-progress']['url'];
+
+                //no in progress keyword set
+                if(empty($image_url)){
+
+                    //random
+                    $key = array_rand($image, 1);
+
+                    $image_url = $image[$key]['url'];
+
+                }
+
+            } else if($wp->query_vars['__signature'] != 'random'){
+
+
+
+                $image_url = $image[$wp->query_vars['__signature']]['url'];
+
+            } else if($wp->query_vars['__signature'] == 'random'){
+                unset($image['in-progress']);
+                $key = array_rand($image, 1);
+
+                $image_url = $image[$key]['url'];
+
+            }
+
+            $sig_image = imagecreatefrompng($image_url);
 
             header('Content-Type: image/png');
 
-            imagepng($im);
-            imagedestroy($im);
+            imagepng($sig_image);
+            imagedestroy($sig_image);
 
         }
-
-//        else if(isset($wp->query_vars['videos'])){
-//
-//           //TODO needs to be moved out into a seperate api for exodus functionality because this creates a plugin depenancy currently no way to auto load plugin depeancies within wordpress and not happening soon, last time i looked
-//           wp_exodus_functionality::get_videos(array('output' => 'json'));
-//        }
-
-
     }
 
     protected function send_response($msg){
