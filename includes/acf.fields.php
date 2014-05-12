@@ -131,6 +131,18 @@ if (function_exists("register_field_group")) {
                 'max' => '',
                 'step' => '',
             ),
+            array (
+                'key' => 'field_5371185d008ab',
+                'label' => 'Twitch',
+                'name' => 'twitch',
+                'type' => 'text',
+                'default_value' => '',
+                'placeholder' => '',
+                'prepend' => '',
+                'append' => '',
+                'formatting' => 'html',
+                'maxlength' => '',
+            ),
         ),
         'location' => array (
             array (
