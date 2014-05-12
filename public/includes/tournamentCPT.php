@@ -4,6 +4,8 @@ class tournamentCPT {
 
     public static $post_type = 'tournament';
 
+    public static $tournament_status = array('Signup', 'In Progress', 'Cancelled', 'Finished');
+
     function __construct() {
 
         add_action( 'init', array( $this, 'register_cpt_tournament') );
@@ -33,6 +35,7 @@ class tournamentCPT {
 
 
         add_filter( 'acf/load_field/name=challonge_tournament_link', array( $this, 'filter_challonge_tournament_listing') );
+        add_filter( 'acf/load_field/name=tournament_status', array( $this, 'filter_tournament_status') );
 
     }
 
@@ -124,6 +127,19 @@ class tournamentCPT {
             'admin_box' => array(
                 'show' => 'from',
                 'context' => 'advanced'
+            )
+        ) );
+
+        p2p_register_connection_type( array(
+            'name' => 'tournament_excluded_players',
+            'from' => self::$post_type,
+            'to' => 'player',
+            'title' => array(
+                'from' => __( 'Excluded Players', 'PLTM' )
+            ),
+            'admin_box' => array(
+                'show' => 'from',
+                'context' => 'side'
             )
         ) );
 
@@ -342,6 +358,14 @@ class tournamentCPT {
 
         }
 
+
+        if (in_array($values['email']['value'], self::player_excluded_from_tournament($tournament_id))){
+
+            $validation_result['is_valid'] = false;
+            $validation_result['form']['cssClass'] = 'player-is-excluded';
+
+        }
+
         return $validation_result;
 
     }
@@ -379,6 +403,8 @@ class tournamentCPT {
         if (count(get_tournament_players($tournament_id)) >= get_field('slots'))
             return false;
 
+
+
         //todo move out to general function file as this is a useful snippit
         foreach ($form['fields'] as $field) {
             $values[$field['field_mapField']] = array(
@@ -388,13 +414,18 @@ class tournamentCPT {
             );
         }
 
+        //if email is in excluded players bin
+        if (in_array($values['email']['value'], self::player_excluded_from_tournament($tournament_id)))
+            return false;
+
+
         //todo email shouldnt be stored with the player profile CTP should be linked either by p2p or meta int
         $find_player = array(
             'post_type'      => playerCPT::$post_type,
             'meta_query'     => array(
                 array(
                     'key'   => 'player_email',
-                    'value' => $entry['3']
+                    'value' => $values['email']['value']
                 )
             ),
             'posts_per_page' => 1
@@ -566,6 +597,14 @@ class tournamentCPT {
         }
 
         return $args;
+
+    }
+
+    public function filter_tournament_status($field){
+
+        $field['choices'] = self::$tournament_status;
+
+        return $field;
 
     }
 
@@ -978,6 +1017,7 @@ class tournamentCPT {
         //todo strong definiton of tournament status
         $args = array(
             'post_type' => self::$post_type,
+            'posts_per_page' => -1
         );
 
         $tournaments = get_posts($args);
@@ -1019,17 +1059,19 @@ class tournamentCPT {
             $signup_status = 'Closed';
         }
 
-        $data['name']          = $tournament->post_title;
-        $data['description']   = $tournament->post_title;
-        $data['date']          = get_post_meta($tournament->ID, 'run_date', true);
-        $data['time']          = get_post_meta($tournament->ID, 'run_time', true);
-        $data['format']        = get_post_meta($tournament->ID, 'tournament_type', true);
-        $data['slots']         = get_post_meta($tournament->ID, 'slots', true);
-        $data['slots_taken']   = count(get_tournament_players($tournament->ID));
-        $data['signup_url']    = get_permalink($tournament->ID) . '/signup';
-        $data['url']           = get_permalink($tournament->ID);
-        $data['signup_status'] = $signup_status;
+        $data['ID']                      = $tournament->ID;
+        $data['name']                    = $tournament->post_title;
+        $data['description']             = $tournament->post_title;
+        $data['date']                    = date('c', strtotime(get_post_meta($tournament->ID, 'run_date', true)));
+        $data['time']                    = get_post_meta($tournament->ID, 'run_time', true);
+        $data['format']                  = get_post_meta($tournament->ID, 'tournament_type', true);
+        $data['slots']                   = get_post_meta($tournament->ID, 'slots', true);
+        $data['slots_taken']             = count(get_tournament_players($tournament->ID));
+        $data['signup_url']              = get_permalink($tournament->ID) . '/signup';
+        $data['url']                     = get_permalink($tournament->ID);
+        $data['signup_status']           = $signup_status;
         $data['challonge_tournament_id'] = $to->get_the_challonge_tournament_id($tournament->ID);
+
 
         if(true && $return['prize']){
             $data['prize']         = self::get_tournament_prizes($tournament->ID);
@@ -1149,5 +1191,27 @@ class tournamentCPT {
 
     }
 
+    public static function players_excluded_from_tournament($tournament_id){
+
+        $excluded_players_list = array();
+
+        $args = array(
+            'connected_type'   => 'tournament_excluded_players',
+            'connected_items'  => $tournament_id,
+            'nopaging'         => true,
+            'suppress_filters' => false
+        );
+
+        $excluded_players = get_posts($args);
+
+        foreach($excluded_players as $player){
+
+            $excluded_players_list[] = get_post_meta($player->ID, 'player_email', true);
+
+        }
+
+        return $excluded_players_list;
+
+    }
 
 }

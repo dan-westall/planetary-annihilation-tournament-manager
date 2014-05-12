@@ -22,6 +22,8 @@ class playerCPT {
 
         add_action( 'admin_menu', array( $this, 'prefix_remove_menu_pages') );
 
+        add_action( 'update_post_meta', array( $this, 'link_player_to_user'), 10, 4 );
+
 
     }
 
@@ -333,5 +335,31 @@ class playerCPT {
 
         return false;
 
+    }
+
+    public function link_player_to_user($meta_id, $object_id, $meta_key, $_meta_value){
+
+        if(get_post_type($object_id) == self::$post_type){
+
+            if($meta_key == 'user_id'){
+
+                //clean up old links before this value is updated
+                $old_user_id = get_post_meta($object_id, 'user_id', true);
+
+                delete_user_meta($old_user_id, 'player_id' , $object_id);
+
+                if($_meta_value == null || $_meta_value == '' || $_meta_value == 'null'){
+
+                    wp_update_post(array('ID' => $object_id, 'post_author' => 3));
+
+                } else {
+
+                    update_user_meta($_meta_value, 'player_id', $object_id);
+
+                    //also need to set this to the post author so user can change there player profile.
+                    wp_update_post(array('ID' => $object_id, 'post_author' => $_meta_value));
+                }
+            }
+        }
     }
 }

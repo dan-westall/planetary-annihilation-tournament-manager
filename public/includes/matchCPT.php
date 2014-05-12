@@ -128,8 +128,12 @@ class matchCPT {
             $data[$row]['pa_stats_match_id']       = get_post_meta($matches[$row]->ID, 'pa_stats_match_id', true);
             $data[$row]['pa_stats_start']          = get_post_meta($matches[$row]->ID, 'pa_stats_start', true);
             $data[$row]['pa_stats_stop']           = get_post_meta($matches[$row]->ID, 'pa_stats_stop', true);
+            $data[$row]['twitch']                  = get_post_meta($matches[$row]->ID, 'twitch', true);
+            $data[$row]['match_round']             = get_post_meta($matches[$row]->ID, 'match_round', true);
             $data[$row]['last_update']             = get_post_meta($matches[$row]->ID, 'last_update', true); //todo to be played, in progress, completed??
             $data[$row]['match_url']               = get_permalink($matches[$row]->ID);
+
+            $data[$row]['videos']               = get_match_videos($matches[$row]->ID);
 
 
         }
@@ -152,6 +156,11 @@ class matchCPT {
 
                 break;
         }
+    }
+
+    public static function match_return_format($match, $data = array(), $return = array('results' => true, 'prize' => true)){
+
+
     }
 
     public static function match_listing_template($vars = array()) {

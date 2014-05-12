@@ -53,6 +53,16 @@ function get_match_player_cards($match_id){
 
 }
 
+function is_tournament_in_progress(){
+
+    $page_id = get_option('page_on_front');
+
+    if(get_post_meta($page_id, '_wp_page_template', true) == 'template-tournament-in-progress.php' )
+        return true;
+
+    return false;
+}
+
 
 
 class DW_Helper {

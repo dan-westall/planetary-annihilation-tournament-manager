@@ -3,7 +3,7 @@
 
 	$(function () {
 
-		// Place your administration-specific JavaScript here
+
 
 	});
 

@@ -120,6 +120,42 @@ if(function_exists("register_field_group"))
                 'formatting' => 'html',
                 'maxlength' => '',
             ),
+            array (
+                'key' => 'field_537136ab23850',
+                'label' => 'Match Round',
+                'name' => 'match_round',
+                'type' => 'text',
+                'default_value' => '',
+                'placeholder' => '',
+                'prepend' => '',
+                'append' => '',
+                'formatting' => 'html',
+                'maxlength' => '',
+            ),
+            array (
+                'key' => 'field_537136c123851',
+                'label' => 'Twitch',
+                'name' => 'twitch',
+                'type' => 'text',
+                'default_value' => '',
+                'placeholder' => '',
+                'prepend' => '',
+                'append' => '',
+                'formatting' => 'html',
+                'maxlength' => '',
+            ),
+            array (
+                'key' => 'field_537136d523852',
+                'label' => 'Favourite',
+                'name' => 'favourite',
+                'type' => 'text',
+                'default_value' => '',
+                'placeholder' => '',
+                'prepend' => '',
+                'append' => '',
+                'formatting' => 'html',
+                'maxlength' => '',
+            ),
         ),
         'location' => array (
             array (
@@ -170,6 +206,66 @@ if(function_exists("register_field_group"))
                     'param' => 'post_type',
                     'operator' => '==',
                     'value' => 'player',
+                    'order_no' => 0,
+                    'group_no' => 0,
+                ),
+            ),
+        ),
+        'options' => array (
+            'position' => 'normal',
+            'layout' => 'default',
+            'hide_on_screen' => array (
+            ),
+        ),
+        'menu_order' => 0,
+    ));
+    register_field_group(array (
+        'id' => 'acf_pltm-signatures',
+        'title' => 'PLTM Signatures',
+        'fields' => array (
+            array (
+                'key' => 'field_53700be82ece6',
+                'label' => 'Site Signatures',
+                'name' => 'site_signatures',
+                'type' => 'repeater',
+                'sub_fields' => array (
+                    array (
+                        'key' => 'field_53701077fb232',
+                        'label' => 'Signature image',
+                        'name' => 'signature_image',
+                        'type' => 'image',
+                        'column_width' => '',
+                        'save_format' => 'object',
+                        'preview_size' => 'guide-banner',
+                        'library' => 'all',
+                    ),
+                    array (
+                        'key' => 'field_537010fafb233',
+                        'label' => 'Keyword',
+                        'name' => 'keyword',
+                        'type' => 'text',
+                        'instructions' => 'Random is a reserved word, for example http://dev.exodusesports.com/signature/{keyword}/signature.png',
+                        'column_width' => '',
+                        'default_value' => '',
+                        'placeholder' => '',
+                        'prepend' => '',
+                        'append' => '',
+                        'formatting' => 'html',
+                        'maxlength' => '',
+                    ),
+                ),
+                'row_min' => '',
+                'row_limit' => '',
+                'layout' => 'row',
+                'button_label' => 'Add Signature',
+            ),
+        ),
+        'location' => array (
+            array (
+                array (
+                    'param' => 'options_page',
+                    'operator' => '==',
+                    'value' => 'acf-options-pltm-signatures',
                     'order_no' => 0,
                     'group_no' => 0,
                 ),
@@ -484,6 +580,7 @@ if(function_exists("register_field_group"))
                     5 => 'Livestream - Survey',
                     3 => 'PreLim Feedback',
                     4 => 'Showdown - Survey',
+                    6 => 'Test All',
                     1 => 'Tournament Signup',
                 ),
                 'default_value' => '',
@@ -565,6 +662,22 @@ if(function_exists("register_field_group"))
                 'formatting' => 'html',
                 'maxlength' => '',
             ),
+            array (
+                'key' => 'field_536fa73ccaa06',
+                'label' => 'Tournament Status',
+                'name' => 'tournament_status',
+                'type' => 'select',
+                'required' => 1,
+                'choices' => array (
+                    0 => 'Signup',
+                    1 => 'In Progress',
+                    2 => 'Cancelled',
+                    3 => 'Finished',
+                ),
+                'default_value' => '',
+                'allow_null' => 0,
+                'multiple' => 0,
+            ),
         ),
         'location' => array (
             array (
@@ -585,4 +698,5 @@ if(function_exists("register_field_group"))
         ),
         'menu_order' => 0,
     ));
+
 }
