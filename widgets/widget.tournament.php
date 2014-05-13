@@ -49,6 +49,7 @@ class tournament_info extends WP_Widget {
             </section>
 
             <section class="prize-tiers tournament-meta-block text">
+
                 <h3>Tournament Prizes</h3>
 
                     <?php if( have_rows('prize_tiers') ):

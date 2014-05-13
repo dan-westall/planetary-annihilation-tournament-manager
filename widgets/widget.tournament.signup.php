@@ -17,7 +17,7 @@ class tournament_signup extends WP_Widget {
         $title 		= apply_filters('widget_title', $instance['title']);
         $message 	= $instance['message'];
         ?>
-        <?php if(!isset($wp_query->query_vars['signup']) && count(get_tournament_players($post->ID)) >= get_field('slots') && get_post_meta($post->ID, 'signup_closed', true)): ?>
+        <?php if(!isset($wp_query->query_vars['signup']) && is_tournament_signup_open($post->ID)): ?>
 
             <?php echo $before_widget; ?>
 

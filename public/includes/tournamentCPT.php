@@ -880,9 +880,7 @@ class tournamentCPT {
 
                 case "signup":
 
-                    if($tournament_closed !== false){
-
-                    } else {
+                    if(self::is_tournament_signup_open($tournament->ID)){
 
                         $html .= sprintf('<li><a href="%1$s/%2$s">%3$s</a></li>', get_permalink(), $tournament_endpoint, ucwords($tournament_endpoint));
 
