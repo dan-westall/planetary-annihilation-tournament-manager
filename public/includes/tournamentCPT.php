@@ -359,7 +359,7 @@ class tournamentCPT {
         }
 
 
-        if (in_array($values['email']['value'], self::player_excluded_from_tournament($tournament_id))){
+        if (in_array($values['email']['value'], self::players_excluded_from_tournament($tournament_id))){
 
             $validation_result['is_valid'] = false;
             $validation_result['form']['cssClass'] = 'player-is-excluded';
@@ -374,6 +374,9 @@ class tournamentCPT {
 
         if(strpos($form['cssClass'], 'already-in-tournament') !== false)
             $message = '<span class="positive-message">Great news, your already signed up to this tournament!. No need to signup again.</span>';
+
+        if(strpos($form['cssClass'], 'player-is-excluded') !== false)
+            $message = '<span class="positive-message">Very Sorry but you are excluded from this tournament, if you think this is in error please contact us via the contact form.</span>';
 
         return $message;
 
@@ -415,7 +418,7 @@ class tournamentCPT {
         }
 
         //if email is in excluded players bin
-        if (in_array($values['email']['value'], self::player_excluded_from_tournament($tournament_id)))
+        if (in_array($values['email']['value'], self::players_excluded_from_tournament($tournament_id)))
             return false;
 
 
