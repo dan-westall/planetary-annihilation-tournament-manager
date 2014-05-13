@@ -1,6 +1,7 @@
 <table class="table match-live-reload" id="tblmatches">
     <thead>
         <tr>
+            <th>Round</th>
             <th>Match</th>
             <th>Player 1</th>
             <th>Player 2</th>
@@ -19,6 +20,7 @@
 
 <script type="text/html" id="matchTemplate">
 <tr>
+    <td><span data-bind="text: match_round"></span></td>
     <td><a data-bind="attr: {href: match_url}"><span data-bind="text: title"></span></a></td>
     <td><span data-bind="text: player1, css:{ spoiler: match_round() !== '1'}"></span><span class="spoiler" data-bind="css:{ matchwinner: player1() === winner()}"/><span></td>
     <td><span data-bind="text: player2, css:{ spoiler: match_round() !== '1'}"></span><span class="spoiler" data-bind="css:{ matchwinner: player2() === winner()}"/><span></td>
