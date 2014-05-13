@@ -376,7 +376,7 @@ class tournamentCPT {
             $message = '<span class="positive-message">Great news, your already signed up to this tournament!. No need to signup again.</span>';
 
         if(strpos($form['cssClass'], 'player-is-excluded') !== false)
-            $message = '<span class="positive-message">Very Sorry but you are excluded from this tournament, if you think this is in error please contact us via the contact form.</span>';
+            $message = '<span class="validation_error">Very Sorry but you are excluded from this tournament, if you think this is in error please contact us via the contact form.</span>';
 
         return $message;
 
