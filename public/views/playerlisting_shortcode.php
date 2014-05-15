@@ -1,8 +1,9 @@
 <table class="table match-live-reload" id="tblplayers">
     <thead>
         <tr>
-            <!--<th>PA Stats</th>-->
+            <th></th>
             <th>Name</th>
+            <th>PA Stats</th>
             <th>Win/Losses</th>
         </tr>
     </thead>
@@ -15,8 +16,9 @@
 
 <script type="text/html" id="playerTemplate">
 <tr>
-    <!--<td><span data-bind="text: pa_stats_player_id"></span></td>-->
+    <td><span class="col-lg-6 small player-profile" data-bind="html: avatar"></span></td>
     <td><span data-bind="text: name"></span></td>
+    <td><span data-bind="if: pa_stats_player_id">OK</span></td>
     <td></td>
 </tr>
 </script>
