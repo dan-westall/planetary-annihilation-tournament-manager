@@ -23,9 +23,11 @@ class tournamentCPT {
         //add_action( 'gform_confirmation', array( $this, 'signup_custom_confirmation'), 10, 2);
 
         //add_action( 'template_include', array( $this, 'load_endpoint_template')  );
-
         //todo sync players from challonge to wordpress, fair bit of work, need to refactor signup_tournament_player to make it happen
         //add_action( 'save_post', array( $this, 'action_challonge_sync_check') );
+
+        add_shortcode('tournament-players', array( $this, 'get_tournament_players') );
+
         add_action( 'save_post',  array( $this, 'delete_tournament_result_cache') );
 
         add_filter( 'tournament_rounds', array( $this, 'filter_tournament_rounds' ) );
@@ -915,11 +917,29 @@ class tournamentCPT {
 
     }
 
+    public static function player_listing_template($vars = array()) {
+        ob_start();
+
+        include( PLTM_PLUGIN_DIR . '/public/views/playerlisting_shortcode.php');
+
+        return ob_get_clean();
+    }
+
+    public static function player_listing_js_deps() {
+        //wp_register_script('knockout',plugins_url('/public/js/ko.min.js',__FILE__) );
+        wp_enqueue_script('custom.knockout');
+        //wp_register_script('socketio',":5000/socket.io/socket.io.js");
+        //wp_enqueue_script('socketio');
+        wp_register_script('player_listing', PLTM_PLUGIN_URI . 'public/assets/js/playerlisting.js' );
+        wp_enqueue_script('player_listing');
+    }
+
     public static function get_tournament_players($attr) {
 
         extract(shortcode_atts(array(
             'tournament_id' => '',
-            'output'        => 'html'
+            'output'        => 'html',
+            'autoreload'    => false
         ), $attr));
 
         $data = array();
@@ -952,6 +972,11 @@ class tournamentCPT {
 
             case "html" :
 
+                self::player_listing_js_deps();
+
+                $matchopts = array($tournament_id,$autoreload);
+
+                return self::player_listing_template($matchopts);
 
 
                 break;
