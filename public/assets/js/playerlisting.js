@@ -40,7 +40,6 @@ var PlayerListing = function() {
 			return right.title() < left.title() ? 1 : -1
 		});
 	};
-	console.log(self.restendpoint());
 
 	/*		
 	var socket = io.connect(':5000');
