@@ -6,6 +6,8 @@ class tournamentCPT {
 
     public static $tournament_status = array('Signup', 'In Progress', 'Cancelled', 'Finished');
 
+    public static $tournament_player_status = array( 'Active', 'Banned', 'No Show', 'Disqualify', 'reserve');
+
     function __construct() {
 
         add_action( 'init', array( $this, 'register_cpt_tournament') );
@@ -129,6 +131,13 @@ class tournamentCPT {
             'admin_box' => array(
                 'show' => 'from',
                 'context' => 'advanced'
+            ),
+            'fields' => array(
+                'status' => array(
+                    'title' => 'Status',
+                    'type' => 'select',
+                    'values' => apply_filters('tournament_player_status', self::$tournament_player_status )
+                )
             )
         ) );
 

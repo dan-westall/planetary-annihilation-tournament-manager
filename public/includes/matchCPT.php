@@ -83,7 +83,10 @@ class matchCPT {
         ), $attr));
 
         $args = array(
-            'post_type'       => self::$post_type,
+            'post_type' => self::$post_type,
+            'meta_key'  => 'match_round',
+            'orderby'   => 'meta_value_num',
+            'order'     => 'ASC',
         );
 
         //if tournament id is set then do linking to matches
