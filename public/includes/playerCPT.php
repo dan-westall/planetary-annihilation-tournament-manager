@@ -52,7 +52,7 @@ class playerCPT {
             'show_ui'             => true,
             'menu_position'       => 10,
             'menu_icon'           => 'dashicons-id',
-            'supports'            => array('title', 'thumbnail', 'author'),
+            'supports'            => array('title', 'author'),
             'capability_type'     => array(self::$post_type,self::$post_type.'s'),
             'map_meta_cap'        => true,
         );
@@ -369,5 +369,20 @@ class playerCPT {
                 }
             }
         }
+    }
+
+    public static function get_player_avatar($player_id, $size = 100){
+
+        $player_user_id = get_post_meta($player_id, 'user_id', true);
+        $user           = get_userdata($player_user_id);
+
+        if(function_exists(get_wp_user_avatar())){
+            $user_avatar_img = get_wp_user_avatar($user->ID, $size);
+        } else {
+            $user_avatar_img = get_avatar($user->ID, $size);
+        }
+
+        return $user_avatar_img;
+
     }
 }

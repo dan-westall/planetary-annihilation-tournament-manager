@@ -230,7 +230,7 @@ class matchCPT {
 
             $winner               = $title = '';
             $player_user_id       = get_post_meta($player->ID, 'user_id', true);
-            $player_profile_image = get_wp_user_avatar(1);;
+            $player_profile_image = playerCPT::get_player_avatar($player->ID);
 
             if(p2p_get_meta($player->p2p_id, 'winner', true)){
                 $winner = 'winner';
@@ -240,9 +240,6 @@ class matchCPT {
                 $title = sprintf('<span>%s</span>', get_user_meta($player_user_id, 'title', true));
             }
 
-            if(has_post_thumbnail($player->ID)){
-                $player_profile_image = get_the_post_thumbnail($player->ID, 'player-profile-thumbnail');
-            }
 
             $match_card[] = sprintf(
                 '<div class="col-lg-5">

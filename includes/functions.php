@@ -63,6 +63,12 @@ function is_tournament_in_progress(){
     return false;
 }
 
+function get_player_avatar($player_id, $size = 100){
+
+     return playerCPT::get_player_avatar($player_id, $size);
+
+}
+
 
 
 class DW_Helper {
