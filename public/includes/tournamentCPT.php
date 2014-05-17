@@ -139,7 +139,11 @@ class tournamentCPT {
                     'title' => 'Status',
                     'type' => 'select',
                     'values' => apply_filters('tournament_player_status', self::$tournament_player_status )
-                )
+                ),
+                'note' => array(
+                    'title' => 'Note',
+                    'type' => 'text',
+                ),
             )
         ) );
 
