@@ -1002,7 +1002,7 @@ class tournamentCPT {
 
             $array = '';
 
-            $data[$row] = playerCPT::player_return_format($players[$row]);
+            $data[$row] = playerCPT::player_return_format_tourney($players[$row],$tournament_id);
 
 
         }

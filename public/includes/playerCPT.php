@@ -130,12 +130,15 @@ class playerCPT {
         $data['clan']               = get_post_meta($player->ID, 'clan', true);
         $data['pa_stats_player_id'] = get_post_meta($player->ID, 'pastats_player_id', true);
 
-        $player_profile_image = get_wp_user_avatar(1, 50);
-
+        $player_profile_image = get_player_avatar($player->ID, $size = 100);
+        //get_wp_user_avatar(1, 50);
+        /*
         if(has_post_thumbnail($player->ID)){
-            $player_profile_image = get_the_post_thumbnail($player->ID, 'small-player-profile-thumbnail');
+            //$player_profile_image = get_the_post_thumbnail($player->ID, 'small-player-profile-thumbnail');
+            $player_profile_image = get_player_avatar($player->ID, $size = 100);
         }        
-        
+        */
+
         $data['avatar'] = $player_profile_image;
 
         if($return['tournaments']){
@@ -145,6 +148,31 @@ class playerCPT {
         return $data;
 
     }
+
+    public static function player_return_format_tourney($player, $tournament_id, $data = array(), $return = array('tournaments' => true)){
+
+        $data['name']               = $player->post_title;
+        $data['clan']               = get_post_meta($player->ID, 'clan', true);
+        $data['pa_stats_player_id'] = get_post_meta($player->ID, 'pastats_player_id', true);
+
+        $player_profile_image = get_player_avatar($player->ID, $size = 100);
+        //get_wp_user_avatar(1, 50);
+        /*
+        if(has_post_thumbnail($player->ID)){
+            //$player_profile_image = get_the_post_thumbnail($player->ID, 'small-player-profile-thumbnail');
+            $player_profile_image = get_player_avatar($player->ID, $size = 100);
+        }        
+        */
+
+        $data['avatar'] = $player_profile_image;
+
+        if($return['tournaments']){
+            $data['player_tournaments']  = self::get_player_info_tournament($player->ID, $tournament_id);
+        }
+
+        return $data;
+
+    }    
 
     public static function get_player_entered_tournaments($player_id){
 
@@ -164,6 +192,14 @@ class playerCPT {
         return $enter_tournaments;
 
     }
+
+    public static function get_player_info_tournament($player_id, $tournament_id){
+        //$player_tournament = tournamentCPT::tournament_return_format($tournament, array(), array('results' => false, 'prize' => false));
+        $player_tournament['matches'] = self::get_player_tournament_matches($player_id, $tournament_id);
+        $player_tournament['player_result'] = self::get_player_tournament_finish($tournament_id, $player_id);
+
+        return $player_tournament;
+    }    
 
     public static function get_player_tournament_matches($player_id, $tournament_id){
 

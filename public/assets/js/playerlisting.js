@@ -1,6 +1,7 @@
 var PlayerModel = function(data){
 	var self = this;
 	ko.mapping.fromJS(data,{},self);
+
 }
 
 var PlayerListing = function() {
