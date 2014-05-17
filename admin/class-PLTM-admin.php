@@ -329,7 +329,7 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
                 if(get_post_meta($post_id, 'pastats_player_id', true)){
                     echo get_post_meta($post_id, 'pastats_player_id', true);
                 } else {
-                    echo 'Player has no player PA stats ID set!';
+                    echo 'Player has no player PA stats ID set! <a class="player-missing-pa-stats-id-email" data-player-id="'.$post_id.'" href="javascript:void(0);">Send Email</a>';
                 }
 
 
