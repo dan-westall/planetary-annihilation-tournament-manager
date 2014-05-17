@@ -133,7 +133,10 @@ var MatchListing = function() {
 	self.SortMatches = function(){
   		self.matches.sort(
 		function(left, right) { 
-			return right.title() < left.title() ? 1 : -1
+			//return right.title() < left.title() ? 1 : -1
+			return left.match_round() === right.match_round() 
+			? right.title().toLowerCase() > left.title().toLowerCase() ? -1 : 1
+			: right.match_round() < left.match_round() ? 1 : -1		
 		});
 	};
 
