@@ -6,7 +6,9 @@ class tournamentCPT {
 
     public static $tournament_status = array('Signup', 'In Progress', 'Cancelled', 'Finished');
 
-    public static $tournament_player_status = array( 'Active', 'Banned', 'No Show', 'Disqualify', 'reserve');
+    public static $tournament_player_status = array( 'Active', 'Reserve', 'No Show', 'Banned', 'Disqualify');
+
+    private $player_tournament_status = '';
 
     function __construct() {
 
@@ -37,11 +39,11 @@ class tournamentCPT {
         //add_filter( 'single_template', array( $this, 'single_tournament_template') );
         add_filter( 'post_updated_messages', array( $this, 'filter_post_type_feedback_messages') );
 
-
         add_filter( 'acf/load_field/name=challonge_tournament_link', array( $this, 'filter_challonge_tournament_listing') );
         add_filter( 'acf/load_field/name=tournament_status', array( $this, 'filter_tournament_status') );
 
     }
+
 
     function register_cpt_tournament(){
 
@@ -343,7 +345,6 @@ class tournamentCPT {
             $validation_result['is_valid'] = false;
         }
 
-
         foreach( $validation_result['form']['fields'] as $field ) {
             $values[$field['field_mapField']] = array(
                 'id'    => $field['id'],
@@ -397,14 +398,19 @@ class tournamentCPT {
 
         global $wpdb;
 
-        $signup_form_id          = get_field('standard_tournament_signup_form', 'option');
-        $tournament_id           = url_to_postid($entry['source_url']);
-        $challonge_tournament_id = $this->get_the_challonge_tournament_id($tournament_id);
-
-        $tournament_closed = get_field('signup_closed', $tournament_id);
+        $signup_form_id           = get_field('standard_tournament_signup_form', 'option');
+        $tournament_id            = url_to_postid($entry['source_url']);
+        $challonge_tournament_id  = $this->get_the_challonge_tournament_id($tournament_id);
+        $tournament_slots         = get_post_meta($tournament_id, 'slots', true);
+        $tournament_reserve_slots = get_post_meta($tournament_id, 'reserve_slots', true);
+        $total_tournament_slots   = ($tournament_slots + $tournament_reserve_slots);
 
         //if tournament 0 bin
-        if ($tournament_id === 0 || $tournament_closed !== false)
+        if ($tournament_id === 0)
+            return false;
+
+        //if returns false stop
+        if(!self::is_tournament_signup_open($tournament_id))
             return false;
 
         if ($signup_form_id && get_field('signup_form')) {
@@ -414,9 +420,9 @@ class tournamentCPT {
         if ($signup_form_id != $entry['form_id'])
             return false;
 
-        if (count(get_tournament_players($tournament_id)) >= get_field('slots'))
+        //count both reserve and active players
+        if (count(get_tournament_players($tournament_id, array(self::$tournament_player_status[0], self::$tournament_player_status[1]))) >= $total_tournament_slots)
             return false;
-
 
 
         //todo move out to general function file as this is a useful snippit
@@ -465,12 +471,17 @@ class tournamentCPT {
             $challonge_result = $this->challonge_add_player_to_tournament($challonge_tournament_id, $values['email']['value'], $values['ign']['value']);
 
             //error check
-            if (true) {
+            if (isset($challonge_result->id)) {
 
                 //player found add player to tornament
                 $p2p_result = $this->action_add_player_to_tournament($player_id, $tournament_id, $challonge_tournament_id, $challonge_result);
 
-                if (!$p2p_result) {
+                if ($p2p_result) {
+
+                    //GFCommon::send_notification($notification, $form, $lead);
+                    do_action( "player_added_to_tournament_{$this->player_tournament_status}", array( 'player_id' => $player_id, 'tournament_id' => $tournament_id ) );
+
+                } else {
                     //email admins let them know something went wrong.
                 }
 
@@ -522,7 +533,16 @@ class tournamentCPT {
 
                 $p2p_result = $this->action_add_player_to_tournament($player_id, $tournament_id, $challonge_tournament_id, $challonge_result);
 
-                if (!$p2p_result) {
+                if ($p2p_result) {
+
+                    //update the player signup entry at this point
+                    //$success = GFAPI::update_entry($entry);
+
+                    //GFCommon::send_notification($notification, $form, $lead);
+
+                    do_action( "player_added_to_tournament_{$this->player_tournament_status}", array( 'player_id' => $player_id, 'tournament_id' => $tournament_id ) );
+
+                } else {
                     //email admins let them know something went wrong.
                 }
 
@@ -543,14 +563,13 @@ class tournamentCPT {
 
         $tournament_closed = get_post_meta($tournament_id, 'signup_closed', true);
 
-
-        if(count(get_tournament_players($tournament_id)) >= get_post_meta($tournament_id, 'slots', true)){
+        if($tournament_closed === true){
 
             return false;
 
         }
 
-        if($tournament_closed === true){
+        if(count(get_tournament_players($tournament_id)) >= get_post_meta($tournament_id, 'slots', true)){
 
             return false;
 
@@ -709,17 +728,34 @@ class tournamentCPT {
 
     public function action_add_player_to_tournament($player_id, $tournament_id, $challonge_tournament_id, $challonge_result){
 
+        $status                   = self::$tournament_player_status[0];
+        $tournament_slots         = get_post_meta($tournament_id, 'slots', true);
+        $tournament_reserve_slots = get_post_meta($tournament_id, 'reserve_slots', true);
+        $total_tournament_slots   = ($tournament_slots + $tournament_reserve_slots);
+        $current_player_count     = count(get_tournament_players($tournament_id, array(self::$tournament_player_status[0], self::$tournament_player_status[1])));
+
+        //TODO not sure the challonge stuff should be in here
         //save the return to db as this has useful info in it
         update_post_meta($player_id, 'challonge_data', $challonge_result);
 
         //easy search
         update_post_meta($player_id, 'challonge_participant_id', $challonge_result->id);
 
+        //if therere are more players then slots reserve, any logic should have been done by this point
+        if($current_player_count > $tournament_slots){
+
+            $status = self::$tournament_player_status[1];
+
+        }
+
         $connection_meta = array(
             'date'                     => current_time('mysql'),
             'challonge_tournament_id'  => $challonge_tournament_id,
-            'challonge_participant_id' => $challonge_result->id
+            'challonge_participant_id' => $challonge_result->id,
+            'status'                   => $status
         );
+
+        $this->player_tournament_status = $status;
 
         //if ladder information is entered then add that to the connection meta
         if (false) {

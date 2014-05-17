@@ -700,3 +700,44 @@ if(function_exists("register_field_group"))
     ));
 
 }
+if(function_exists("register_field_group"))
+{
+    register_field_group(array (
+        'id' => 'acf_notification',
+        'title' => 'Notification',
+        'fields' => array (
+            array (
+                'key' => 'field_5377e4c0a7eeb',
+                'label' => 'Notification Actions',
+                'name' => 'notification_actions',
+                'type' => 'select',
+                'choices' => array (
+                    'tournament_signup_active' => 'Tournament Signup Not Reserve',
+                    'tournament_signup_reserve' => 'Tournament Signup Reserve',
+                ),
+                'default_value' => '',
+                'allow_null' => 1,
+                'multiple' => 0,
+            ),
+        ),
+        'location' => array (
+            array (
+                array (
+                    'param' => 'post_type',
+                    'operator' => '==',
+                    'value' => 'notification',
+                    'order_no' => 0,
+                    'group_no' => 0,
+                ),
+            ),
+        ),
+        'options' => array (
+            'position' => 'side',
+            'layout' => 'default',
+            'hide_on_screen' => array (
+            ),
+        ),
+        'menu_order' => 0,
+    ));
+}
+

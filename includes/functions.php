@@ -1,10 +1,17 @@
 <?php
 
-function get_tournament_players($tournament_id){
+function get_tournament_players($tournament_id, $status = array('active')){
 
     $players = get_posts(array(
         'connected_type'   => 'tournament_players',
         'connected_items'  => $tournament_id,
+        'connected_meta' => array(
+            array(
+                'key' => 'status',
+                'value' => $status,
+                'compare' => 'IN'
+            )
+        ),
         'nopaging'         => true,
         'suppress_filters' => false
     ));

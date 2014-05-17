@@ -23,6 +23,7 @@ require_once( PLTM_PLUGIN_DIR.'/public/includes/playerCPT.php');
 require_once( PLTM_PLUGIN_DIR.'/public/includes/sponsorCPT.php');
 require_once( PLTM_PLUGIN_DIR.'/public/includes/tournamentCPT.php');
 require_once( PLTM_PLUGIN_DIR.'/public/includes/matchCPT.php');
+require_once( PLTM_PLUGIN_DIR.'/public/includes/notificationCPT.php');
 
 // widgets
 require_once( PLTM_PLUGIN_DIR.'/widgets/widget.tournament.php');
