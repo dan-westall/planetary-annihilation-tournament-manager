@@ -25,6 +25,8 @@ class playerCPT {
         add_action( 'update_post_meta', array( $this, 'link_player_to_user'), 10, 4 );
 
 
+        add_action('wp_ajax_player_missing_pa_stats_id',array($this,'player_missing_pa_stats_id'));
+
     }
 
     function register_cpt_player() {
@@ -419,6 +421,18 @@ class playerCPT {
         }
 
         return $user_avatar_img;
+
+    }
+
+    public function player_missing_pa_stats_id(){
+
+        check_ajax_referer( 'missing_pa_stats_id', 'security' );
+
+        $player_id = $_POST['player_id'];
+
+        do_action('player_missing_pa_stats_id', array( 'player_id' => $player_id));
+
+        die();
 
     }
 }

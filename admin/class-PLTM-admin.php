@@ -70,7 +70,6 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
         add_action('admin_menu', array($this, 'add_plugin_admin_menu'));
         add_action('admin_init', array($this, 'remove_dashboard_meta'));
 
-
         // Add an action link pointing to the options page.
         $plugin_basename = plugin_basename(plugin_dir_path(__DIR__) . $this->plugin_slug . '.php');
         add_filter('plugin_action_links_' . $plugin_basename, array($this, 'add_action_links'));
@@ -87,11 +86,16 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
         add_filter('manage_edit-match_columns', array($this, 'match_columns'));
         add_filter('manage_edit-tournament_columns', array($this, 'tournament_columns'));
         add_filter("manage_edit-player_columns", array($this, 'player_columns'));
+        add_filter("manage_edit-notification_columns", array($this, 'notification_columns'));
 
         add_action('manage_posts_custom_column', array($this, 'custom_columns'), 10, 2);
 
         //admin dashboard widgets
         add_action('wp_dashboard_setup', array($this, 'tournament_player_management') );
+
+        //ajax
+
+
 
         acf_add_options_sub_page(array(
             'title' => 'PLTM Signatures',
@@ -150,6 +154,21 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
             'player_user_account' => __('Player User Acount'),
             'pa_stats_id'       => __('Player PA Stats ID'),
 
+        );
+
+        return $columns;
+
+    }
+
+    public function notification_columns($columns) {
+
+        global $post, $current_user;
+        get_currentuserinfo();
+
+        $columns = array(
+            'cb'                   => '<input type="checkbox" />',
+            'title'                => __('Title'),
+            'notification_action'  => __('Notification Action')
         );
 
         return $columns;
@@ -328,11 +347,21 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
 
                 if(get_post_meta($post_id, 'pastats_player_id', true)){
                     echo get_post_meta($post_id, 'pastats_player_id', true);
-                } else {
-                    echo 'Player has no player PA stats ID set! <a class="player-missing-pa-stats-id-email" data-player-id="'.$post_id.'" href="javascript:void(0);">Send Email</a>';
+                } else if(get_post_meta($post_id, 'player_email', true)) {
+                    echo 'Player has no player PA stats ID set! <a class="player-missing-pa-stats-id-email" data-security="'.wp_create_nonce( "missing_pa_stats_id" ).'" data-player-id="'.$post_id.'" href="javascript:void(0);">Send Email</a>';
                 }
 
 
+
+                break;
+
+            case "notification_action" :
+
+                if(get_post_meta($post_id, 'notification_actions', true)){
+                    echo notificationCPT::$notification_actions[get_post_meta($post_id, 'notification_actions', true)];
+                } else {
+                    echo 'Not in use';
+                }
 
                 break;
 

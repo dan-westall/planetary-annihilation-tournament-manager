@@ -4,7 +4,10 @@ class notificationCPT {
 
     public static $post_type = 'notification';
 
-    public static $notification_actions = array( 'tournament_signup_active' => 'Tournament Signup Not Reserve', 'tournament_signup_reserve' => 'Tournament Signup Reserve');
+    public static $notification_actions = array(
+        'tournament_signup_active' => 'Tournament Signup Not Reserve',
+        'tournament_signup_reserve' => 'Tournament Signup Reserve',
+        'player_missing_pa_stats_id' => 'Player Missing PA Stats ID');
 
     function __construct() {
 
@@ -16,6 +19,8 @@ class notificationCPT {
 
         add_action( 'player_added_to_tournament_active', array( $this, 'email_notification' ), 10, 3);
         add_action( 'player_added_to_tournament_reserve', array( $this, 'email_notification' ), 10, 3);
+
+        add_action( 'player_missing_pa_stats_id', array( $this, 'email_notification' ), 10, 3);
 
         add_filter( 'acf/load_field/name=notification_actions', array( $this, 'filter_notification_listing') );
 
@@ -78,17 +83,15 @@ class notificationCPT {
 
                 foreach (self::$notification_actions as $key => $value) {
 
-                    if ($action === $value) {
+                    if ($action === $key) {
 
 
-                        global $cart_status;
-
-                        $subject = exodus_2014_get_notification(array('location' => $key, 'field' => 'post_title', 'filter' => 'the_title'));
+                        $subject = $this->exodus_get_notification(array('location' => $key, 'field' => 'post_title', 'filter' => 'the_title'));
 
                         //only continue if the message has a subject, because if not then no notification has been set
                         if(!empty($subject)){
 
-                            $message = exodus_2014_get_notification(array('location' => $key));
+                            $message = $this->exodus_get_notification(array('location' => $key));
 
                             $player_email = get_post_meta($args['player_id'], 'player_email', true);
 
@@ -108,18 +111,18 @@ class notificationCPT {
 
                             $message = str_replace($find, $replace, $html_message );
 
-                            add_filter( 'wp_mail_content_type', 'set_html_content_type' );
+                            $headers = array('Content-Type: text/html; charset=UTF-8', 'From: eXodus eSports <info@exodusesports.com>');
 
-                            $mail = wp_mail( "dan.westall@googlemail.com, {$player_email}", $subject, ( $message ));
+                            $mail = wp_mail( "dan.westall@googlemail.com, {$player_email}", html_entity_decode($subject), $message, $headers );
 
-                            // Reset content-type to avoid conflicts -- http://core.trac.wordpress.org/ticket/23578
-                            remove_filter( 'wp_mail_content_type', 'set_html_content_type' );
+                            return $mail;
 
                         }
 
+                        break 2;
+
                     }
 
-                    break 2;
                 }
         }
 
@@ -155,37 +158,17 @@ class notificationCPT {
             $filter = $args['filter'];
         }
 
-        if(taxonomy_exists($args['location']) && isset($args['taxonomy_term']) && !empty($args['taxonomy_term'])){
-
-            $textarea = get_posts(array(
-                'post_type' => 'textarea',
-                'meta_query' => array(
-                    array(
-                        'key' => 'text_area_location',
-                        'value' => $args['location']
-                    ),
-                    array(
-                        'key' => 'taxonomy_term_location',
-                        'value' => $args['taxonomy_term']
-                    )
-                )
-
-            ));
-
-            $testarea_id = $textarea[0]->ID;
-
-        } else {
 
             $testarea_id = $wpdb->get_var($wpdb->prepare(
                 "
             SELECT post_id
             FROM $wpdb->postmeta
-            WHERE meta_value = %s AND meta_key = 'text_area_location' LIMIT 1
+            WHERE meta_value = %s AND meta_key = 'notification_actions' LIMIT 1
         ",
                 $args['location']
             ));
 
-        }
+
 
         if(empty($testarea_id))
             return false;
