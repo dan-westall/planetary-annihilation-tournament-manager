@@ -101,8 +101,8 @@ function pltm_add_match( $data ){
     }
     update_post_meta($match_id, 'match_round', $args["match_round"]);
     update_post_meta($match_id, 'last_update', $args["last_update"]);
-    update_post_meta($match_id, 'favorite', $args["favorite"]);
-    update_post_meta($match_id, 'favoritepercent', $args["favoritepercent"]);
+    update_post_meta($match_id, 'favourite', $args["favorite"]);
+    update_post_meta($match_id, 'favouritepercent', $args["favoritepercent"]);
     update_post_meta($match_id, 'twitch', $args["twitch"]);
     
 

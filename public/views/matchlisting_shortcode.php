@@ -27,7 +27,7 @@
     <td><span data-bind="text:pasduration"></span></td>
     <td>
     <a data-bind="if:pasduration, attr: {href: paslink}" target="_blank"><?php echo '<img src="' . plugins_url( '../../public/assets/img/pastatssmall.png' , __FILE__ ) . '" border="0" title="pastats" alt="pastats">'; ?></a>
-    <a data-bind="if:twitch,attr: {href: twitch}" target="_blank"><?php echo '<img src="' . plugins_url( '../../public/assets/img/twitchblack.png' , __FILE__ ) . '" border="0" title="twitch" alt="twitch">'; ?></a></td>
+    <a data-bind="if:showtwitch,attr: {href: twitch}" target="_blank"><?php echo '<img src="' . plugins_url( '../../public/assets/img/twitchblack.png' , __FILE__ ) . '" border="0" title="twitch" alt="twitch">'; ?></a></td>
     <!--<td data-bind="text: last_update"></td>-->
     <!--<td data-bind="text: now"></td>-->
 </tr>

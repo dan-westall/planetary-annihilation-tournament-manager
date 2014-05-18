@@ -75,6 +75,21 @@ var MatchModel = function(data){
 
     });
 
+	self.showtwitch = ko.computed(function(){
+		if(self.twitch() !== "#"){
+			if(self.winner() === undefined){
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else{
+			return false;
+		}
+	});
+
 };
 
 var MatchListing = function() {
