@@ -24,6 +24,10 @@
                 dataType: 'JSON',
                 success: function (results) {
 
+                    $button.slideUp(function(){
+                        $button.parent().append('<span>Message Sent!</span>')
+                    });
+
 
 
                 }

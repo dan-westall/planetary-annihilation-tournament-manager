@@ -110,10 +110,11 @@ class notificationCPT {
                             $html_message = apply_filters( 'message_html', html_entity_decode( $message ) );
 
                             $message = str_replace($find, $replace, $html_message );
+                            $subject = str_replace($find, $replace, $subject );
 
                             $headers = array('Content-Type: text/html; charset=UTF-8', 'From: eXodus eSports <info@exodusesports.com>');
 
-                            $mail = wp_mail( "dan.westall@googlemail.com, {$player_email}", html_entity_decode($subject), $message, $headers );
+                            $mail = wp_mail( $player_email, html_entity_decode($subject), $message, $headers );
 
                             return $mail;
 
