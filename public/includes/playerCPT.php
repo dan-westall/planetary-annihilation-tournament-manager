@@ -25,9 +25,10 @@ class playerCPT {
         add_action( 'update_post_meta', array( $this, 'link_player_to_user'), 10, 4 );
 
 
-        add_action('wp_ajax_player_missing_pa_stats_id',array($this,'player_missing_pa_stats_id'));
+        add_action('wp_ajax_player_missing_pa_stats_id', array($this,'player_missing_pa_stats_id'));
 
     }
+
 
     function register_cpt_player() {
 
@@ -50,7 +51,6 @@ class playerCPT {
             'description'         => 'Tournament Players',
             'public'              => true,
             'has_archive'         => true,
-            'exclude_from_search' => true,
             'show_ui'             => true,
             'menu_position'       => 10,
             'menu_icon'           => 'dashicons-id',
