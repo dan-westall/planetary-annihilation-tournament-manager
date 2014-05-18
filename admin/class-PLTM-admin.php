@@ -93,22 +93,18 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
         //admin dashboard widgets
         add_action('wp_dashboard_setup', array($this, 'tournament_player_management') );
 
-        //ajax
-
-
-
         acf_add_options_sub_page(array(
             'title' => 'PLTM Signatures',
             'parent' => 'options-general.php',
             'capability' => 'manage_options'
         ));
 
-        add_action( 'restrict_manage_posts', array($this, 'bs_event_table_filtering') );
-        add_filter( 'parse_query', array($this, 'bs_event_table_filter') );
-
+        add_filter( 'parse_query', array($this, 'player_table_filter') );
+        add_action( 'restrict_manage_posts', array($this, 'player_table_filtering') );
+        
     }
 
-    function bs_event_table_filter( $query ) {
+    function player_table_filter( $query ) {
         if( is_admin() && $query->query['post_type'] == playerCPT::$post_type ) {
             $qv = &$query->query_vars;
 
@@ -122,7 +118,7 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
         }
     }
 
-    public function bs_event_table_filtering() {
+    public function player_table_filtering() {
 
         global $wpdb;
 
