@@ -103,6 +103,36 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
             'capability' => 'manage_options'
         ));
 
+        add_action( 'restrict_manage_posts', array($this, 'bs_event_table_filtering') );
+        add_filter( 'parse_query', array($this, 'bs_event_table_filter') );
+
+    }
+
+    function bs_event_table_filter( $query ) {
+        if( is_admin() && $query->query['post_type'] == playerCPT::$post_type ) {
+            $qv = &$query->query_vars;
+
+            if( !empty( $_GET['tournament_filter'] ) ) {
+
+                $qv['connected_type']  = 'tournament_players';
+                $qv['connected_items'] = $_GET['tournament_filter'];
+                $qv['nopaging']        = true;
+
+            }
+        }
+    }
+
+    public function bs_event_table_filtering() {
+
+        global $wpdb;
+
+        $screen = get_current_screen();
+
+        if ( $screen->post_type == 'player' ) {
+
+            DW_Helper::generate_post_select('tournament_filter', tournamentCPT::$post_type, $_GET['tournament_filter'] );
+
+        }
 
     }
 

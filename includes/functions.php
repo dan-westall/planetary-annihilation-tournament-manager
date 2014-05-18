@@ -117,6 +117,18 @@ class DW_Helper {
 
     }
 
+    public static function generate_post_select($select_id, $post_type, $selected = 0) {
+        $post_type_object = get_post_type_object($post_type);
+        $label = $post_type_object->label;
+        $posts = get_posts(array('post_type'=> $post_type, 'post_status'=> 'publish', 'suppress_filters' => false, 'posts_per_page'=>-1));
+        echo '<select name="'. $select_id .'" id="'.$select_id.'">';
+        echo '<option value = "" >All '.$label.' </option>';
+        foreach ($posts as $post) {
+            echo '<option value="', $post->ID, '"', $selected == $post->ID ? ' selected="selected"' : '', '>', $post->post_title, '</option>';
+        }
+        echo '</select>';
+    }
+
 }
 
 $DW_helper = new DW_Helper();
