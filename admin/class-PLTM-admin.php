@@ -101,36 +101,9 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
 
         add_filter( 'parse_query', array($this, 'player_table_filter') );
         add_action( 'restrict_manage_posts', array($this, 'player_table_filtering') );
-        
-    }
-
-    function player_table_filter( $query ) {
-        if( is_admin() && $query->query['post_type'] == playerCPT::$post_type ) {
-            $qv = &$query->query_vars;
-
-            if( !empty( $_GET['tournament_filter'] ) ) {
-
-                $qv['connected_type']  = 'tournament_players';
-                $qv['connected_items'] = $_GET['tournament_filter'];
-                $qv['nopaging']        = true;
-
-            }
-        }
-    }
-
-    public function player_table_filtering() {
-
-        global $wpdb;
-
-        $screen = get_current_screen();
-
-        if ( $screen->post_type == 'player' ) {
-
-            DW_Helper::generate_post_select('tournament_filter', tournamentCPT::$post_type, $_GET['tournament_filter'] );
-
-        }
 
     }
+
 
     public function tournament_columns($columns) {
 
@@ -142,7 +115,6 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
             'title'    => __('Title'),
             'spaces'   => __('Open Slots / Taken slots'),
             'run_date' => __('Run date'),
-            'admin'    => __('Tournament Director'),
             'status'   => __('Status')
         );
 
@@ -270,21 +242,22 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
 
         switch ($column) {
 
-            case 'amount';
+            case 'spaces';
 
-                echo '&pound; ';
+                $tournament_closed        = get_post_meta($post_id, 'signup_closed', true);
+                $tournament_slots         = get_post_meta($post_id, 'slots', true);
+                $tournament_reserve_slots = get_post_meta($post_id, 'reserve_slots', true);
+                $total_tournament_slots   = ($tournament_slots + $tournament_reserve_slots);
 
-                echo get_post_meta($post_id, 'total_product_price', true);
+                $current_player_total     = count(get_tournament_players($post_id, array(tournamentCPT::$tournament_player_status[0], tournamentCPT::$tournament_player_status[1])));
+
+                echo sprintf('%s/%s', $total_tournament_slots, $current_player_total);
 
                 break;
 
-            case 'the_customer';
+            case 'run_date';
 
-                $the_post = get_post($post_id);
-
-                $user = get_userdata($the_post->post_author);
-
-                echo $user->user_email;
+                echo date( 'd.m.y', strtotime(get_post_meta($post_id, 'run_date', true) ) );
 
                 break;
 
@@ -296,7 +269,7 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
 
             case 'status';
 
-                echo get_post_meta($post_id, 'tournament_status', true);
+                echo tournamentCPT::$tournament_status[get_post_meta($post_id, 'tournament_status', true)];
 
                 break;
 
@@ -606,6 +579,34 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
             ),
             $links
         );
+
+    }
+
+    function player_table_filter( $query ) {
+        if( is_admin() && $query->query['post_type'] == playerCPT::$post_type ) {
+            $qv = &$query->query_vars;
+
+            if( !empty( $_GET['tournament_filter'] ) ) {
+
+                $qv['connected_type']  = 'tournament_players';
+                $qv['connected_items'] = $_GET['tournament_filter'];
+                $qv['nopaging']        = true;
+
+            }
+        }
+    }
+
+    public function player_table_filtering() {
+
+        global $wpdb;
+
+        $screen = get_current_screen();
+
+        if ( $screen->post_type == 'player' ) {
+
+            DW_Helper::generate_post_select('tournament_filter', tournamentCPT::$post_type, $_GET['tournament_filter'] );
+
+        }
 
     }
 
