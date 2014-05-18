@@ -345,7 +345,7 @@ class tournamentCPT {
         if ($signup_form_id != $validation_result['form']['id'])
             return $validation_result;
 
-        if (count(get_tournament_players($tournament_id)) >= get_field('slots')){
+        if (!is_tournament_signup_open($tournament_id)){
             $validation_result['is_valid'] = false;
         }
 
@@ -424,9 +424,9 @@ class tournamentCPT {
         if ($signup_form_id != $entry['form_id'])
             return false;
 
-        //count both reserve and active players
-        if (count(get_tournament_players($tournament_id, array(self::$tournament_player_status[0], self::$tournament_player_status[1]))) >= $total_tournament_slots)
-            return false;
+//        //count both reserve and active players
+//        if (count(get_tournament_players($tournament_id, array(self::$tournament_player_status[0], self::$tournament_player_status[1]))) >= $total_tournament_slots)
+//            return false;
 
 
         //todo move out to general function file as this is a useful snippit
@@ -482,8 +482,10 @@ class tournamentCPT {
 
                 if ($p2p_result) {
 
+                    $action = "player_added_to_tournament_{$this->player_tournament_status}";
+
                     //GFCommon::send_notification($notification, $form, $lead);
-                    do_action( "player_added_to_tournament_{$this->player_tournament_status}", array( 'player_id' => $player_id, 'tournament_id' => $tournament_id ) );
+                    do_action( "tournament_signup_{$this->player_tournament_status}", array( 'player_id' => $player_id, 'tournament_id' => $tournament_id ) );
 
                 } else {
                     //email admins let them know something went wrong.
@@ -544,7 +546,9 @@ class tournamentCPT {
 
                     //GFCommon::send_notification($notification, $form, $lead);
 
-                    do_action( "player_added_to_tournament_{$this->player_tournament_status}", array( 'player_id' => $player_id, 'tournament_id' => $tournament_id ) );
+                    $action = "player_added_to_tournament_{$this->player_tournament_status}";
+
+                    do_action( "tournament_signup_{$this->player_tournament_status}", array( 'player_id' => $player_id, 'tournament_id' => $tournament_id ) );
 
                 } else {
                     //email admins let them know something went wrong.
@@ -565,7 +569,12 @@ class tournamentCPT {
 
     public static function is_tournament_signup_open($tournament_id){
 
-        $tournament_closed = get_post_meta($tournament_id, 'signup_closed', true);
+        $tournament_closed        = get_post_meta($tournament_id, 'signup_closed', true);
+        $tournament_slots         = get_post_meta($tournament_id, 'slots', true);
+        $tournament_reserve_slots = get_post_meta($tournament_id, 'reserve_slots', true);
+        $total_tournament_slots   = ($tournament_slots + $tournament_reserve_slots);
+
+        $current_player_total     = count(get_tournament_players($tournament_id, array(self::$tournament_player_status[0], self::$tournament_player_status[1])));
 
         if($tournament_closed === true){
 
@@ -573,7 +582,7 @@ class tournamentCPT {
 
         }
 
-        if(count(get_tournament_players($tournament_id)) >= get_post_meta($tournament_id, 'slots', true)){
+        if($current_player_total >= $total_tournament_slots){
 
             return false;
 
@@ -746,7 +755,7 @@ class tournamentCPT {
         update_post_meta($player_id, 'challonge_participant_id', $challonge_result->id);
 
         //if therere are more players then slots reserve, any logic should have been done by this point
-        if($current_player_count > $tournament_slots){
+        if($current_player_count >= $tournament_slots){
 
             $status = self::$tournament_player_status[1];
 

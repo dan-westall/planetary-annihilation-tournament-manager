@@ -5,8 +5,8 @@ class notificationCPT {
     public static $post_type = 'notification';
 
     public static $notification_actions = array(
-        'tournament_signup_active' => 'Tournament Signup Not Reserve',
-        'tournament_signup_reserve' => 'Tournament Signup Reserve',
+        'tournament_signup_Active' => 'Tournament Signup Not Reserve',
+        'tournament_signup_Reserve' => 'Tournament Signup Reserve',
         'player_missing_pa_stats_id' => 'Player Missing PA Stats ID');
 
     function __construct() {
@@ -17,8 +17,8 @@ class notificationCPT {
 
         add_action( 'p2p_init', array( $this, 'register_p2p_connections' ) );
 
-        add_action( 'player_added_to_tournament_active', array( $this, 'email_notification' ), 10, 3);
-        add_action( 'player_added_to_tournament_reserve', array( $this, 'email_notification' ), 10, 3);
+        add_action( 'tournament_signup_Active', array( $this, 'email_notification' ), 10, 3);
+        add_action( 'tournament_signup_Reserve', array( $this, 'email_notification' ), 10, 3);
 
         add_action( 'player_missing_pa_stats_id', array( $this, 'email_notification' ), 10, 3);
 
