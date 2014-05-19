@@ -22,6 +22,24 @@ class tournament_info extends WP_Widget {
         <div class="tournament-widget-info">
 
             <section class="format tournament-meta-block text">
+                <h3>Tournament Date</h3>
+                <div class="row">
+                    <center>
+                    <?php
+                        if(get_field('run_date') && get_field('run_time')){
+                            $format_in = 'Ymd'; // the format your value is saved in (set in the field options)
+                            $format_out = 'm ([ .\t-])* dd [,.stndrh\t ]*'; // the format you want to end up with
+                            $rundate = DateTime::createFromFormat($format_in, get_field('run_date'));
+                            $form_short_code = sprintf('[countdown date=%s %s size=large]', get_field('run_date'), get_field('run_time'));
+                            echo $rundate->format('l jS F Y') . ' @ <a href="http://www.timeanddate.com/worldclock/fixedtime.html?msg=Tournament&iso=' . get_field('run_date') . 'T' . str_replace(':','',get_field('run_time')) . '">' . get_field('run_time') . ' UTC</a><br/>';
+                            echo do_shortcode($form_short_code);
+                        }
+                    ?>
+                    </center>
+                </div>
+            </section>                
+
+            <section class="format tournament-meta-block text">    
                 <h3>Tournament Format</h3>
 
                 <div class="row">
@@ -84,15 +102,21 @@ class tournament_info extends WP_Widget {
 
                 <ul class="row">
                     <li class="col-lg-4">
+                        <?php if(get_field('forum_link')) : ?>
                         <a href="<?php the_field('forum_link'); ?>">Forum Link</a>
+                        <?php endif; ?>
                     </li>
 
                     <li class="col-lg-4">
+                        <?php if(get_field('brackets')) : ?>
                         <a href="<?php the_field('brackets'); ?>">Bracket Link</a>
+                        <?php endif; ?>
                     </li>
 
                     <li class="col-lg-4">
+                        <?php if(get_field('irc')) : ?>
                         <a href="<?php the_field('irc'); ?>">IRC</a>
+                        <?php endif; ?>
                     </li>
 
                 </ul>
