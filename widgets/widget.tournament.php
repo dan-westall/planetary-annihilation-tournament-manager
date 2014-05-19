@@ -28,9 +28,9 @@ class tournament_info extends WP_Widget {
                     <?php
                         if(get_field('run_date') && get_field('run_time')){
                             $format_in = 'Ymd'; // the format your value is saved in (set in the field options)
-                            $format_out = 'm ([ .\t-])* dd [,.stndrh\t ]*'; // the format you want to end up with
                             $rundate = DateTime::createFromFormat($format_in, get_field('run_date'));
-                            $form_short_code = sprintf('[countdown date=%s %s size=large]', get_field('run_date'), get_field('run_time'));
+                            $form_short_code = sprintf('[countdown date="%s %s" size="large"]', $rundate->format('Y-m-d'), get_field('run_time'));
+                            //echo $form_short_code;
                             echo $rundate->format('l jS F Y') . ' @ <a href="http://www.timeanddate.com/worldclock/fixedtime.html?msg=Tournament&iso=' . get_field('run_date') . 'T' . str_replace(':','',get_field('run_time')) . '">' . get_field('run_time') . ' UTC</a><br/>';
                             echo do_shortcode($form_short_code);
                         }
