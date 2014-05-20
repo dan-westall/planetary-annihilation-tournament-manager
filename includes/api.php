@@ -173,6 +173,10 @@ class PLTM_API_Endpoint{
 
                 }
 
+            } else if(isset($image['tournament-promotion'])){
+
+                $image_url = $image['tournament-promotion']['url'];
+
             } else if($wp->query_vars['__signature'] != 'random'){
 
                 $image_url = $image[$wp->query_vars['__signature']]['url'];
