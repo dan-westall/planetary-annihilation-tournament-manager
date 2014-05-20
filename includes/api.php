@@ -175,11 +175,10 @@ class PLTM_API_Endpoint{
 
             } else if($wp->query_vars['__signature'] != 'random'){
 
-
-
                 $image_url = $image[$wp->query_vars['__signature']]['url'];
 
             } else if($wp->query_vars['__signature'] == 'random'){
+
                 unset($image['in-progress']);
                 $key = array_rand($image, 1);
 
