@@ -99,8 +99,8 @@ class tournament_info extends WP_Widget {
 
                 <dl class="col-lg-6">
                     <?php if(get_field('slots')) : ?>
-                        <dt>Slots/Taken/Remaining</dt>
-                        <dd><?php the_field('slots'); ?>/<?php echo count(get_tournament_players($post->ID)); ?>/<?php echo ( get_field('slots') - count(get_tournament_players($post->ID)) ) ?></dd>
+                        <dt>Slots/Open/Reserves</dt>
+                        <dd><?php the_field('slots'); ?>/<?php echo ( get_field('slots') - count(get_tournament_players($post->ID, array(tournamentCPT::$tournament_player_status[0]))) ) ?>/ <?php echo count(get_tournament_players($post->ID, array(tournamentCPT::$tournament_player_status[1]))) ?></dd>
                     <?php endif; ?>
                 </dl>
 
