@@ -576,7 +576,7 @@ class tournamentCPT {
 
         $current_player_total     = count(get_tournament_players($tournament_id, array(self::$tournament_player_status[0], self::$tournament_player_status[1])));
 
-        if($tournament_closed === true){
+        if($tournament_closed == true){
 
             return false;
 
@@ -587,6 +587,7 @@ class tournamentCPT {
             return false;
 
         }
+
 
         return true;
 
