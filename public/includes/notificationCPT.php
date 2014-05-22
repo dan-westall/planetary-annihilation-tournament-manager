@@ -7,7 +7,8 @@ class notificationCPT {
     public static $notification_actions = array(
         'tournament_signup_Active' => 'Tournament Signup Not Reserve',
         'tournament_signup_Reserve' => 'Tournament Signup Reserve',
-        'player_missing_pa_stats_id' => 'Player Missing PA Stats ID');
+        'player_missing_pa_stats_id' => 'Player Missing PA Stats ID',
+        'tournament_2_day_notice' => 'Tournament 2 day notice');
 
     function __construct() {
 
@@ -22,7 +23,15 @@ class notificationCPT {
 
         add_action( 'player_missing_pa_stats_id', array( $this, 'email_notification' ), 10, 3);
 
+        add_action( 'tournament_2_day_notice', array( $this, 'email_notification' ), 10, 3);
+
         add_filter( 'acf/load_field/name=notification_actions', array( $this, 'filter_notification_listing') );
+
+        //mass notifications
+        add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
+        add_action( 'save_post', array( $this, 'save' ) );
+
+        add_action('wp_ajax_tournament_2_day_notice', array($this,'tournament_2_day_notice'));
 
     }
 
@@ -60,6 +69,26 @@ class notificationCPT {
 
     public function register_p2p_connections(){
 
+        p2p_register_connection_type( array(
+            'name' => 'notification_players',
+            'from' => self::$post_type,
+            'to' => 'player',
+            'duplicate_connections' => true,
+            'admin_box' => array(
+                'show' => 'to',
+                'context' => 'advanced'
+            ),
+            'fields' => array(
+                'tournament' => array(
+                    'title' => 'Tournament',
+                    'type' => 'text',
+                ),
+                'date' => array(
+                    'title' => 'Date Sent',
+                    'type' => 'text',
+                ),
+            )
+        ) );
 
     }
 
@@ -75,7 +104,54 @@ class notificationCPT {
 
         switch ($action) {
 
-            case 'plugins_loaded':
+            case 'tournament_2_day_notice':
+
+                //todo loads of code replication needs to be removed.
+
+                $all_players = get_tournament_players($args['tournament_id'], array(tournamentCPT::$tournament_player_status[0], tournamentCPT::$tournament_player_status[1]));
+
+                $subject = $this->exodus_get_notification(array('location' => $action, 'field' => 'post_title', 'filter' => 'the_title'));
+
+                //only continue if the message has a subject, because if not then no notification has been set
+                if(!empty($subject)){
+
+                    $notification = DW_Helper::get_post_by_meta('notification_actions', $action);
+                    $message         = $this->exodus_get_notification(array('location' => $action));
+                    $tournament_name = get_the_title($args['tournament_id']);
+                    $tournament_url  = sprintf('<a href="%s">%s</a>', get_permalink($args['tournament_id']), get_the_title($args['tournament_id']));
+
+                    foreach($all_players as $player){
+
+                        $player_email = get_post_meta($player->ID, 'player_email', true);
+
+                        $find = array(
+                            '<TOURNAMENT NAME>',
+                            '<TOURNAMENT URL>',
+                            '<PLAYER IGN>'
+                        );
+
+                        $replace = array(
+                            $tournament_name,
+                            $tournament_url,
+                            get_the_title($player->ID)
+                        );
+
+                        $html_message = apply_filters( 'message_html', html_entity_decode( $message ) );
+
+                        $message = str_replace($find, $replace, $html_message );
+                        $subject = str_replace($find, $replace, $subject );
+
+                        $headers = array('Content-Type: text/html; charset=UTF-8', 'From: eXodus eSports <info@exodusesports.com>');
+
+                        $mail = wp_mail( 'dan.westall@googlemail.com', html_entity_decode($subject), $message, $headers );
+
+                        if($mail){
+                            $p2p_result = p2p_type('notification_players')->connect($notification->ID, $player->ID, array( 'date' =>  date("Y-m-d H:i:s"), 'tournament' => get_the_title($args['tournament_id']) ));
+                        }
+
+                    }
+
+                }
 
                 break;
 
@@ -90,6 +166,8 @@ class notificationCPT {
 
                         //only continue if the message has a subject, because if not then no notification has been set
                         if(!empty($subject)){
+
+                            $notification_id = DW_Helper::get_post_by_meta('notification_actions', $key);
 
                             $message = $this->exodus_get_notification(array('location' => $key));
 
@@ -115,6 +193,10 @@ class notificationCPT {
                             $headers = array('Content-Type: text/html; charset=UTF-8', 'From: eXodus eSports <info@exodusesports.com>');
 
                             $mail = wp_mail( $player_email, html_entity_decode($subject), $message, $headers );
+
+                            if($mail){
+                                $p2p_result = p2p_type('tournament_players')->connect($notification_id, $args['player_id'], array( 'date' =>  date("Y-m-d H:i:s"), 'tournament' => get_the_title($args['tournament_id']) ));
+                            }
 
                             return $mail;
 
@@ -204,5 +286,45 @@ class notificationCPT {
 
     }
 
+    public function tournament_2_day_notice(){
 
+        check_ajax_referer( 'send-players-2-day-notification', 'security' );
+
+        do_action('tournament_2_day_notice', array( 'tournament_id' => $_POST['tournament_id'] ));
+
+        die();
+
+    }
+
+    /**
+     * Adds the meta box container.
+     */
+    public function add_meta_box( $post_type ) {
+        $post_types = array('tournament');     //limit meta box to certain post types
+        if ( in_array( $post_type, $post_types )) {
+            add_meta_box(
+                'tournament_players_mass_notification',
+                __('Tournament mass notification', 'PLTM'),
+                array($this, 'render_meta_box_tournament_notification'),
+                $post_type,
+                'side',
+                'high'
+            );
+        }
+    }
+
+    /**
+     * Render Meta Box content.
+     *
+     * @param WP_Post $post The post object.
+     */
+    public function render_meta_box_tournament_notification( $post ) {
+
+        // Display the form, using the current value.
+        echo '<label for="myplugin_new_field">';
+        _e( 'Send notifications', 'PLTM' );
+        echo '</label> ';
+
+        echo '<br /><br /><a href="javascript:void(0);" class="button" data-tournament-id="'.$post->ID.'" data-security="'.wp_create_nonce( "send-players-2-day-notification" ).'" id="send-players-2-day-notification">Send 2 day notification</a>';
+    }
 }
