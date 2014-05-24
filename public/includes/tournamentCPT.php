@@ -32,7 +32,7 @@ class tournamentCPT {
 
         add_shortcode('tournament-players', array( $this, 'get_tournament_players') );
 
-        add_action( 'save_post',  array( $this, 'delete_tournament_result_cache') );
+        add_action( 'save_post',  array( $this, 'delete_tournament_caches') );
 
         add_filter( 'tournament_rounds', array( $this, 'filter_tournament_rounds' ) );
         add_filter( 'the_title', array( $this, 'filter_endpoint_titles'), 10, 2 );
@@ -1264,13 +1264,20 @@ class tournamentCPT {
 
     }
 
-    public function delete_tournament_result_cache($post_id){
+    public function delete_tournament_caches($post_id){
+
+        if ( wp_is_post_revision( $post_id ) )
+            return;
 
         $tournament_id = matchCPT::get_match_tournament_id($post_id);
 
-        // If this isn't a 'book' post, don't update it.
+        //todo is this being used?
         if ( matchCPT::$post_type != $_POST['post_type'] ) {
             delete_transient( 'tournament_result_' . $tournament_id );
+        }
+
+        if ( tournamentCPT::$post_type == $_POST['post_type'] ) {
+            delete_transient( 'tournament_' .$post_id. '_players' );
         }
 
 
