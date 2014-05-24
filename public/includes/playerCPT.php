@@ -24,8 +24,11 @@ class playerCPT {
 
         add_action( 'update_post_meta', array( $this, 'link_player_to_user'), 10, 4 );
 
-
         add_action('wp_ajax_player_missing_pa_stats_id', array($this,'player_missing_pa_stats_id'));
+
+        add_action( 'profile_update', array( $this, 'delete_user_caches'), 10, 2 );
+
+
 
     }
 
@@ -404,17 +407,24 @@ class playerCPT {
         $player_user_id = get_post_meta($player_id, 'user_id', true);
         $user           = get_userdata($player_user_id);
 
-        if(function_exists(get_wp_user_avatar())){
+        //delete_transient( 'player_' .$user->ID. '_avatar' );
 
-            $image = get_wp_user_avatar_src($user->ID, $size);
+        if ( false === ( $user_avatar_img = get_transient( 'player_' .$user->ID. '_avatar' ) ) ) {
 
-            if($image[1] < 200 || $image[2] < 200){
+            if (function_exists(get_wp_user_avatar())) {
+
+                $image = get_wp_user_avatar_src($user->ID, $size);
+
+                if ($image[1] < 200 || $image[2] < 200) {
+                    $user_avatar_img = get_avatar($user->ID, $size);
+                }
+
+                $user_avatar_img = get_wp_user_avatar($user->ID, $size);
+            } else {
                 $user_avatar_img = get_avatar($user->ID, $size);
             }
 
-            $user_avatar_img = get_wp_user_avatar($user->ID, $size);
-        } else {
-            $user_avatar_img = get_avatar($user->ID, $size);
+            set_transient( 'player_' .$user->ID. '_avatar', $user_avatar_img, 12 * HOUR_IN_SECONDS );
         }
 
         return $user_avatar_img;
@@ -430,6 +440,12 @@ class playerCPT {
         do_action('player_missing_pa_stats_id', array( 'player_id' => $player_id));
 
         die();
+
+    }
+
+    function delete_user_caches( $user_id, $old_user_data ) {
+
+        delete_transient( 'player_' .$user_id. '_avatar' );
 
     }
 }
