@@ -128,18 +128,12 @@ class playerCPT {
 
     public static function player_return_format($player, $data = array(), $return = array('tournaments' => true)){
 
+        $data['id']                 = $player->ID;
         $data['name']               = $player->post_title;
         $data['clan']               = get_post_meta($player->ID, 'clan', true);
         $data['pa_stats_player_id'] = get_post_meta($player->ID, 'pastats_player_id', true);
 
         $player_profile_image = get_player_avatar($player->ID, $size = 100);
-        //get_wp_user_avatar(1, 50);
-        /*
-        if(has_post_thumbnail($player->ID)){
-            //$player_profile_image = get_the_post_thumbnail($player->ID, 'small-player-profile-thumbnail');
-            $player_profile_image = get_player_avatar($player->ID, $size = 100);
-        }        
-        */
 
         $data['avatar'] = $player_profile_image;
 
@@ -153,24 +147,14 @@ class playerCPT {
 
     public static function player_return_format_tourney($player, $tournament_id, $data = array(), $return = array('tournaments' => true)){
 
+        $data['id']                 = $player->ID;
         $data['name']               = $player->post_title;
-        $data['clan']               = get_post_meta($player->ID, 'clan', true);
         $data['pa_stats_player_id'] = get_post_meta($player->ID, 'pastats_player_id', true);
-
-        $player_profile_image = get_player_avatar($player->ID, $size = 100);
-        //get_wp_user_avatar(1, 50);
-        /*
-        if(has_post_thumbnail($player->ID)){
-            //$player_profile_image = get_the_post_thumbnail($player->ID, 'small-player-profile-thumbnail');
-            $player_profile_image = get_player_avatar($player->ID, $size = 100);
-        }        
-        */
-
-        $data['avatar'] = $player_profile_image;
-
+       
         if($return['tournaments']){
             $data['player_tournaments']  = self::get_player_info_tournament($player->ID, $tournament_id);
         }
+        
 
         return $data;
 

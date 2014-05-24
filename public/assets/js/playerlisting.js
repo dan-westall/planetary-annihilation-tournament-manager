@@ -2,6 +2,24 @@ var PlayerModel = function(data){
 	var self = this;
 	ko.mapping.fromJS(data,{},self);
 
+	self.avatar = ko.observable();
+
+	self.restendpoint = ko.computed(function(){
+		return "/api/player/" + self.id();
+	});
+
+	self.LoadExtraData = function(){
+		$.getJSON(self.restendpoint(),function(data){
+			//ko.mapping.fromJS(data.data,mapping,self.matches);
+    		
+    		if(data !== undefined){
+	  			//console.log(data.data);
+	  			self.avatar(data.avatar);
+			}
+			
+		});
+	}
+	self.LoadExtraData();
 }
 
 var PlayerListing = function() {
