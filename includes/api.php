@@ -24,6 +24,7 @@ class PLTM_API_Endpoint{
         $vars[] = 'return';
         $vars[] = 'match';
         $vars[] = 'player';
+        $vars[] = 'playercid';
         $vars[] = 'id_type';
         $vars[] = 'videos';
         $vars[] = 'test';
@@ -46,6 +47,7 @@ class PLTM_API_Endpoint{
 
         add_rewrite_rule('^api/match/?([0-9]+)?/?([^/]*)?/?','index.php?__api=1&match_id=$matches[1]&id_type=$matches[2]','top');
         add_rewrite_rule('^api/player/?([0-9]+)?/?','index.php?__api=1&player=$matches[1]','top');
+        add_rewrite_rule('^api/playercid/?([0-9]+)?/?','index.php?__api=1&playercid=$matches[1]','top');
 
 
         add_rewrite_tag('%tournaments%','([^&]+)');
@@ -143,6 +145,15 @@ class PLTM_API_Endpoint{
                 $this->send_response('player id is missing');
 
             playerCPT::get_player(array('player_id' => $player_id, 'output' => 'json'));
+
+        } else if(isset($wp->query_vars['playercid'])){
+
+            $player_cid = $wp->query_vars['playercid'];
+
+            if(!$player_cid)
+                $this->send_response('player challongeid is missing');
+
+            playerCPT::get_player(array('player_id' => $player_cid, 'output' => 'json'));
 
         } else if(isset($wp->query_vars['__signature'])){
 
