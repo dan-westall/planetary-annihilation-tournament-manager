@@ -84,7 +84,7 @@ class DW_Helper {
 
         global $wpdb;
 
-        $post_id = $wpdb->get_var($wpdb->prepare(
+        $statment = $wpdb->prepare(
             "
                 SELECT post_id
                 FROM $wpdb->postmeta
@@ -92,7 +92,9 @@ class DW_Helper {
             ",
             $meta_value,
             $meta_key
-        ));
+        );
+
+        $post_id = $wpdb->get_var($statment);
 
         if($post_id)
             return get_post($post_id);
