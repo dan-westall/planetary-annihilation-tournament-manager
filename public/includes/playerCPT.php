@@ -86,6 +86,12 @@ class playerCPT {
 
                 break;
 
+            case "challonge_participant_id":
+
+                $player = DW_Helper::get_post_by_meta('challonge_participant_id', $id);
+
+                break;
+
         }
 
         return $player;
@@ -96,11 +102,11 @@ class playerCPT {
 
         extract(shortcode_atts(array(
             'player_id' => '',
-            'by' => '',
-            'output'        => 'html'
+            'by'        => 'pastats_player_id',
+            'output'    => 'html'
         ), $attr));
 
-        $player = self::get_player_by($player_id);
+        $player = self::get_player_by($player_id, $by);
 
         $data = self::player_return_format($player);
 

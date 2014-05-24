@@ -46,8 +46,9 @@ class PLTM_API_Endpoint{
         add_rewrite_rule('^api/tournament/?([^/]*)?/?([^/]*)?/?','index.php?__api=1&tournament=$matches[1]&return=$matches[2]','top');
 
         add_rewrite_rule('^api/match/?([0-9]+)?/?([^/]*)?/?','index.php?__api=1&match_id=$matches[1]&id_type=$matches[2]','top');
-        add_rewrite_rule('^api/player/?([0-9]+)?/?','index.php?__api=1&player=$matches[1]','top');
         add_rewrite_rule('^api/playercid/?([0-9]+)?/?','index.php?__api=1&playercid=$matches[1]','top');
+        add_rewrite_rule('^api/player/?([0-9]+)?/?','index.php?__api=1&player=$matches[1]','top');
+
 
 
         add_rewrite_tag('%tournaments%','([^&]+)');
@@ -153,7 +154,7 @@ class PLTM_API_Endpoint{
             if(!$player_cid)
                 $this->send_response('player challongeid is missing');
 
-            playerCPT::get_player(array('player_id' => $player_cid, 'output' => 'json'));
+            playerCPT::get_player(array('player_id' => $player_cid, 'by' => 'challonge_participant_id', 'output' => 'json'));
 
         } else if(isset($wp->query_vars['__signature'])){
 
