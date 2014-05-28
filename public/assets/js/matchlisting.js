@@ -2,7 +2,7 @@ var MatchModel = function(data){
 	var self = this;
 	ko.mapping.fromJS(data,{},self);
 	//console.log(self.players()[0]);
-//	console.log(self);
+	//console.log(self.videos());
     self.player1 = ko.computed(function(){
     	if(self.players().length > 0){
     		return self.players()[0].player_name();		
@@ -89,6 +89,18 @@ var MatchModel = function(data){
 			return false;
 		}
 	});
+
+	self.showvideo = ko.computed(function(){
+		if(self.videos().length > 0){
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	});
+
+	//console.log(self.showvideo());
 
 };
 
