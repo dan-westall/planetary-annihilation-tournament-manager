@@ -713,6 +713,9 @@ class tournamentCPT {
             //easy search
             update_post_meta($connection->p2p_to, 'challonge_participant_id', $challonge_result->id);
 
+
+            $this->delete_tournament_caches($tournament_id);
+
         }
 
     }
@@ -736,6 +739,7 @@ class tournamentCPT {
             //easy search
             delete_post_meta($connection->p2p_to, 'challonge_participant_id');
 
+            $this->delete_tournament_caches($tournament_id);
 
         }
     }
@@ -1272,11 +1276,11 @@ class tournamentCPT {
         $tournament_id = matchCPT::get_match_tournament_id($post_id);
 
         //todo is this being used?
-        if ( matchCPT::$post_type != $_POST['post_type'] ) {
+        if ( matchCPT::$post_type != get_post_type($post_id) ) {
             delete_transient( 'tournament_result_' . $tournament_id );
         }
 
-        if ( tournamentCPT::$post_type == $_POST['post_type'] ) {
+        if ( tournamentCPT::$post_type == get_post_type($post_id) ) {
             delete_transient( 'tournament_' .$post_id. '_players' );
         }
 
