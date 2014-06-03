@@ -426,11 +426,11 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
 
     function tournament_player_management() {
 
-        wp_add_dashboard_widget(
-            'tournament_player_signup_status', // Widget slug.
-            'Tournament Player signup stats', // Title.
-            array( $this, 'tournament_player_signup_status') // Display function.
-        );
+//        wp_add_dashboard_widget(
+//            'tournament_player_signup_status', // Widget slug.
+//            'Tournament Player signup stats', // Title.
+//            array( $this, 'tournament_player_signup_status') // Display function.
+//        );
     }
 
     public function tournament_player_signup_status() {

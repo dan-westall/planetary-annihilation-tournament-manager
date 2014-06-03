@@ -54,6 +54,27 @@
 
         });
 
+        $('body').on('click', '#send-players-tournament-wrap-up', function(){
+
+            var $button = $(this);
+
+            $.ajax({
+                url: ajaxurl,
+                type: 'POST',
+                cache: false,
+                data: {
+                    action: 'tournament_wrap_up',
+                    security: $button.data('security'),
+                    tournament_id: $button.data('tournament-id')
+                },
+                dataType: 'JSON',
+                success: function (results) {
+                    $button.parent().append('<div>Message Sent!</div>')
+                }
+            })
+
+        });
+
 	});
 
 }(jQuery));
