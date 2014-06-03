@@ -26,7 +26,7 @@ class tournamentCPT {
         add_filter( 'gform_validation_message', array( $this, 'signup_form_validation_message'), 10, 2);
         //add_action( 'gform_confirmation', array( $this, 'signup_custom_confirmation'), 10, 2);
 
-        //add_action( 'template_include', array( $this, 'load_endpoint_template')  );
+        add_action( 'template_include', array( $this, 'load_endpoint_template')  );
         //todo sync players from challonge to wordpress, fair bit of work, need to refactor signup_tournament_player to make it happen
         //add_action( 'save_post', array( $this, 'action_challonge_sync_check') );
 
@@ -191,19 +191,14 @@ class tournamentCPT {
 
         global $wp_query, $post;
 
-        //if(){
+        if ($post->post_type == 'tournament' && isset( $wp_query->query_vars['countdown'] )) {
 
-        foreach(Planetary_Annihilation_Tournament_Manager::$endpoints as $endpoint){
+            $template_path = get_template_directory() . "/countdown.php";
 
-            if ($post->post_type == 'tournament' && isset( $wp_query->query_vars[$endpoint] )) {
-
-                $template_path = PLTM_PLUGIN_DIR . "/includes/templates/single-$post->post_type-$endpoint.php";
-
-                if(file_exists($template_path)){
-                    return $template_path;
-                }
-
+            if(file_exists($template_path)){
+                return $template_path;
             }
+
         }
 
         return $template_path;
@@ -943,6 +938,9 @@ class tournamentCPT {
         $html .= sprintf('<li><a href="%1$s">%2$s</a></li>', get_permalink(), 'Home');
 
         foreach (Planetary_Annihilation_Tournament_Manager::$endpoints as $tournament_endpoint):
+
+            if($tournament_endpoint == 'countdown')
+                continue 1;
 
             switch($tournament_endpoint){
 
