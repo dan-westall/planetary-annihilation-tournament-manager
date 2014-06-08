@@ -55,7 +55,6 @@ function pltm_add_match( $data ){
 
                 $p2p_result = p2p_type('match_players')->connect($match_id, $player['wp_player_id'], array(
                     'date'                     => current_time('mysql'),
-                    'challonge_tournament_id'  => $challonge_tournament_id,
                     'team'                     => $player['team']
                 ));
 
@@ -79,17 +78,15 @@ function pltm_add_match( $data ){
         update_post_meta($match_id, 'challonge_match_id', $args["challonge_match_id"]);
         update_post_meta($match_id, 'challonge_tournament_id', $args["challonge_tournament_id"]);
 
-        //todo should be be able to link matches to matches so we can create chains? in future.
-        $p2p_result = p2p_type('tournament_matches')->connect($args["wp_post_id"], $match_id, array(
+
+        $p2p_result = p2p_type('tournament_matches')->connect($args["wp_tournament_id"], $match_id, array(
             'date'                    => current_time('mysql'),
-            'challonge_tournament_id' => $args["challonge_tournament_id"]
         ));
 
         foreach($args['players'] as &$player){
 
             $p2p_result = p2p_type('match_players')->connect($match_id, $player['wp_player_id'], array(
                 'date'                     => current_time('mysql'),
-                'challonge_tournament_id'  => $challonge_tournament_id,
                 'team'                     => $player['team']
             ));
 
