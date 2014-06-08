@@ -103,9 +103,13 @@ function pltm_add_match( $data ){
         update_post_meta($match_id, 'twitch', $args["twitch"]);
     }
 
-    update_post_meta($match_id, 'pa_stats_match_id', $args["pastatsmatches"][0]["gameId"]);
-    update_post_meta($match_id, 'pa_stats_start', $args["pastatsmatches"][0]["start"]);
-    update_post_meta($match_id, 'pa_stats_stop', $args["pastatsmatches"][0]["end"]);
+    if(is_array($args["pastatsmatches"][0])){
+
+        update_post_meta($match_id, 'pa_stats_match_id', $args["pastatsmatches"][0]["gameId"]);
+        update_post_meta($match_id, 'pa_stats_start', $args["pastatsmatches"][0]["start"]);
+        update_post_meta($match_id, 'pa_stats_stop', $args["pastatsmatches"][0]["end"]);
+
+    }
 
     //make sure if the winner is a team then all team players have winner set
     $wining_team = array_column($args['players'], 'winner', 'team');
