@@ -219,8 +219,10 @@ class matchCPT {
 
             }
 
-            $data[$row]['title']   = $matches[$row]->post_title;
-            $data[$row]['players'] = $match_players;
+
+            $data[$row]['wp_match_id'] = $matches[$row]->ID;
+            $data[$row]['title']       = $matches[$row]->post_title;
+            $data[$row]['players']     = $match_players;
 
             $data[$row]['challonge_tournament_id'] = get_post_meta($matches[$row]->ID, 'challonge_tournament_id', true);
             $data[$row]['challonge_match_id']      = get_post_meta($matches[$row]->ID, 'challonge_match_id', true);

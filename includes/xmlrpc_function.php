@@ -30,7 +30,7 @@ function pltm_add_match( $data ){
 
     //name is unique
     $qargs = array(
-        'name'           => $args["challonge_match_id"],
+        'name'           => $args["match_id"],
         'post_type'      => matchCPT::$post_type,
         'posts_per_page' => 1
 
@@ -68,12 +68,26 @@ function pltm_add_match( $data ){
         $new_match = array(
             'post_type'    => matchCPT::$post_type,
             'post_title'   => $match_name,
-            'post_name'    => $args["challonge_match_id"],
             'post_status'  => 'publish',
             'post_content' => 'start'
         );
 
+        //if match_id was provided but no match was found use it when creating match
+        if(isset($args["match_id"])){
+            $new_match['post_name'] = $args["match_id"];
+        }
+
         $match_id  = wp_insert_post($new_match);
+
+        //if missing match_id then native id to be used as match ID update post to reflect this
+        if(!isset($args["match_id"])){
+
+            wp_update_post( array(
+                'ID'        => $match_id,
+                'post_name' => $match_id
+            ) );
+
+        }
 
         if(!empty($args["challonge_match_id"])){
             update_post_meta($match_id, 'challonge_match_id', $args["challonge_match_id"]);
