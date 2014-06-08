@@ -16,18 +16,14 @@ function pltm_add_match( $data ){
     //todo added more complex naming, for more than 1v1 and teams.. not sure on limit
     //$match_name = sprintf('%s vs %s', $args["player_1"], $args["player_2"]);
     $match_name = "Match " . $args["match_letter"];
-    $wp_player_id1  = playerCPT::get_player_by($args['player_1_pastats_id'])->ID;
-    $wp_player_id2  = playerCPT::get_player_by($args['player_2_pastats_id'])->ID;
-    $connection_meta1 = array(
-        'date'                     => current_time('mysql'),
-        'challonge_tournament_id'  => $challonge_tournament_id,
-        'team'                     => 1
-    );
-    $connection_meta2 = array(
-        'date'                     => current_time('mysql'),
-        'challonge_tournament_id'  => $challonge_tournament_id,
-        'team'                     => 2
-    );    
+
+    foreach($args['players'] as &$player){
+
+        $wp_player_id = playerCPT::get_player_by($player['player_pastats_id'])->ID;
+
+        $player['wp_player_id'] = $wp_player_id;
+
+    }
     
     //find if an existing Match exists ? 
     $match_id = 0;
@@ -50,24 +46,22 @@ function pltm_add_match( $data ){
         $post     = $match[0];
         $match_id = $post->ID;
 
-        //update existing
-        $update_match = array(
-            'ID'           => $match_id,
-            'post_content' => 'This an Update'
-        );
+        foreach($args['players'] as &$player){
 
-        wp_update_post($update_match);
+            //check connection
+            $p2p_id = p2p_type('match_players')->get_p2p_id($match_id, $player['wp_player_id']);
 
-        $p2pplayer1 = p2p_type('match_players')->get_p2p_id($match_id, $wp_player_id1);
-        $p2pplayer2 = p2p_type('match_players')->get_p2p_id($match_id, $wp_player_id2);
+            if(!$p2p_id) {
 
-        //return $p2pplayer1 . " " . $p2pplayer2;
-        if($p2pplayer1 == ""){
-            $p2p_result1 = p2p_type('match_players')->connect($match_id, $wp_player_id1, $connection_meta1);
+                $p2p_result = p2p_type('match_players')->connect($match_id, $player['wp_player_id'], array(
+                    'date'                     => current_time('mysql'),
+                    'challonge_tournament_id'  => $challonge_tournament_id,
+                    'team'                     => $player['team']
+                ));
+
+            }
+
         }
-        if($p2pplayer2 == ""){
-            $p2p_result2 = p2p_type('match_players')->connect($match_id, $wp_player_id2, $connection_meta2);
-        }        
 
     } else {
 
@@ -84,64 +78,56 @@ function pltm_add_match( $data ){
 
         update_post_meta($match_id, 'challonge_match_id', $args["challonge_match_id"]);
         update_post_meta($match_id, 'challonge_tournament_id', $args["challonge_tournament_id"]);
-        
-
-        $connection_meta = array(
-            'date'                    => current_time('mysql'),
-            'challonge_tournament_id' => $args["challonge_tournament_id"]
-        );
 
         //todo should be be able to link matches to matches so we can create chains? in future.
-        $p2p_result = p2p_type('tournament_matches')->connect($args["wp_post_id"], $match_id, $connection_meta);
-        //team is simple int, for example if its a ffa each player team would just be a int in a series, if team play, 2 players would be team int 1 and 2 team int 2
+        $p2p_result = p2p_type('tournament_matches')->connect($args["wp_post_id"], $match_id, array(
+            'date'                    => current_time('mysql'),
+            'challonge_tournament_id' => $args["challonge_tournament_id"]
+        ));
 
-        $p2p_result1 = p2p_type('match_players')->connect($match_id, $wp_player_id1, $connection_meta1);
-        $p2p_result2 = p2p_type('match_players')->connect($match_id, $wp_player_id2, $connection_meta2);
+        foreach($args['players'] as &$player){
+
+            $p2p_result = p2p_type('match_players')->connect($match_id, $player['wp_player_id'], array(
+                'date'                     => current_time('mysql'),
+                'challonge_tournament_id'  => $challonge_tournament_id,
+                'team'                     => $player['team']
+            ));
+
+        }
 
     }
+
     update_post_meta($match_id, 'match_round', $args["match_round"]);
     update_post_meta($match_id, 'last_update', $args["last_update"]);
     update_post_meta($match_id, 'favourite', $args["favorite"]);
     update_post_meta($match_id, 'favouritepercent', $args["favoritepercent"]);
     update_post_meta($match_id, 'twitch', $args["twitch"]);
-    
+    update_post_meta($match_id, 'pa_stats_match_id', $args["pastatsmatches"][0]["gameId"]);
+    update_post_meta($match_id, 'pa_stats_start', $args["pastatsmatches"][0]["start"]);
+    update_post_meta($match_id, 'pa_stats_stop', $args["pastatsmatches"][0]["end"]);
 
-    //note dw if you just want to access the first one, as evident by the break at the end of the first loop just do $args["pastatsmatches"][0] then do $args["pastatsmatches"][0]['gameId'] etc, loop not needed
-    foreach($args["pastatsmatches"] as $key => $pamatch){
+    //make sure if the winner is a team then all team players have winner set
+    $wining_team = array_column($args['players'], 'winner', 'team');
 
-        update_post_meta($match_id, 'pa_stats_match_id', $pamatch["gameId"]);
-        update_post_meta($match_id, 'pa_stats_start', $pamatch["start"]);
-        update_post_meta($match_id, 'pa_stats_stop', $pamatch["end"]);
+    foreach($args['players'] as &$player){
 
-        // recommend if(!empty($pamatch["winner"]))
-        if($pamatch["winner"] != ''){
+        //player is part of winning team
+        if($wining_team[$player['team']]){
 
-            $winner_id = playerCPT::get_player_by($pamatch["winner"])->ID;
-            $p2pwinner = p2p_type('match_players')->get_p2p_id($match_id, $winner_id); 
-            p2p_update_meta($p2pwinner, 'winner', 1);
+            $p2p_id = p2p_type('match_players')->get_p2p_id($match_id, $player['wp_player_id']);
 
-            do_action('match_winner_declared', $match_id, $winner_id);
+            p2p_update_meta($p2p_id, 'winner', 1);
 
-            if($pamatch["winner"] == $args["player_1_pastats_id"]){
+            do_action('match_winner_declared', $match_id, $player['wp_player_id']);
 
-                $loser_id = playerCPT::get_player_by($args["player_2_pastats_id"])->ID;
-                $p2ploser = p2p_type('match_players')->get_p2p_id($match_id, $loser_id); 
-                p2p_update_meta($p2ploser, 'winner', 0);
+        } else {
 
-            } else {
+            $p2p_id = p2p_type('match_players')->get_p2p_id($match_id, $player['wp_player_id']);
 
-                $loser_id = playerCPT::get_player_by($args["player_1_pastats_id"])->ID;
-                $p2ploser = p2p_type('match_players')->get_p2p_id($match_id, $loser_id); 
-                p2p_update_meta($p2ploser, 'winner', 0);
+            p2p_update_meta($p2p_id, 'winner', 0);
 
-            }
-
-            do_action('match_loser_declared', $match_id, $loser_id);
-
+            do_action('match_loser_declared', $match_id, $player['wp_player_id']);
         }
-
-        //return $key . " " . $pamatch["winner"];
-        break;
 
     }
 

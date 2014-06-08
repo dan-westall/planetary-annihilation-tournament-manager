@@ -67,6 +67,11 @@ class matchCPT {
                 'winner' => array(
                     'title' => 'Winner',
                     'type' => 'checkbox'
+                ),
+                'team' => array(
+                    'title' => 'Team',
+                    'type' => 'select',
+                    'values' => range(0, 10)
                 )
             )
         ) );
