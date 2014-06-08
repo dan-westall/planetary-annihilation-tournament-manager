@@ -75,9 +75,13 @@ function pltm_add_match( $data ){
 
         $match_id  = wp_insert_post($new_match);
 
-        update_post_meta($match_id, 'challonge_match_id', $args["challonge_match_id"]);
-        update_post_meta($match_id, 'challonge_tournament_id', $args["challonge_tournament_id"]);
+        if(!empty($args["challonge_match_id"])){
+            update_post_meta($match_id, 'challonge_match_id', $args["challonge_match_id"]);
+        }
 
+        if(!empty($args["challonge_tournament_id"])){
+            update_post_meta($match_id, 'challonge_tournament_id', $args["challonge_tournament_id"]);
+        }
 
         $p2p_result = p2p_type('tournament_matches')->connect($args["wp_tournament_id"], $match_id, array(
             'date'                    => current_time('mysql'),
