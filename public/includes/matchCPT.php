@@ -162,7 +162,6 @@ class matchCPT {
 
         }
 
-
     }
 
     public static function get_match_results($attr) {
@@ -207,7 +206,8 @@ class matchCPT {
                 $match_players[] = array(
                     'player_name'        => $player->post_title,
                     'pa_stats_player_id' => get_post_meta($player->ID, 'pastats_player_id', true),
-                    'winner'             => p2p_get_meta($player->p2p_id, 'winner', true)
+                    'winner'             => p2p_get_meta($player->p2p_id, 'winner', true),
+                    'team'               => p2p_get_meta($player->p2p_id, 'team', true)
                 );
 
             }
