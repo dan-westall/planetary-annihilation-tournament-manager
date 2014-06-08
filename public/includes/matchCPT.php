@@ -140,11 +140,12 @@ class matchCPT {
             'name' => 'match_commentators',
             'from' => self::$post_type,
             'to' => 'user',
+            'sortable' => 'from',
             'title' => array(
                 'from' => __( 'Match Commentators', 'PLTM' )
             ),
             'admin_box' => array(
-                'show' => 'any',
+                'show' => 'from',
                 'context' => 'side'
             )
         ) );
