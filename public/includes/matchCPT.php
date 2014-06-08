@@ -136,6 +136,19 @@ class matchCPT {
             )
         ) );
 
+        p2p_register_connection_type( array(
+            'name' => 'match_commentators',
+            'from' => self::$post_type,
+            'to' => 'user',
+            'title' => array(
+                'from' => __( 'Match Commentators', 'PLTM' )
+            ),
+            'admin_box' => array(
+                'show' => 'any',
+                'context' => 'side'
+            )
+        ) );
+
     }
 
     function populate_taxonomy_terms(){
