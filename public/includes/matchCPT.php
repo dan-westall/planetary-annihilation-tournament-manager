@@ -4,22 +4,15 @@ class matchCPT {
 
     public static $post_type = 'match';
 
-    public static $match_formats = array(
-        'tournament_signup_Active' => 'Tournament Signup Not Reserve',
-        'tournament_signup_Reserve' => 'Tournament Signup Reserve',
-        'player_missing_pa_stats_id' => 'Player Missing PA Stats ID',
-        'tournament_2_day_notice' => 'Tournament 2 day notice');
+    public static $match_status = array( 'Open', 'Pending', 'Complete');
 
-    public static $match_types = array(
-        'tournament_signup_Active' => 'Tournament Signup Not Reserve',
-        'tournament_signup_Reserve' => 'Tournament Signup Reserve',
-        'player_missing_pa_stats_id' => 'Player Missing PA Stats ID',
-        'tournament_2_day_notice' => 'Tournament 2 day notice');
+    public static $match_format = array('Verses', 'FFA', 'Team');
 
     function __construct() {
 
         add_action( 'init', array( $this, 'register_cpt_match') );
         add_action( 'init', array( $this, 'register_cpt_taxonomies') );
+        add_action( 'init', array( $this, 'populate_taxonomy_terms') );
         //add_action( 'template_include', array( $this, 'get_match_results') );
 
         add_action( 'p2p_init', array( $this, 'register_p2p_connections' ) );
@@ -155,13 +148,13 @@ class matchCPT {
             // if no terms then lets add our terms
             if( empty( $terms ) ){
 
-                $terms = self::$taxonomy;
+                $terms = self::${$taxonomy};
 
                 foreach( $terms as $term ){
 
-                    if( !term_exists( $term['name'], $taxonomy ) ){
+                    if( !term_exists( $term, $taxonomy ) ){
 
-                        wp_insert_term( $term['name'], $taxonomy, array( 'slug' => strtolower(str_replace(' ', '-', $term['name'])) ) );
+                        wp_insert_term( $term, $taxonomy, array( 'slug' => strtolower(str_replace(' ', '-', $term)) ) );
 
                     }
                 }
