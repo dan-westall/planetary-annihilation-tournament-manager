@@ -98,7 +98,11 @@ function pltm_add_match( $data ){
     update_post_meta($match_id, 'last_update', $args["last_update"]);
     update_post_meta($match_id, 'favourite', $args["favorite"]);
     update_post_meta($match_id, 'favouritepercent', $args["favoritepercent"]);
-    update_post_meta($match_id, 'twitch', $args["twitch"]);
+
+    if(!empty($args["twitch"])){
+        update_post_meta($match_id, 'twitch', $args["twitch"]);
+    }
+
     update_post_meta($match_id, 'pa_stats_match_id', $args["pastatsmatches"][0]["gameId"]);
     update_post_meta($match_id, 'pa_stats_start', $args["pastatsmatches"][0]["start"]);
     update_post_meta($match_id, 'pa_stats_stop', $args["pastatsmatches"][0]["end"]);
