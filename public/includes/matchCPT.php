@@ -4,9 +4,22 @@ class matchCPT {
 
     public static $post_type = 'match';
 
+    public static $match_formats = array(
+        'tournament_signup_Active' => 'Tournament Signup Not Reserve',
+        'tournament_signup_Reserve' => 'Tournament Signup Reserve',
+        'player_missing_pa_stats_id' => 'Player Missing PA Stats ID',
+        'tournament_2_day_notice' => 'Tournament 2 day notice');
+
+    public static $match_types = array(
+        'tournament_signup_Active' => 'Tournament Signup Not Reserve',
+        'tournament_signup_Reserve' => 'Tournament Signup Reserve',
+        'player_missing_pa_stats_id' => 'Player Missing PA Stats ID',
+        'tournament_2_day_notice' => 'Tournament 2 day notice');
+
     function __construct() {
 
         add_action( 'init', array( $this, 'register_cpt_match') );
+        add_action( 'init', array( $this, 'register_cpt_taxonomies') );
         //add_action( 'template_include', array( $this, 'get_match_results') );
 
         add_action( 'p2p_init', array( $this, 'register_p2p_connections' ) );
@@ -51,6 +64,60 @@ class matchCPT {
 
         register_post_type( self::$post_type, $matchArgs );
 
+
+
+    }
+
+    function register_cpt_taxonomies(){
+
+        $labels = array(
+            'name'              => _x( 'Match Status', 'taxonomy general name' ),
+            'singular_name'     => _x( 'Match Status', 'taxonomy singular name' ),
+            'search_items'      => __( 'Search Match Status' ),
+            'all_items'         => __( 'All Match Status' ),
+            'parent_item'       => __( 'Parent Match Status' ),
+            'parent_item_colon' => __( 'Parent Match Status:' ),
+            'edit_item'         => __( 'Edit Match Status' ),
+            'update_item'       => __( 'Update Match Status' ),
+            'add_new_item'      => __( 'Add New Match Status' ),
+            'new_item_name'     => __( 'New Match Status Name' ),
+            'menu_name'         => __( 'Match Status' ),
+        );
+
+        $args = array(
+            'labels'            => $labels,
+            'show_ui'           => true,
+            'show_admin_column' => true,
+            'query_var'         => true,
+            'rewrite'           => array( 'slug' => 'match-status' ),
+        );
+
+        register_taxonomy( 'match_status', self::$post_type, $args );        
+        
+        $labels = array(
+            'name'              => _x( 'Match Format', 'taxonomy general name' ),
+            'singular_name'     => _x( 'Match Format', 'taxonomy singular name' ),
+            'search_items'      => __( 'Search Match Formats' ),
+            'all_items'         => __( 'All Match Format' ),
+            'parent_item'       => __( 'Parent Match Format' ),
+            'parent_item_colon' => __( 'Parent Match Format:' ),
+            'edit_item'         => __( 'Edit Match Format' ),
+            'update_item'       => __( 'Update Match Format' ),
+            'add_new_item'      => __( 'Add New Match Format' ),
+            'new_item_name'     => __( 'New Match Format Name' ),
+            'menu_name'         => __( 'Match Format' ),
+        );
+
+        $args = array(
+            'labels'            => $labels,
+            'show_ui'           => true,
+            'show_admin_column' => true,
+            'query_var'         => true,
+            'rewrite'           => array( 'slug' => 'match-format' ),
+        );
+
+        register_taxonomy( 'match_format', self::$post_type, $args );
+
     }
 
     public function register_p2p_connections(){
@@ -75,6 +142,33 @@ class matchCPT {
                 )
             )
         ) );
+
+    }
+
+    function populate_taxonomy_terms(){
+
+        foreach(array('match_status', 'match_format') as $taxonomy){
+
+            // Match Formats
+            $terms = get_terms( $taxonomy, array( 'hide_empty' => false ) );
+
+            // if no terms then lets add our terms
+            if( empty( $terms ) ){
+
+                $terms = self::$taxonomy;
+
+                foreach( $terms as $term ){
+
+                    if( !term_exists( $term['name'], $taxonomy ) ){
+
+                        wp_insert_term( $term['name'], $taxonomy, array( 'slug' => strtolower(str_replace(' ', '-', $term['name'])) ) );
+
+                    }
+                }
+            }
+
+        }
+
 
     }
 
