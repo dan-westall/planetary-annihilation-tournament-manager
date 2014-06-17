@@ -17,7 +17,7 @@ function pltm_add_match( $data ){
     //$match_name = sprintf('%s vs %s', $args["player_1"], $args["player_2"]);
     $match_name = "Match " . $args["match_letter"];
 
-    foreach($args['players'] as $player){
+    foreach($args['players'] as &$player){
 
         $wp_player_id = playerCPT::get_player_by($player['pa_stats_player_id'])->ID;
 
@@ -46,7 +46,7 @@ function pltm_add_match( $data ){
         $post     = $match[0];
         $match_id = $post->ID;
 
-        foreach($args['players'] as $player){
+        foreach($args['players'] as &$player){
 
             //check connection
             $p2p_id = p2p_type('match_players')->get_p2p_id($match_id, $player['wp_player_id']);
@@ -132,7 +132,7 @@ function pltm_add_match( $data ){
     //make sure if the winner is a team then all team players have winner set
     $wining_team = array_column($args['players'], 'winner', 'team');
 
-    foreach($args['players'] as $player){
+    foreach($args['players'] as &$player){
 
         //player is part of winning team
         if($wining_team[$player['team']]){
