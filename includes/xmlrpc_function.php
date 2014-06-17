@@ -19,7 +19,7 @@ function pltm_add_match( $data ){
 
     foreach($args['players'] as $player){
 
-        $wp_player_id = playerCPT::get_player_by($player['pastats_player_id'])->ID;
+        $wp_player_id = playerCPT::get_player_by($player['pa_stats_player_id'])->ID;
 
         $player['wp_player_id'] = $wp_player_id;
 
