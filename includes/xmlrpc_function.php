@@ -24,8 +24,8 @@ function pltm_add_match( $data ){
         $player['wp_player_id'] = $wp_player_id;
 
     }
-    
-    //find if an existing Match exists ? 
+
+    //find if an existing Match exists ?
     $match_id = 0;
 
     //name is unique
@@ -64,7 +64,7 @@ function pltm_add_match( $data ){
 
     } else {
 
-        //create match 
+        //create match
         $new_match = array(
             'post_type'    => matchCPT::$post_type,
             'post_title'   => $match_name,
@@ -132,7 +132,7 @@ function pltm_add_match( $data ){
     //make sure if the winner is a team then all team players have winner set
     $wining_team = array_column($args['players'], 'winner', 'team');
 
-    foreach($args['players'] as &$player){
+    foreach($args['players'] as $player){
 
         //player is part of winning team
         if($wining_team[$player['team']]){
