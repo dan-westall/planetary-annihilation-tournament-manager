@@ -57,7 +57,7 @@ class playerCPT {
             'show_ui'             => true,
             'menu_position'       => 10,
             'menu_icon'           => 'dashicons-id',
-            'supports'            => array('title', 'author'),
+            'supports'            => array('title', 'author', 'comments'),
             'capability_type'     => array(self::$post_type,self::$post_type.'s'),
             'map_meta_cap'        => true,
         );
@@ -409,7 +409,7 @@ class playerCPT {
 
         //delete_transient( 'player_' .$user->ID. '_avatar' );
 
-        if ( false === ( $user_avatar_img = get_transient( 'player_' .$user->ID. '_avatar' ) ) ) {
+        if ( false === ( $user_avatar_img = get_transient( 'player_' .$user->ID. '_avatar_' .$size ) ) ) {
 
             if (function_exists(get_wp_user_avatar())) {
 
@@ -424,7 +424,7 @@ class playerCPT {
                 $user_avatar_img = get_avatar($user->ID, $size);
             }
 
-            set_transient( 'player_' .$user->ID. '_avatar', $user_avatar_img, 12 * HOUR_IN_SECONDS );
+            set_transient( 'player_' .$user->ID. '_avatar_' .$size, $user_avatar_img, 12 * HOUR_IN_SECONDS );
         }
 
         return $user_avatar_img;

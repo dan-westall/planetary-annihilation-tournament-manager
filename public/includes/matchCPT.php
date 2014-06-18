@@ -4,9 +4,15 @@ class matchCPT {
 
     public static $post_type = 'match';
 
+    public static $match_status = array( 'Open', 'Pending', 'Complete');
+
+    public static $match_format = array('Verses', 'FFA', 'Team');
+
     function __construct() {
 
         add_action( 'init', array( $this, 'register_cpt_match') );
+        add_action( 'init', array( $this, 'register_cpt_taxonomies') );
+        add_action( 'init', array( $this, 'populate_taxonomy_terms') );
         //add_action( 'template_include', array( $this, 'get_match_results') );
 
         add_action( 'p2p_init', array( $this, 'register_p2p_connections' ) );
@@ -14,6 +20,10 @@ class matchCPT {
         add_shortcode('tournament-matches', array( $this, 'get_match_results') );
 
         add_filter( 'wp_insert_post_data',  array( $this, 'default_comments_on' ) );
+
+        add_filter( 'json_prepare_post',  array( $this, 'extend_json_api' ), 100, 3 );
+
+
 
         //moved outside to our own api endpoint
 //        add_action('wp_ajax_pltm_get_match_results',  array( $this, 'get_match_json') );
@@ -44,12 +54,67 @@ class matchCPT {
                 'has_archive'         => true,
                 'exclude_from_search' => true,
                 'show_ui'             => true,
+                'show_in_json'        => true,
                 'menu_position'       => 10,
                 'menu_icon'           => 'dashicons-video-alt3',
                 'supports'            => array('title', 'thumbnail', 'comments')
             );
 
         register_post_type( self::$post_type, $matchArgs );
+
+
+
+    }
+
+    function register_cpt_taxonomies(){
+
+        $labels = array(
+            'name'              => _x( 'Match Status', 'taxonomy general name' ),
+            'singular_name'     => _x( 'Match Status', 'taxonomy singular name' ),
+            'search_items'      => __( 'Search Match Status' ),
+            'all_items'         => __( 'All Match Status' ),
+            'parent_item'       => __( 'Parent Match Status' ),
+            'parent_item_colon' => __( 'Parent Match Status:' ),
+            'edit_item'         => __( 'Edit Match Status' ),
+            'update_item'       => __( 'Update Match Status' ),
+            'add_new_item'      => __( 'Add New Match Status' ),
+            'new_item_name'     => __( 'New Match Status Name' ),
+            'menu_name'         => __( 'Match Status' ),
+        );
+
+        $args = array(
+            'labels'            => $labels,
+            'show_ui'           => true,
+            'show_admin_column' => true,
+            'query_var'         => true,
+            'rewrite'           => array( 'slug' => 'match-status' ),
+        );
+
+        register_taxonomy( 'match_status', self::$post_type, $args );        
+        
+        $labels = array(
+            'name'              => _x( 'Match Format', 'taxonomy general name' ),
+            'singular_name'     => _x( 'Match Format', 'taxonomy singular name' ),
+            'search_items'      => __( 'Search Match Formats' ),
+            'all_items'         => __( 'All Match Format' ),
+            'parent_item'       => __( 'Parent Match Format' ),
+            'parent_item_colon' => __( 'Parent Match Format:' ),
+            'edit_item'         => __( 'Edit Match Format' ),
+            'update_item'       => __( 'Update Match Format' ),
+            'add_new_item'      => __( 'Add New Match Format' ),
+            'new_item_name'     => __( 'New Match Format Name' ),
+            'menu_name'         => __( 'Match Format' ),
+        );
+
+        $args = array(
+            'labels'            => $labels,
+            'show_ui'           => true,
+            'show_admin_column' => true,
+            'query_var'         => true,
+            'rewrite'           => array( 'slug' => 'match-format' ),
+        );
+
+        register_taxonomy( 'match_format', self::$post_type, $args );
 
     }
 
@@ -67,9 +132,54 @@ class matchCPT {
                 'winner' => array(
                     'title' => 'Winner',
                     'type' => 'checkbox'
+                ),
+                'team' => array(
+                    'title' => 'Team',
+                    'type' => 'select',
+                    'values' => range(0, 10)
                 )
             )
         ) );
+
+        p2p_register_connection_type( array(
+            'name' => 'match_commentators',
+            'from' => self::$post_type,
+            'to' => 'user',
+            'sortable' => 'from',
+            'title' => array(
+                'from' => __( 'Match Commentators', 'PLTM' )
+            ),
+            'admin_box' => array(
+                'show' => 'from',
+                'context' => 'side'
+            )
+        ) );
+
+    }
+
+    function populate_taxonomy_terms(){
+
+        foreach(array('match_status', 'match_format') as $taxonomy){
+
+            // Match Formats
+            $terms = get_terms( $taxonomy, array( 'hide_empty' => false ) );
+
+            // if no terms then lets add our terms
+            if( empty( $terms ) ){
+
+                $terms = self::${$taxonomy};
+
+                foreach( $terms as $term ){
+
+                    if( !term_exists( $term, $taxonomy ) ){
+
+                        wp_insert_term( $term, $taxonomy, array( 'slug' => strtolower(str_replace(' ', '-', $term)) ) );
+
+                    }
+                }
+            }
+
+        }
 
     }
 
@@ -115,13 +225,16 @@ class matchCPT {
                 $match_players[] = array(
                     'player_name'        => $player->post_title,
                     'pa_stats_player_id' => get_post_meta($player->ID, 'pastats_player_id', true),
-                    'winner'             => p2p_get_meta($player->p2p_id, 'winner', true)
+                    'winner'             => p2p_get_meta($player->p2p_id, 'winner', true),
+                    'team'               => p2p_get_meta($player->p2p_id, 'team', true)
                 );
 
             }
 
-            $data[$row]['title']   = $matches[$row]->post_title;
-            $data[$row]['players'] = $match_players;
+
+            $data[$row]['wp_match_id'] = $matches[$row]->ID;
+            $data[$row]['title']       = $matches[$row]->post_title;
+            $data[$row]['players']     = $match_players;
 
             $data[$row]['challonge_tournament_id'] = get_post_meta($matches[$row]->ID, 'challonge_tournament_id', true);
             $data[$row]['challonge_match_id']      = get_post_meta($matches[$row]->ID, 'challonge_match_id', true);
@@ -284,6 +397,50 @@ class matchCPT {
         }
 
         return $data;
+    }
+
+    public function extend_json_api($_post, $post, $context){
+
+        if($post['post_type'] == 'match'){
+
+            //dont need author
+            unset($_post['author']);
+
+            $comments   = wp_count_comments( $post['ID']);
+            $tournament = p2p_type('tournament_matches')->set_direction('to')->get_connected($post['ID']);
+            $players    = p2p_type('match_players')->get_connected($post['ID']);
+
+            if(isset($tournament->posts[0]->ID)){
+
+                $_post['meta']['tournament']['name'] = $tournament->posts[0]->post_title;
+                $_post['meta']['tournament']['url']  = get_permalink($tournament->posts[0]->ID);
+
+            }
+
+            foreach ($players->posts as $player) {
+
+                $match_players[] = array(
+                    'wp_player_id'       => $player->ID,
+                    'player_name'        => $player->post_title,
+                    'pa_stats_player_id' => get_post_meta($player->ID, 'pastats_player_id', true),
+                    'winner'             => p2p_get_meta($player->p2p_id, 'winner', true),
+                    'team'               => p2p_get_meta($player->p2p_id, 'team', true),
+                    'url'                => get_permalink($player->ID)
+                );
+
+            }
+
+            $_post['meta']['players'] = $match_players;
+            $_post['meta']['comment_count'] = $comments->approved;
+            $_post['meta']['video'] =  get_match_videos($post['ID']);
+            $_post['meta']['pa_stats_id'] = get_post_meta($post['ID'], 'pa_stats_match_id', true);
+
+        }
+
+
+
+        return $_post;
+
     }
 
 }

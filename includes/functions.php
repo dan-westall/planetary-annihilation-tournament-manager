@@ -76,6 +76,23 @@ function get_player_avatar($player_id, $size = 100){
 
 }
 
+function get_match_commentators($match_id){
+
+    $commentators = get_users( array(
+        'connected_type' => 'match_commentators',
+        'connected_items' => $match_id
+    ) );
+
+    foreach($commentators as $commentator){
+
+        $commentators_str[] = $commentator->display_name;
+
+    }
+
+    return implode(', ', $commentators_str);
+
+}
+
 
 
 class DW_Helper {
