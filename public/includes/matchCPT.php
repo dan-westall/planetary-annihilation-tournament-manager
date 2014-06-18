@@ -21,6 +21,10 @@ class matchCPT {
 
         add_filter( 'wp_insert_post_data',  array( $this, 'default_comments_on' ) );
 
+        add_filter( 'json_prepare_post',  array( $this, 'extend_json_api' ), 100, 3 );
+
+
+
         //moved outside to our own api endpoint
 //        add_action('wp_ajax_pltm_get_match_results',  array( $this, 'get_match_json') );
 //        add_action('wp_ajax_nopriv_pltm_get_match_results',  array( $this, 'get_match_json') );
@@ -50,6 +54,7 @@ class matchCPT {
                 'has_archive'         => true,
                 'exclude_from_search' => true,
                 'show_ui'             => true,
+                'show_in_json'        => true,
                 'menu_position'       => 10,
                 'menu_icon'           => 'dashicons-video-alt3',
                 'supports'            => array('title', 'thumbnail', 'comments')
@@ -392,6 +397,50 @@ class matchCPT {
         }
 
         return $data;
+    }
+
+    public function extend_json_api($_post, $post, $context){
+
+        if($post['post_type'] == 'match'){
+
+            //dont need author
+            unset($_post['author']);
+
+            $comments   = wp_count_comments( $post['ID']);
+            $tournament = p2p_type('tournament_matches')->set_direction('to')->get_connected($post['ID']);
+            $players    = p2p_type('match_players')->get_connected($post['ID']);
+
+            if(isset($tournament->posts[0]->ID)){
+
+                $_post['meta']['tournament']['name'] = $tournament->posts[0]->post_title;
+                $_post['meta']['tournament']['url']  = get_permalink($tournament->posts[0]->ID);
+
+            }
+
+            foreach ($players->posts as $player) {
+
+                $match_players[] = array(
+                    'wp_player_id'       => $player->ID,
+                    'player_name'        => $player->post_title,
+                    'pa_stats_player_id' => get_post_meta($player->ID, 'pastats_player_id', true),
+                    'winner'             => p2p_get_meta($player->p2p_id, 'winner', true),
+                    'team'               => p2p_get_meta($player->p2p_id, 'team', true),
+                    'url'                => get_permalink($player->ID)
+                );
+
+            }
+
+            $_post['meta']['players'] = $match_players;
+            $_post['meta']['comment_count'] = $comments->approved;
+            $_post['meta']['video'] =  get_match_videos($post['ID']);
+            $_post['meta']['pa_stats_id'] = get_post_meta($post['ID'], 'pa_stats_match_id', true);
+
+        }
+
+
+
+        return $_post;
+
     }
 
 }
