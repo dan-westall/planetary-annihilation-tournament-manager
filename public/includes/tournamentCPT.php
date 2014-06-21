@@ -1149,7 +1149,7 @@ class tournamentCPT {
         $data['ID']                      = $tournament->ID;
         $data['name']                    = $tournament->post_title;
         $data['description']             = $tournament->post_title;
-        $data['date']                    = date('c', strtotime(get_post_meta($tournament->ID, 'run_date', true)));
+        $data['date']                    = date('c', strtotime(get_post_meta($tournament->ID, 'run_date', true). ' ' .get_post_meta($tournament->ID, 'run_time', true)));
         $data['time']                    = get_post_meta($tournament->ID, 'run_time', true);
         $data['format']                  = get_post_meta($tournament->ID, 'tournament_type', true);
         $data['slots']                   = get_post_meta($tournament->ID, 'slots', true);
