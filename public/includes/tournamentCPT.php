@@ -4,7 +4,7 @@ class tournamentCPT {
 
     public static $post_type = 'tournament';
 
-    public static $tournament_status = array('Signup', 'In Progress', 'Cancelled', 'Finished');
+    public static $tournament_status = array('Signup', 'In Progress', 'Cancelled', 'Finished', 'Preparation');
 
     public static $tournament_player_status = array( 'Active', 'Reserve', 'No Show', 'Banned', 'Disqualify');
 

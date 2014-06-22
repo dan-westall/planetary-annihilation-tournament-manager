@@ -203,6 +203,11 @@ class matchCPT {
             $args['connected_items'] = $tournament_id;
             $args['nopaging']        = true;
 
+            //check that we can show the match
+            if(!in_array(get_post_meta($tournament_id, 'tournament_status', true), array(1,2,3))){
+                wp_send_json(array('message' => 'Tournament not at correct status'));
+            }
+
         } else if(!empty($match_id)){
 
             //if match_id is set then get the wp id by default challnonge match id is used.
