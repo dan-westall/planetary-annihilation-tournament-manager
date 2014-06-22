@@ -205,7 +205,13 @@ class matchCPT {
 
             //check that we can show the match
             if(!in_array(get_post_meta($tournament_id, 'tournament_status', true), array(1,2,3))){
-                wp_send_json(array('message' => 'Tournament not at correct status'));
+
+               if($output == 'json'){
+                   wp_send_json(array('message' => 'Tournament not at correct status'));
+               } else {
+                   return 'No Matches to show';
+               }
+
             }
 
         } else if(!empty($match_id)){
