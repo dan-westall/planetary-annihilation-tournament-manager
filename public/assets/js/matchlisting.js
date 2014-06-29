@@ -5,7 +5,7 @@ var MatchModel = function(data){
 	//console.log(self.videos());
     self.player1 = ko.computed(function(){
     	if(self.players().length > 0){
-    		return self.players()[0].player_name();		
+    		return self.players()[0].player_name();
     	}
     });
     self.player2 = ko.computed(function(){
@@ -24,10 +24,45 @@ var MatchModel = function(data){
 		    		if(self.players()[1].winner() == 1){
 		      			return self.players()[1].player_name();
 		      		}
-		  		}			
+		  		}
 			}
 		}
     });
+
+	function playersperTeam(players, team){
+		var output = "";
+		var cleanplayers = _.filter(players, {'team': team + ""});
+		for(var p = 0; p < cleanplayers.length; p++){
+			if(p === 0){
+				output = cleanplayers[p].player_name;
+				if(cleanplayers[p].winner === '1'){
+					output = output + "<span class=\"spoiler matchwinner\"></span>";
+				}
+			}
+			else{
+				output = output + ", " + cleanplayers[p].player_name;
+					if(cleanplayers[p].winner === '1'){
+						output = output + "<span class=\"spoiler matchwinner\"></span>";
+					}
+			}
+		}
+		return output;
+	}
+
+	self.niceplayeroutput = ko.computed(function (){
+		var cleanplayers = _.sortBy(ko.toJS(self.players()),'team');
+		var teams = _.uniq(_.map(cleanplayers,'team'),true);
+		var output = "";
+		for(var t = 0; t < teams.length; t++){
+			if(t === 0){
+				output = playersperTeam(cleanplayers,t);
+			}
+			else {
+				output = output + " vs. " + playersperTeam(cleanplayers,t);
+			}
+		}
+		return output;
+	},this);
 
 	self.paslink = ko.computed(function(){
 		return "http://pastats.com/chart?gameId=" + self.pa_stats_match_id();
@@ -123,7 +158,7 @@ var MatchListing = function() {
 		//CORRECT URL !
 		$.getJSON(self.restendpoint(),function(data){
 			//ko.mapping.fromJS(data.data,mapping,self.matches);
-    		
+
     		if(data !== undefined){
 //    			console.log(data.data);
 				for(var i = 0; i < data.length; i++){
@@ -131,7 +166,7 @@ var MatchListing = function() {
 					self.SortMatches();
 				}
 			}
-			
+
 		});
 	};
 
@@ -143,15 +178,15 @@ var MatchListing = function() {
 				var updatedmatch = new MatchModel(data[0]);
 				var oldMatch = ko.utils.arrayFirst(self.matches(), function(item) {
 				    return item.challonge_match_id() == updatedmatch.challonge_match_id();
-				});				
+				});
 				if(oldMatch === null){
 					self.matches.push(updatedmatch);
 					self.SortMatches();
 				}
 				else{
-					self.matches.replace(oldMatch, updatedmatch);	
+					self.matches.replace(oldMatch, updatedmatch);
 				}
-				
+
 
 			}
 		});
@@ -159,17 +194,17 @@ var MatchListing = function() {
 
 	self.SortMatches = function(){
   		self.matches.sort(
-		function(left, right) { 
+		function(left, right) {
 			//return right.title() < left.title() ? 1 : -1
-			return left.match_round() === right.match_round() 
+			return left.match_round() === right.match_round()
 			? right.title().toLowerCase() > left.title().toLowerCase() ? -1 : 1
-			: right.match_round() < left.match_round() ? 1 : -1		
+			: right.match_round() < left.match_round() ? 1 : -1
 		});
 	};
 
-	/*		
+	/*
 	var socket = io.connect(':5000');
-    
+
     socket.on('updatedMatch', function (data) {
       self.UpdateMatch(data);
 	  //socket.emit('my other event', { my: 'data' });
@@ -181,7 +216,7 @@ var MatchListing = function() {
 		});
 	});
 	*/
-	
+
 	self.AutoReload = function(){
 		setInterval(self.Start,60000);
 	};
@@ -191,4 +226,3 @@ var MatchListing = function() {
 
 var eematchlisting = new MatchListing();
 ko.applyBindings(eematchlisting);
-
