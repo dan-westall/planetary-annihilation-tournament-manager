@@ -3,7 +3,7 @@ var MatchModel = function(data){
 	ko.mapping.fromJS(data,{},self);
 
 	self.haswinner = ko.computed(function(){
-		var cleanplayers = _.filter(players, {'winner': team + "1"});
+		var cleanplayers = _.filter(_.sortBy(ko.toJS(self.players()),'winner'), {'winner': team + "1"});
 		if(cleanplayers.length >= 1){
 			return true;
 		}
