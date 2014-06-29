@@ -15,15 +15,9 @@ var MatchModel = function(data){
 		for(var p = 0; p < cleanplayers.length; p++){
 			if(p === 0){
 				output = cleanplayers[p].player_name;
-				if(cleanplayers[p].winner === '1'){
-					output = output + "<span class=\"spoiler matchwinner\"></span>";
-				}
 			}
 			else{
 				output = output + ", " + cleanplayers[p].player_name;
-					if(cleanplayers[p].winner === '1'){
-						output = output + "<span class=\"spoiler matchwinner\"></span>";
-					}
 			}
 		}
 		return output;
@@ -34,11 +28,18 @@ var MatchModel = function(data){
 		var teams = _.uniq(_.map(cleanplayers,'team'),true);
 		var output = "";
 		for(var t = 0; t < teams.length; t++){
+			var teamwinners = _.filter(_.sortBy(cleanplayers,'winner'), {'winner': "1", 'team': t + ""});
 			if(t === 0){
 				output = playersperTeam(cleanplayers,t);
+				if(teamwinners.length >= 1){
+						output = output + "<span class=\"spoiler matchwinner\"></span>";
+				}
 			}
 			else {
-				output = output + " vs. " + playersperTeam(cleanplayers,t);
+				output = output + " <b>VS.</b> " + playersperTeam(cleanplayers,t);
+				if(teamwinners.length >= 1){
+						output = output + "<span class=\"spoiler matchwinner\"></span>";
+				}
 			}
 		}
 		return output;
