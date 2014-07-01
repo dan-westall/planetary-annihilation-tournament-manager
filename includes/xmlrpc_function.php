@@ -156,6 +156,6 @@ function pltm_add_match( $data ){
 
     do_action('match_updated', $match_id);
 
-    return "match ". $args["match_letter"] ." added and got wp-id ". $match_id;
+    return get_permalink( $match_id );
 
 }
