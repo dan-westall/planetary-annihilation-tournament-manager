@@ -27,7 +27,7 @@ class statistic {
 
         global $wpdb;
 
-        $query = $wpdb->prepare("SELECT p2p_from FROM $wpdb->p2p WHERE p2p_to = %d AND p2p_type = 'match_players'", $this->players[0]);
+        $query = $wpdb->prepare("SELECT p2p_from FROM $wpdb->p2p WHERE p2p_to = %d AND p2p_type = 'match_players' ORDER BY p2p_id", $this->players[0]);
 
         $player_matches = $wpdb->get_col($query);
 
@@ -153,7 +153,70 @@ class statistic {
 
     }
 
-    public function average_win_rate(){
+    public function longest_win_streak($template = '<div><div>%1$s</div><a href="%2$s"><span>%3$s</span></a></div>'){
+
+        $matches       = $this->matches;
+        $win = 0;
+
+        foreach($matches as $match_id){
+
+            $p2p_id = p2p_type( 'match_players' )->get_p2p_id( $match_id, $this->players[0] );
+
+            $result = p2p_get_meta( $p2p_id, 'winner', true );
+
+            if($result){
+                $win ++;
+            } else {
+
+                if($streak < $win){
+                    $streak = $win;
+                }
+
+                $win = 0;
+
+            }
+
+        }
+//
+        return sprintf(
+            $template,
+            __('Longest Win streak'),
+            '',
+            $streak
+        );
+
+
+    }
+
+    public function average_win_rate($template = '<div><div>%1$s</div><a href="%2$s"><span>%3$s</span></a></div>'){
+
+        $matches = $this->matches;
+        $win     = $lose = 0;
+
+        foreach ($matches as $match_id) {
+
+            $p2p_id = p2p_type('match_players')->get_p2p_id($match_id, $this->players[0]);
+
+            $result = p2p_get_meta($p2p_id, 'winner', true);
+
+            if ($result) {
+                $win ++;
+            } else {
+                $lose = 0;
+            }
+
+        }
+
+        $ratio = round( ( $win / count($matches) ) * 100 );
+
+//
+        return sprintf(
+            $template,
+            __('Wins %'),
+            '',
+            $ratio
+        );
+
 
     }
 
