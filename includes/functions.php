@@ -93,7 +93,11 @@ function get_match_commentators($match_id){
 
 }
 
+function get_tournament_badges(){
 
+    ?><a href="http://dev.exodusesports.com/tournament/king-of-the-planet-5/"><img src="<?php echo get_template_directory_uri();?>/public/img/icon_kotp.png" alt="King of the planet!" /></a><?php
+
+}
 
 class DW_Helper {
 
