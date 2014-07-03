@@ -119,10 +119,6 @@ class statistic {
 
         foreach($matches as $match_id){
 
-//            var time = (self.pa_stats_stop() - self.pa_stats_start()) / 1000;
-//            var minutes = Math.floor(time / 60);
-//            var seconds = time - minutes * 60;
-
             $match_time_mill = ( get_post_meta( $match_id, 'pa_stats_stop', true ) - get_post_meta( $match_id, 'pa_stats_start', true ) );
             $match_time =  round( ( $match_time_mill / 1000 ) );
 
@@ -177,7 +173,7 @@ class statistic {
             }
 
         }
-//
+
         return sprintf(
             $template,
             __('Longest Win streak'),
