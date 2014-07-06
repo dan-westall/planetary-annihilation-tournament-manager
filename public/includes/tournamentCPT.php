@@ -4,7 +4,7 @@ class tournamentCPT {
 
     public static $post_type = 'tournament';
 
-    public static $tournament_status = array('Signup', 'In Progress', 'Cancelled', 'Finished');
+    public static $tournament_status = array('Signup', 'In Progress', 'Cancelled', 'Finished', 'Preparation');
 
     public static $tournament_player_status = array( 'Active', 'Reserve', 'No Show', 'Banned', 'Disqualify');
 
@@ -1149,7 +1149,7 @@ class tournamentCPT {
         $data['ID']                      = $tournament->ID;
         $data['name']                    = $tournament->post_title;
         $data['description']             = $tournament->post_title;
-        $data['date']                    = date('c', strtotime(get_post_meta($tournament->ID, 'run_date', true)));
+        $data['date']                    = date('c', strtotime(get_post_meta($tournament->ID, 'run_date', true). ' ' .get_post_meta($tournament->ID, 'run_time', true)));
         $data['time']                    = get_post_meta($tournament->ID, 'run_time', true);
         $data['format']                  = get_post_meta($tournament->ID, 'tournament_type', true);
         $data['slots']                   = get_post_meta($tournament->ID, 'slots', true);

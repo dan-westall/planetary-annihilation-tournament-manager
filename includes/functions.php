@@ -76,7 +76,28 @@ function get_player_avatar($player_id, $size = 100){
 
 }
 
+function get_match_commentators($match_id){
 
+    $commentators = get_users( array(
+        'connected_type' => 'match_commentators',
+        'connected_items' => $match_id
+    ) );
+
+    foreach($commentators as $commentator){
+
+        $commentators_str[] = $commentator->display_name;
+
+    }
+
+    return implode(', ', $commentators_str);
+
+}
+
+function get_tournament_badges(){
+
+    ?><a href="http://dev.exodusesports.com/tournament/king-of-the-planet-5/"><img src="<?php echo get_template_directory_uri();?>/public/img/icon_kotp.png" alt="King of the planet!" /></a><?php
+
+}
 
 class DW_Helper {
 

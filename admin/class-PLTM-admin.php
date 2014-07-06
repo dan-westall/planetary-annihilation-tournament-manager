@@ -426,11 +426,11 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
 
     function tournament_player_management() {
 
-        wp_add_dashboard_widget(
-            'tournament_player_signup_status', // Widget slug.
-            'Tournament Player signup stats', // Title.
-            array( $this, 'tournament_player_signup_status') // Display function.
-        );
+//        wp_add_dashboard_widget(
+//            'tournament_player_signup_status', // Widget slug.
+//            'Tournament Player signup stats', // Title.
+//            array( $this, 'tournament_player_signup_status') // Display function.
+//        );
     }
 
     public function tournament_player_signup_status() {
@@ -583,14 +583,31 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
     }
 
     function player_table_filter( $query ) {
-        if( is_admin() && $query->query['post_type'] == playerCPT::$post_type ) {
+        if( is_admin() && ( $query->query['post_type'] == playerCPT::$post_type  || $query->query['post_type'] == matchCPT::$post_type ) ) {
             $qv = &$query->query_vars;
 
             if( !empty( $_GET['tournament_filter'] ) ) {
 
-                $qv['connected_type']  = 'tournament_players';
-                $qv['connected_items'] = $_GET['tournament_filter'];
-                $qv['nopaging']        = true;
+                switch($query->query['post_type']){
+
+                    case playerCPT::$post_type:
+
+                        $qv['connected_type']  = 'tournament_players';
+                        $qv['connected_items'] = $_GET['tournament_filter'];
+                        $qv['nopaging']        = true;
+
+                        break;
+
+                    case matchCPT::$post_type:
+
+                        $qv['connected_type']  = 'tournament_matches';
+                        $qv['connected_items'] = $_GET['tournament_filter'];
+                        $qv['nopaging']        = true;
+
+                        break;
+                }
+
+
 
             }
         }
@@ -602,7 +619,7 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
 
         $screen = get_current_screen();
 
-        if ( $screen->post_type == 'player' ) {
+        if ( $screen->post_type == 'player' || $screen->post_type == 'match') {
 
             DW_Helper::generate_post_select('tournament_filter', tournamentCPT::$post_type, $_GET['tournament_filter'] );
 

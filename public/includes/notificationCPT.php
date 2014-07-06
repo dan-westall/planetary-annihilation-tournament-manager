@@ -8,7 +8,8 @@ class notificationCPT {
         'tournament_signup_Active' => 'Tournament Signup Not Reserve',
         'tournament_signup_Reserve' => 'Tournament Signup Reserve',
         'player_missing_pa_stats_id' => 'Player Missing PA Stats ID',
-        'tournament_2_day_notice' => 'Tournament 2 day notice');
+        'tournament_2_day_notice' => 'Tournament 2 day notice',
+        'tournament_wrap_up' => 'Tournament Wrap Up');
 
     function __construct() {
 
@@ -24,6 +25,7 @@ class notificationCPT {
         add_action( 'player_missing_pa_stats_id', array( $this, 'email_notification' ), 10, 3);
 
         add_action( 'tournament_2_day_notice', array( $this, 'email_notification' ), 10, 3);
+        add_action( 'tournament_wrap_up', array( $this, 'email_notification' ), 10, 3);
 
         add_filter( 'acf/load_field/name=notification_actions', array( $this, 'filter_notification_listing') );
 
@@ -32,6 +34,7 @@ class notificationCPT {
         add_action( 'save_post', array( $this, 'save' ) );
 
         add_action('wp_ajax_tournament_2_day_notice', array($this,'tournament_2_day_notice'));
+        add_action('wp_ajax_tournament_wrap_up', array($this,'tournament_wrap_up'));
 
     }
 
@@ -105,6 +108,7 @@ class notificationCPT {
         switch ($action) {
 
             case 'tournament_2_day_notice':
+            case 'tournament_wrap_up':
 
                 //todo loads of code replication needs to be removed.
 
@@ -286,11 +290,26 @@ class notificationCPT {
 
     }
 
+
+    //todo general notification function merge
     public function tournament_2_day_notice(){
 
         check_ajax_referer( 'send-players-2-day-notification', 'security' );
 
         do_action('tournament_2_day_notice', array( 'tournament_id' => $_POST['tournament_id'] ));
+
+        die();
+
+    }
+
+    public function tournament_wrap_up(){
+
+        check_ajax_referer( 'send-players-tournament-wrap-up', 'security' );
+
+        do_action('tournament_wrap_up', array( 'tournament_id' => $_POST['tournament_id'] ));
+
+        //todo link notifications to tournament for tournament wide emails.
+        update_post_meta($_POST['tournament_id'], 'wrap_up_email_sent', date('Y-m-d H:i:s'));
 
         die();
 
@@ -326,5 +345,11 @@ class notificationCPT {
         echo '</label> ';
 
         echo '<br /><br /><a href="javascript:void(0);" class="button" data-tournament-id="'.$post->ID.'" data-security="'.wp_create_nonce( "send-players-2-day-notification" ).'" id="send-players-2-day-notification">Send 2 day notification</a>';
+
+       if(get_post_meta($post->ID, 'wrap_up_email_sent', date('Y-m-d H:i:s'))){
+           echo '<br /><div>wrap-up email sent! ' . get_post_meta($post->ID, 'wrap_up_email_sent', true).'</div>';
+       } else {
+           echo '<br /><br /><a href="javascript:void(0);" class="button" data-tournament-id="'.$post->ID.'" data-security="'.wp_create_nonce( "send-players-tournament-wrap-up" ).'" id="send-players-tournament-wrap-up">Tournament Wrapup</a>';
+       }
     }
 }
