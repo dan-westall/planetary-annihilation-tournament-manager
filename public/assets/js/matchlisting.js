@@ -14,10 +14,10 @@ var MatchModel = function(data){
 		var cleanplayers = _.filter(players, {'team': team + ""});
 		for(var p = 0; p < cleanplayers.length; p++){
 			if(p === 0){
-				output = "<a href='#'>" + cleanplayers[p].player_name + "</a>";
+				output =  cleanplayers[p].player_name;
 			}
 			else{
-				output = output + ", <a href='#'>" + cleanplayers[p].player_name + "</a>";
+				output = output + ", " + cleanplayers[p].player_name;
 			}
 		}
 		return output;
