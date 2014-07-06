@@ -1,33 +1,49 @@
 var MatchModel = function(data){
 	var self = this;
 	ko.mapping.fromJS(data,{},self);
-	//console.log(self.players()[0]);
-	//console.log(self.videos());
-    self.player1 = ko.computed(function(){
-    	if(self.players().length > 0){
-    		return self.players()[0].player_name();		
-    	}
-    });
-    self.player2 = ko.computed(function(){
-    	if(self.players().length > 1){
-      		return self.players()[1].player_name();
-  		}
-    });
 
-    self.winner = ko.computed(function(){
-		if(self.players().length > 0){
-			if(self.players()[0].winner() == 1){
-				return self.players()[0].player_name();
+	self.haswinner = ko.computed(function(){
+		var cleanplayers = _.filter(_.sortBy(ko.toJS(self.players()),'winner'), {'winner': "1"});
+		if(cleanplayers.length >= 1){
+			return true;
+		}
+	});
+
+	function playersperTeam(players, team){
+		var output = "";
+		var cleanplayers = _.filter(players, {'team': team + ""});
+		for(var p = 0; p < cleanplayers.length; p++){
+			if(p === 0){
+				output = "<a href='#'>" + cleanplayers[p].player_name + "</a>";
 			}
 			else{
-		    	if(self.players().length > 1){
-		    		if(self.players()[1].winner() == 1){
-		      			return self.players()[1].player_name();
-		      		}
-		  		}			
+				output = output + ", <a href='#'>" + cleanplayers[p].player_name + "</a>";
 			}
 		}
-    });
+		return output;
+	}
+
+	self.niceplayeroutput = ko.computed(function (){
+		var cleanplayers = _.sortBy(ko.toJS(self.players()),'team');
+		var teams = _.uniq(_.map(cleanplayers,'team'),true);
+		var output = "";
+		for(var t = 0; t < teams.length; t++){
+			var teamwinners = _.filter(_.sortBy(cleanplayers,'winner'), {'winner': "1", 'team': t + ""});
+			if(t === 0){
+				output = playersperTeam(cleanplayers,t);
+				if(teamwinners.length >= 1){
+						output = output + "<span class=\"spoiler matchwinner\"></span>";
+				}
+			}
+			else {
+				output = output + " <b>VS.</b> " + playersperTeam(cleanplayers,t);
+				if(teamwinners.length >= 1){
+						output = output + "<span class=\"spoiler matchwinner\"></span>";
+				}
+			}
+		}
+		return output;
+	},this);
 
 	self.paslink = ko.computed(function(){
 		return "http://pastats.com/chart?gameId=" + self.pa_stats_match_id();
@@ -43,41 +59,41 @@ var MatchModel = function(data){
 
 	setInterval(self.updateNow, 1000);
 
-    self.pasduration = ko.computed(function(){
-        //return "10:01";
-        if(self.paslink() !== "http://pastats.com/chart?gameId="){
-            if(self.winner() !== undefined){
-                var time = (self.pa_stats_stop() - self.pa_stats_start()) / 1000;
-                var minutes = Math.floor(time / 60);
-                var seconds = time - minutes * 60;
-                seconds = seconds.toString().substring(0,2);
+  self.pasduration = ko.computed(function(){
+      //return "10:01";
+      if(self.paslink() !== "http://pastats.com/chart?gameId="){
+          if(self.haswinner() !== undefined){
+              var time = (self.pa_stats_stop() - self.pa_stats_start()) / 1000;
+              var minutes = Math.floor(time / 60);
+              var seconds = time - minutes * 60;
+              seconds = seconds.toString().substring(0,2);
 //console.log(seconds.substring(1,2));
-                if(seconds.substring(1,2) === '.'){
-                    seconds = '0' + seconds.substring(0,1);
-                }
-                return minutes + ":" + seconds;
-            }
-            else
-            {
-                if(self.winner() === undefined){
-                    var time = (parseInt(self.now()) - self.pa_stats_start()) / 1000;
-                    var minutes = Math.floor(time / 60);
-                    var seconds = time - minutes * 60;
-                    seconds = seconds.toString().substring(0,2);
+              if(seconds.substring(1,2) === '.'){
+                  seconds = '0' + seconds.substring(0,1);
+              }
+              return minutes + ":" + seconds;
+          }
+          else
+          {
+              if(self.haswinner() === undefined){
+                  var time = (parseInt(self.now()) - self.pa_stats_start()) / 1000;
+                  var minutes = Math.floor(time / 60);
+                  var seconds = time - minutes * 60;
+                  seconds = seconds.toString().substring(0,2);
 //console.log(seconds.substring(1,1));
-                    if(seconds.substring(1,2) === '.'){
-                        seconds = '0' + seconds.substring(0,1);
-                    }
-                    return "+" + minutes + ":" + seconds;
-                }
-            }
-        }
+                  if(seconds.substring(1,2) === '.'){
+                      seconds = '0' + seconds.substring(0,1);
+                  }
+                  return "+" + minutes + ":" + seconds;
+              }
+          }
+      }
 
-    });
+  });
 
 	self.showtwitch = ko.computed(function(){
 		if(self.twitch() !== "#"){
-			if(self.winner() === undefined){
+			if(self.haswinner() === undefined){
 				return true;
 			}
 			else
@@ -123,7 +139,7 @@ var MatchListing = function() {
 		//CORRECT URL !
 		$.getJSON(self.restendpoint(),function(data){
 			//ko.mapping.fromJS(data.data,mapping,self.matches);
-    		
+
     		if(data !== undefined){
 //    			console.log(data.data);
 				for(var i = 0; i < data.length; i++){
@@ -131,7 +147,7 @@ var MatchListing = function() {
 					self.SortMatches();
 				}
 			}
-			
+
 		});
 	};
 
@@ -143,15 +159,15 @@ var MatchListing = function() {
 				var updatedmatch = new MatchModel(data[0]);
 				var oldMatch = ko.utils.arrayFirst(self.matches(), function(item) {
 				    return item.challonge_match_id() == updatedmatch.challonge_match_id();
-				});				
+				});
 				if(oldMatch === null){
 					self.matches.push(updatedmatch);
 					self.SortMatches();
 				}
 				else{
-					self.matches.replace(oldMatch, updatedmatch);	
+					self.matches.replace(oldMatch, updatedmatch);
 				}
-				
+
 
 			}
 		});
@@ -159,17 +175,17 @@ var MatchListing = function() {
 
 	self.SortMatches = function(){
   		self.matches.sort(
-		function(left, right) { 
+		function(left, right) {
 			//return right.title() < left.title() ? 1 : -1
-			return left.match_round() === right.match_round() 
+			return left.match_round() === right.match_round()
 			? right.title().toLowerCase() > left.title().toLowerCase() ? -1 : 1
-			: right.match_round() < left.match_round() ? 1 : -1		
+			: right.match_round() < left.match_round() ? 1 : -1
 		});
 	};
 
-	/*		
+	/*
 	var socket = io.connect(':5000');
-    
+
     socket.on('updatedMatch', function (data) {
       self.UpdateMatch(data);
 	  //socket.emit('my other event', { my: 'data' });
@@ -181,7 +197,7 @@ var MatchListing = function() {
 		});
 	});
 	*/
-	
+
 	self.AutoReload = function(){
 		setInterval(self.Start,60000);
 	};
@@ -191,4 +207,3 @@ var MatchListing = function() {
 
 var eematchlisting = new MatchListing();
 ko.applyBindings(eematchlisting);
-

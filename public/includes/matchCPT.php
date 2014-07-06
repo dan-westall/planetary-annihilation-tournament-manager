@@ -90,8 +90,8 @@ class matchCPT {
             'rewrite'           => array( 'slug' => 'match-status' ),
         );
 
-        register_taxonomy( 'match_status', self::$post_type, $args );        
-        
+        register_taxonomy( 'match_status', self::$post_type, $args );
+
         $labels = array(
             'name'              => _x( 'Match Format', 'taxonomy general name' ),
             'singular_name'     => _x( 'Match Format', 'taxonomy singular name' ),
@@ -298,6 +298,7 @@ class matchCPT {
     public static function match_listing_js_deps() {
         //wp_register_script('knockout',plugins_url('/public/js/ko.min.js',__FILE__) );
         wp_enqueue_script('custom.knockout');
+        wp_enqueue_script('custom.lodash');
         //wp_register_script('socketio',":5000/socket.io/socket.io.js");
         //wp_enqueue_script('socketio');
         wp_register_script('match_listing', PLTM_PLUGIN_URI . 'public/assets/js/matchlisting.js' );

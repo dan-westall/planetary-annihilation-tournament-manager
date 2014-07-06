@@ -85,7 +85,11 @@ function get_match_commentators($match_id){
 
     foreach($commentators as $commentator){
 
-        $commentators_str[] = $commentator->display_name;
+        if($player_id = get_user_meta($commentator->ID, 'player_id', true)){
+            $commentators_str[] = sprintf('<a href="%s">%s</a>', get_permalink($player_id), $commentator->display_name);
+        } else {
+            $commentators_str[] = $commentator->display_name;
+        }
 
     }
 
