@@ -22,7 +22,7 @@ class tournament_info extends WP_Widget {
         <div class="tournament-widget-info">
 
             <section class="format tournament-meta-block text">
-                <h3>Tournament Date</h3>
+                <h3>Date</h3>
                 <div class="row">
                     <center>
                     <?php
@@ -81,7 +81,7 @@ class tournament_info extends WP_Widget {
             </section>                
 
             <section class="format tournament-meta-block text">    
-                <h3>Tournament Format</h3>
+                <h3>Format</h3>
 
                 <div class="row">
 
@@ -109,7 +109,7 @@ class tournament_info extends WP_Widget {
 
             <section class="prize-tiers tournament-meta-block text">
 
-                <h3>Tournament Prizes</h3>
+                <h3>Prizes</h3>
 
                     <?php if( have_rows('prize_tiers') ):
 

@@ -109,7 +109,7 @@ class statistic {
 
     }
 
-    public function finished_under($time = 720, $template = '<div><div></div><a href="%2$s"><span>%3$s</span></a></div>'){
+    public function finished_under($time = 720, $template = '<div><div></div><a href="%2$s"><span>%3$s</span></a></div>', $title = '%% of Matches finished within %s minutes'){
 
         global $wpdb;
 
@@ -132,7 +132,7 @@ class statistic {
 
         return sprintf(
             $template,
-            sprintf(__('%% of Matches finished within %s minutes'), ( $time / 60) ),
+            sprintf($title, ( $time / 60) ),
             '',
             $percentage
         );
