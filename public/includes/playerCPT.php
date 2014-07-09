@@ -402,24 +402,24 @@ class playerCPT {
         }
     }
 
-    public static function get_player_avatar($player_id, $size = 100){
+    public static function get_player_avatar($player_id, $size = 200){
 
         $player_user_id = get_post_meta($player_id, 'user_id', true);
         $user           = get_userdata($player_user_id);
 
-        //delete_transient( 'player_' .$user->ID. '_avatar' );
+        delete_transient( 'player_' .$user->ID. '_avatar_' .$size );
 
         if ( false === ( $user_avatar_img = get_transient( 'player_' .$user->ID. '_avatar_' .$size ) ) ) {
 
-            if (function_exists(get_wp_user_avatar())) {
+            if (function_exists('get_wp_user_avatar')) {
+//
+//                $image = get_wp_user_avatar_src($user->ID, $size);
+//
+//                if ($image[1] < 200 || $image[2] < 200) {
+//                    $user_avatar_img = get_avatar($user->ID, $size);
+//                }
 
-                $image = get_wp_user_avatar_src($user->ID, $size);
-
-                if ($image[1] < 200 || $image[2] < 200) {
-                    $user_avatar_img = get_avatar($user->ID, $size);
-                }
-
-                $user_avatar_img = get_wp_user_avatar($user->ID, $size);
+                $user_avatar_img = get_wp_user_avatar($user->ID, 'player-profile-thumbnail');
             } else {
                 $user_avatar_img = get_avatar($user->ID, $size);
             }
