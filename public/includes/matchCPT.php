@@ -126,7 +126,8 @@ class matchCPT {
             'to' => playerCPT::$post_type,
             'admin_box' => array(
                 'show' => 'any',
-                'context' => 'side'
+                'context' => 'advanced',
+                'priority' => 'high'
             ),
             'fields' => array(
                 'winner' => array(
@@ -138,7 +139,8 @@ class matchCPT {
                     'type' => 'select',
                     'values' => range(0, 10)
                 )
-            )
+            ),
+            'sortable' => 'any'
         ) );
 
         p2p_register_connection_type( array(
@@ -152,7 +154,8 @@ class matchCPT {
             'admin_box' => array(
                 'show' => 'from',
                 'context' => 'side'
-            )
+            ),
+            'sortable' => 'any'
         ) );
 
     }
