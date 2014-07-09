@@ -207,7 +207,7 @@ class matchCPT {
             $args['nopaging']        = true;
 
             //check that we can show the match
-            if(!in_array(get_post_meta($tournament_id, 'tournament_status', true), array(1,2,3))){
+            if(!in_array(get_post_meta($tournament_id, 'tournament_status', true), array(1,2,3,4))){
 
                if($output == 'json'){
                    wp_send_json(array('message' => 'Tournament not at correct status'));

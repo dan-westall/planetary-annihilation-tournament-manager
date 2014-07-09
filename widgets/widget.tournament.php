@@ -26,8 +26,8 @@ class tournament_info extends WP_Widget {
                 <div class="row">
                     <center>
                     <?php
-                        
-                        if(get_field('tournament_status') === '0'){
+
+                        if(get_field('tournament_status') === '0' || get_field('tournament_status') === '4'){
                             if(get_field('run_date') && get_field('run_time')){
                                 $format_in = 'Ymd'; // the format your value is saved in (set in the field options)
                                 $rundate = DateTime::createFromFormat($format_in, get_field('run_date'));
@@ -48,7 +48,7 @@ class tournament_info extends WP_Widget {
                                         $rundate = DateTime::createFromFormat($format_in, get_field('run_date'));
                                         echo $rundate->format('l jS F Y') . ' @ <a href="http://www.timeanddate.com/worldclock/fixedtime.html?msg=Tournament&iso=' . get_field('run_date') . 'T' . str_replace(':','',get_field('run_time')) . '" target="_blank">' . get_field('run_time') . ' UTC</a><br/>';
 
-                                    }                                  
+                                    }
                                 echo "<br/>LIVE NOW";
                             }
                             else{
@@ -58,29 +58,29 @@ class tournament_info extends WP_Widget {
                                         $rundate = DateTime::createFromFormat($format_in, get_field('run_date'));
                                         echo $rundate->format('l jS F Y') . ' @ <a href="http://www.timeanddate.com/worldclock/fixedtime.html?msg=Tournament&iso=' . get_field('run_date') . 'T' . str_replace(':','',get_field('run_time')) . '" target="_blank">' . get_field('run_time') . ' UTC</a><br/>';
 
-                                    }                                      
+                                    }
                                     echo "<br/>CANCELLED";
                                 }
                                 else{
-                                    
+
                                     if(get_field('run_date') && get_field('run_time')){
                                         $format_in = 'Ymd'; // the format your value is saved in (set in the field options)
                                         $rundate = DateTime::createFromFormat($format_in, get_field('run_date'));
                                         echo $rundate->format('l jS F Y') . ' @ <a href="http://www.timeanddate.com/worldclock/fixedtime.html?msg=Tournament&iso=' . get_field('run_date') . 'T' . str_replace(':','',get_field('run_time')) . '" target="_blank">' . get_field('run_time') . ' UTC</a><br/>';
 
-                                    }   
-                                    echo "<br/>Finished";                                 
-                                }                                
+                                    }
+                                    echo "<br/>Finished";
+                                }
                             }
                         }
                     ?>
-                    
+
                     </center>
                     <br/>
                 </div>
-            </section>                
+            </section>
 
-            <section class="format tournament-meta-block text">    
+            <section class="format tournament-meta-block text">
                 <h3>Format</h3>
 
                 <div class="row">
