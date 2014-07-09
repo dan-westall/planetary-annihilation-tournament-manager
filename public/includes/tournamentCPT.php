@@ -939,7 +939,7 @@ class tournamentCPT {
 
         foreach (Planetary_Annihilation_Tournament_Manager::$endpoints as $tournament_endpoint):
 
-            if($tournament_endpoint == 'countdown')
+            if($tournament_endpoint == 'countdown' || ($tournament->ID != 2564 && $tournament_endpoint == 'brackets'))
                 continue 1;
 
             switch($tournament_endpoint){

@@ -47,7 +47,7 @@ class Planetary_Annihilation_Tournament_Manager {
 
     //todo move tournament endpoint functionality down into the tournament cpt class
     //public static $endpoints = array('signup', 'matches', 'players', 'results', 'schedule', 'rules', 'planets');
-    public static $endpoints = array('signup', 'rules', 'matches', 'players', 'countdown');
+    public static $endpoints = array('signup', 'rules', 'matches', 'players', 'countdown', 'brackets');
 
 	/**
 	 * Instance of this class.
