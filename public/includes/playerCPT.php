@@ -28,8 +28,6 @@ class playerCPT {
 
         add_action( 'profile_update', array( $this, 'delete_user_caches'), 10, 2 );
 
-
-
     }
 
 
@@ -402,7 +400,7 @@ class playerCPT {
         }
     }
 
-    public static function get_player_avatar($player_id, $size = 200){
+    public static function get_player_avatar($player_id, $size = 'player-profile-thumbnail'){
 
         $player_user_id = get_post_meta($player_id, 'user_id', true);
         $user           = get_userdata($player_user_id);
@@ -452,6 +450,8 @@ class playerCPT {
     function delete_user_caches( $user_id, $old_user_data ) {
 
         delete_transient( 'player_' .$user_id. '_avatar' );
+        delete_transient( 'player_' .$user_id. '_avatar_player-profile-thumbnail' );
+        delete_transient( 'player_' .$user_id. '_avatar_small-player-profile-thumbnail' );
 
     }
 }
