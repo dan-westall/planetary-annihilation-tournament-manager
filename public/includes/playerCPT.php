@@ -402,30 +402,36 @@ class playerCPT {
         }
     }
 
-    public static function get_player_avatar($player_id, $size = 100){
+    public static function get_player_avatar($player_id, $size = 200){
 
         $player_user_id = get_post_meta($player_id, 'user_id', true);
         $user           = get_userdata($player_user_id);
 
-        //delete_transient( 'player_' .$user->ID. '_avatar' );
-
         if ( false === ( $user_avatar_img = get_transient( 'player_' .$user->ID. '_avatar_' .$size ) ) ) {
 
-            if (function_exists(get_wp_user_avatar())) {
+            if($player_user_id == 'null') {
+                $user_avatar_img = get_avatar($user->ID, $size);
+            } else {
 
-                $image = get_wp_user_avatar_src($user->ID, $size);
+                if (function_exists('get_wp_user_avatar')) {
+    //
+    //                $image = get_wp_user_avatar_src($user->ID, $size);
+    //
+    //                if ($image[1] < 200 || $image[2] < 200) {
+    //                    $user_avatar_img = get_avatar($user->ID, $size);
+    //                }
 
-                if ($image[1] < 200 || $image[2] < 200) {
+                    $user_avatar_img = get_wp_user_avatar($user->ID, 'player-profile-thumbnail');
+                } else {
                     $user_avatar_img = get_avatar($user->ID, $size);
                 }
 
-                $user_avatar_img = get_wp_user_avatar($user->ID, $size);
-            } else {
-                $user_avatar_img = get_avatar($user->ID, $size);
             }
 
             set_transient( 'player_' .$user->ID. '_avatar_' .$size, $user_avatar_img, 12 * HOUR_IN_SECONDS );
         }
+
+
 
         return $user_avatar_img;
 

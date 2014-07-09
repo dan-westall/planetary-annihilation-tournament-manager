@@ -58,7 +58,7 @@ class tournament_staff extends WP_Widget {
 
                         if(get_user_meta($staff_member->ID, 'twitch_url', true)) : ?>
 
-                            <td class="has-twitch staff-member"><?php echo $staff_member->display_name; ?> <a class="twitch-link" href="<?php echo get_user_meta($staff_member->ID, 'twitch_url', true); ?>"></a><br />
+                            <td class="has-twitch staff-member"><a href=""><?php echo $staff_member->display_name; ?></a> <a class="twitch-link" href="<?php echo get_user_meta($staff_member->ID, 'twitch_url', true); ?>"></a><br />
 
 
 
