@@ -405,11 +405,11 @@ class playerCPT {
         $player_user_id = get_post_meta($player_id, 'user_id', true);
         $user           = get_userdata($player_user_id);
 
-        //delete_transient( 'player_' .$user->ID. '_avatar_' .$size );
+        delete_transient( 'player_' .$user->ID. '_avatar_' .$size );
 
         if ( false === ( $user_avatar_img = get_transient( 'player_' .$user->ID. '_avatar_' .$size ) ) ) {
 
-            if($player_user_id == 'null') {
+            if($player_user_id == 'null' || $player_user_id ==  false) {
                 $user_avatar_img = get_avatar($user->ID, $size);
             } else {
 

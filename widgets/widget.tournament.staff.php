@@ -54,7 +54,13 @@ class tournament_staff extends WP_Widget {
 
                     foreach($staff as $staff_member):
 
-                        $player_id = get_user_meta($staff_member->ID, 'player_id', true);
+                        $player_id = '';
+
+                        if($player_id = get_user_meta($staff_member->ID, 'player_id', true)){
+                            $img = get_player_avatar($player_id, 'small');
+                        } else {
+                            $img = get_player_avatar($player_id, 'small');
+                        }
                         
                         //No twitch links here link to player pages twitch is from user and ain't correct
                         echo '<tr>';
@@ -63,7 +69,7 @@ class tournament_staff extends WP_Widget {
 
                             <td class=" staff-member  small player-profile">
                                 <a href="<?php echo get_permalink($player_id); ?>">
-                                <?php echo get_player_avatar($player_id, 'small'); ?>
+                                <?php echo $img; ?>
                                </a>
                             </td>
 
