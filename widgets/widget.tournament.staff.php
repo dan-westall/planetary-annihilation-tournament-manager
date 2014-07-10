@@ -44,7 +44,7 @@ class tournament_staff extends WP_Widget {
         <div class="tournament-widget-info">
 
             <section class="staff tournament-meta-block">
-                <h3>Staff Members</h3>
+                <h3>Event Staff</h3>
 
 
 
@@ -54,18 +54,22 @@ class tournament_staff extends WP_Widget {
 
                     foreach($staff as $staff_member):
 
+                        $player_id = get_user_meta($staff_member->ID, 'player_id', true);
+                        
+                        //No twitch links here link to player pages twitch is from user and ain't correct
                         echo '<tr>';
 
-                        if(get_user_meta($staff_member->ID, 'twitch_url', true)) : ?>
+                        if(get_permalink($player_id)) : ?>
 
-                            <td class="has-twitch staff-member"><a href=""><?php echo $staff_member->display_name; ?></a> <a class="twitch-link" href="<?php echo get_user_meta($staff_member->ID, 'twitch_url', true); ?>"></a><br />
-
-
-
+                            <td class=" staff-member  small player-profile">
+                                <a href="<?php echo get_permalink($player_id); ?>">
+                                <?php echo get_player_avatar($player_id, 'small'); ?>
+                               </a>
                             </td>
 
                             <td>
-                                <strong>(<?php echo p2p_get_meta( $staff_member->data->p2p_id, 'role', true ); ?>)</strong>
+                                <a href="<?php echo get_permalink($player_id); ?>"><?php echo $staff_member->display_name; ?></a> <strong>(<?php echo p2p_get_meta( $staff_member->data->p2p_id, 'role', true ); ?>)</strong>
+                                <div class="job"><?php echo p2p_get_meta( $staff_member->data->p2p_id, 'job', true ); ?></div>
                             </td>
 
                         <?php else : ?>

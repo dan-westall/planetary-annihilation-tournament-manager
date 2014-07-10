@@ -405,6 +405,8 @@ class playerCPT {
         $player_user_id = get_post_meta($player_id, 'user_id', true);
         $user           = get_userdata($player_user_id);
 
+        //delete_transient( 'player_' .$user->ID. '_avatar_' .$size );
+
         if ( false === ( $user_avatar_img = get_transient( 'player_' .$user->ID. '_avatar_' .$size ) ) ) {
 
             if($player_user_id == 'null') {
@@ -419,7 +421,7 @@ class playerCPT {
     //                    $user_avatar_img = get_avatar($user->ID, $size);
     //                }
 
-                    $user_avatar_img = get_wp_user_avatar($user->ID, 'player-profile-thumbnail');
+                    $user_avatar_img = get_wp_user_avatar($user->ID, $size);
                 } else {
                     $user_avatar_img = get_avatar($user->ID, $size);
                 }
