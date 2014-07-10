@@ -61,15 +61,15 @@ class tournament_staff extends WP_Widget {
 
                         if(get_permalink($player_id)) : ?>
 
-                            <td class=" staff-member  small player-profile"><a href="<?php echo get_permalink($player_id); ?>">
-                                <?php echo get_player_avatar($player_id, 'small-player-profile-thumbnail'); ?>
-                                <?php echo $staff_member->display_name; ?></a> 
-                                <br />
+                            <td class=" staff-member  small player-profile">
+                                <a href="<?php echo get_permalink($player_id); ?>">
+                                <?php echo get_player_avatar($player_id, 'small'); ?>
+                               </a>
                             </td>
 
                             <td>
-                                <strong>(<?php echo p2p_get_meta( $staff_member->data->p2p_id, 'role', true ); ?>)</strong>
-                                <?php echo p2p_get_meta( $staff_member->data->p2p_id, 'job', true ); ?>
+                                <a href="<?php echo get_permalink($player_id); ?>"><?php echo $staff_member->display_name; ?></a> <strong>(<?php echo p2p_get_meta( $staff_member->data->p2p_id, 'role', true ); ?>)</strong>
+                                <div class="job"><?php echo p2p_get_meta( $staff_member->data->p2p_id, 'job', true ); ?></div>
                             </td>
 
                         <?php else : ?>
