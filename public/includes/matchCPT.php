@@ -23,7 +23,8 @@ class matchCPT {
 
         add_filter( 'json_prepare_post',  array( $this, 'extend_json_api' ), 100, 3 );
 
-
+        add_filter('posts_orderby', array( $this, 'edit_posts_orderby'), 10, 2);
+        add_filter('posts_join_paged', array( $this, 'edit_posts_join_paged'), 10, 2);
 
         //moved outside to our own api endpoint
 //        add_action('wp_ajax_pltm_get_match_results',  array( $this, 'get_match_json') );
@@ -457,5 +458,31 @@ class matchCPT {
         return $_post;
 
     }
+
+    public  function edit_posts_join_paged($join_paged_statement, $query) {
+
+        global $wpdb;
+
+        if($query->query_vars['orderby'] == 'tournament_date'){
+
+            //  $join_paged_statement = $wpdb->prepare("LEFT JOIN wp_gdsr_data_article gdsra ON gdsra.post_id = wp_posts.ID");
+
+        }
+
+        return $join_paged_statement;
+    }
+
+    public  function edit_posts_orderby($orderby_statement, $query) {
+
+        if($query->query_vars['orderby'] == 'tournament_date'){
+
+            //$orderby_statement = "(gdsra.user_votes_total_sum/gdsra.user_votes_count) DESC";
+
+        }
+
+
+        return $orderby_statement;
+    }
+
 
 }
