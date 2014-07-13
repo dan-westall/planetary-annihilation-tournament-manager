@@ -80,7 +80,7 @@ class Planetary_Annihilation_Tournament_Manager {
 
 
         new planetCPT();
-        new sponsorCPT();
+        //new sponsorCPT();
         new playerCPT();
         new tournamentCPT();
         new matchCPT();

@@ -26,6 +26,8 @@ class matchCPT {
         add_filter('posts_orderby', array( $this, 'edit_posts_orderby'), 10, 2);
         add_filter('posts_join_paged', array( $this, 'edit_posts_join_paged'), 10, 2);
 
+        add_filter( 'the_title', array( $this, 'pre_title_tournament_name'), 10, 2);
+
         //moved outside to our own api endpoint
 //        add_action('wp_ajax_pltm_get_match_results',  array( $this, 'get_match_json') );
 //        add_action('wp_ajax_nopriv_pltm_get_match_results',  array( $this, 'get_match_json') );
@@ -457,6 +459,24 @@ class matchCPT {
 
         return $_post;
 
+    }
+
+    public function pre_title_tournament_name($title, $id){
+
+        if(is_admin() && get_post_type($id) == matchCPT::$post_type){
+
+            $tournament = p2p_type('tournament_matches')->set_direction('to')->get_connected($id);
+
+            if(isset($tournament->posts[0]->ID)){
+
+                $title = $title .' - ' . $tournament->posts[0]->post_title;
+
+            }
+
+
+        }
+
+        return $title;
     }
 
     public  function edit_posts_join_paged($join_paged_statement, $query) {
