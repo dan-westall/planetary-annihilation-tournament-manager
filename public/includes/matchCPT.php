@@ -463,7 +463,7 @@ class matchCPT {
 
     public function pre_title_tournament_name($title, $id){
 
-        if(is_admin() && get_post_type($id) == matchCPT::$post_type){
+        if(is_admin() && get_post_type($id) == matchCPT::$post_type && in_the_loop() == false){
 
             $tournament = p2p_type('tournament_matches')->set_direction('to')->get_connected($id);
 
