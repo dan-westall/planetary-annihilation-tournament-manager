@@ -114,6 +114,7 @@ class statistic {
         global $wpdb;
 
         $matches_under = array();
+        $classes = '';
         $matches       = $this->matches;
         $total_matches = count($matches);
 
@@ -130,11 +131,16 @@ class statistic {
 
         $percentage = round( ( count( $matches_under ) / $total_matches ) * 100 );
 
+        if(strlen($percentage) > 2){
+            $classes = 'small-numbers';
+        }
+
         return sprintf(
             $template,
             sprintf($title, ( $time / 60) ),
             '',
-            $percentage
+            $percentage,
+            $classes
         );
 
     }
