@@ -421,8 +421,31 @@ class matchCPT {
 
         if($post['post_type'] == 'match'){
 
+            /*
+             *         "content": "",
+        "parent": 0,
+        "link": "http:\/\/exodus-esports.dev\/match\/2573\/",
+        "date": "2014-07-13T07:00:49+00:00",
+        "modified": "2014-07-13T08:22:03+00:00",
+        "format": "standard",
+        "slug": "2573",
+        "guid": "http:\/\/exodus-esports.dev\/?post_type=match&#038;p=2573",
+        "excerpt": null,
+        "menu_order": 0,
+        "comment_status": "open",
+        "ping_status": "closed",
+        "sticky": false,
+        "date_tz": "UTC",
+        "date_gmt": "2014-07-13T07:00:49+00:00",
+        "modified_tz": "UTC",
+        "modified_gmt": "2014-07-13T08:22:03+00:00",*/
+
+            $remove_fields = array('author', 'parent', 'format', 'slug', 'guid', 'excerpt', 'menu_order', 'ping_status', 'sticky');
+
             //dont need author
-            unset($_post['author']);
+            foreach($remove_fields as $field){
+                unset($_post[$field]);
+            }
 
             $comments   = wp_count_comments( $post['ID']);
             $tournament = p2p_type('tournament_matches')->set_direction('to')->get_connected($post['ID']);
