@@ -448,10 +448,14 @@ class matchCPT {
 
             }
 
-            $_post['meta']['players'] = $match_players;
-            $_post['meta']['comment_count'] = $comments->approved;
-            $_post['meta']['video'] =  get_match_videos($post['ID']);
-            $_post['meta']['pa_stats_id'] = get_post_meta($post['ID'], 'pa_stats_match_id', true);
+            $_post['meta']['players']        = $match_players;
+            $_post['meta']['comment_count']  = $comments->approved;
+            $_post['meta']['video']          = get_match_videos($post['ID']);
+            $_post['meta']['pa_stats_id']    = get_post_meta($post['ID'], 'pa_stats_match_id', true);
+            $_post['meta']['pa_stats_start'] = get_post_meta($post['ID'], 'pa_stats_start', true);
+            $_post['meta']['pa_stats_stop']  = get_post_meta($post['ID'], 'pa_stats_stop', true);
+            $_post['meta']['twitch']         = get_post_meta($post['ID'], 'twitch', true);
+            $_post['meta']['match_round']    = get_post_meta($post['ID'], 'match_round', true);
 
         }
 
