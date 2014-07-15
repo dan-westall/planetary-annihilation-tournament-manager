@@ -23,8 +23,9 @@ class matchCPT {
 
         add_filter( 'json_prepare_post',  array( $this, 'extend_json_api' ), 100, 3 );
 
-        add_filter('posts_orderby', array( $this, 'edit_posts_orderby'), 10, 2);
-        add_filter('posts_join_paged', array( $this, 'edit_posts_join_paged'), 10, 2);
+
+        add_filter('posts_fields', array( $this, 'edit_posts_fields'), 10, 100);
+        add_filter('posts_orderby_request', array( $this, 'order_matches_by_tournament_date'), 10, 100);
 
         add_filter( 'the_title', array( $this, 'pre_title_tournament_name'), 10, 2);
 
@@ -506,24 +507,24 @@ class matchCPT {
         return $title;
     }
 
-    public  function edit_posts_join_paged($join_paged_statement, $query) {
-
+    public function edit_posts_fields($statment_fields, $query){
         global $wpdb;
 
         if($query->query_vars['orderby'] == 'tournament_date'){
 
-            //  $join_paged_statement = $wpdb->prepare("LEFT JOIN wp_gdsr_data_article gdsra ON gdsra.post_id = wp_posts.ID");
+            $statment_query  = $wpdb->prepare("(SELECT meta_value FROM $wpdb->p2p LEFT JOIN wp_postmeta ON post_id = p2p_from WHERE p2p_to = wp_posts.ID AND meta_key = 'run_date') AS tournament_date");
 
+            $statment_fields .= ', '.$statment_query;
         }
 
-        return $join_paged_statement;
+        return $statment_fields;
     }
 
-    public  function edit_posts_orderby($orderby_statement, $query) {
+    public function order_matches_by_tournament_date($orderby_statement, $query) {
 
         if($query->query_vars['orderby'] == 'tournament_date'){
 
-            //$orderby_statement = "(gdsra.user_votes_total_sum/gdsra.user_votes_count) DESC";
+            $orderby_statement = "tournament_date DESC";
 
         }
 
