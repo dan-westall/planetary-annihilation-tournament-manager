@@ -524,7 +524,7 @@ class matchCPT {
 
         if($query->query_vars['orderby'] == 'tournament_date'){
 
-            $orderby_statement = "tournament_date DESC";
+            $orderby_statement = "tournament_date DESC, ".$orderby_statement;
 
         }
 
