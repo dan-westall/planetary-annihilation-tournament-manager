@@ -28,6 +28,12 @@ class playerCPT {
 
         add_action( 'profile_update', array( $this, 'delete_user_caches'), 10, 2 );
 
+        //shortcut for pastats_id to player id
+        add_action( 'pre_get_posts', array( $this, 'pastats_converstion'), 10, 2 );
+        add_filter('query_vars', array( $this, 'pastats_queryvars'), 10, 1 );
+
+
+
     }
 
 
@@ -51,7 +57,7 @@ class playerCPT {
             'labels'              => $playerLabel,
             'description'         => 'Tournament Players',
             'public'              => true,
-            'has_archive'         => true,
+            'has_archive'         => false,
             'show_ui'             => true,
             'menu_position'       => 10,
             'menu_icon'           => 'dashicons-id',
@@ -449,5 +455,28 @@ class playerCPT {
         delete_transient( 'player_' .$user_id. '_avatar_player-profile-thumbnail' );
         delete_transient( 'player_' .$user_id. '_avatar_small-player-profile-thumbnail' );
 
+    }
+
+    public function pastats_converstion($query){
+
+        if($query->get('pastats_player_id')){
+            $meta_query = array(
+                array(
+                    'key'   => 'pastats_player_id',
+                    'value' => $query->get('pastats_player_id')
+                )
+            );
+
+            $query->set( 'meta_query', $meta_query);
+            $query->set( 'posts_per_page', 1 );
+            echo '';
+
+        }
+
+    }
+
+    public function pastats_queryvars($qvars){
+        $qvars[] = 'pastats_player_id';
+        return $qvars;
     }
 }
