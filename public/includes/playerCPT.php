@@ -469,7 +469,6 @@ class playerCPT {
 
             $query->set( 'meta_query', $meta_query);
             $query->set( 'posts_per_page', 1 );
-            echo '';
 
         }
 
