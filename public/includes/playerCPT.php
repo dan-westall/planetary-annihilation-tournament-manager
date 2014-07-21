@@ -28,9 +28,10 @@ class playerCPT {
 
         add_action( 'profile_update', array( $this, 'delete_user_caches'), 10, 2 );
 
+
         //shortcut for pastats_id to player id
         add_action( 'pre_get_posts', array( $this, 'pastats_converstion'), 10, 2 );
-
+        add_filter( 'query_vars', array( $this, 'pastats_queryvars'), 10, 1 );
 
         add_filter( 'json_prepare_post',  array( $this, 'extend_json_api' ), 100, 3 );
 
@@ -476,9 +477,14 @@ class playerCPT {
 
     }
 
+    public function pastats_queryvars($qvars){
+        $qvars[] = 'pastats_player_id';
+        return $qvars;
+    }
+
     public function extend_json_api($_post, $post, $context){
 
-        if($post['post_type'] == 'tournament'){
+        if($post['post_type'] == self::$post_type){
 
             $remove_fields = array('author', 'parent', 'format', 'slug', 'guid', 'excerpt', 'menu_order', 'ping_status', 'sticky');
 
