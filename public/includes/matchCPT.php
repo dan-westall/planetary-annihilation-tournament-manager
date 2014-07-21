@@ -23,8 +23,9 @@ class matchCPT {
 
         add_filter( 'json_prepare_post',  array( $this, 'extend_json_api' ), 100, 3 );
 
-        add_filter('posts_orderby', array( $this, 'edit_posts_orderby'), 10, 2);
-        add_filter('posts_join_paged', array( $this, 'edit_posts_join_paged'), 10, 2);
+
+        add_filter('posts_fields', array( $this, 'edit_posts_fields'), 10, 100);
+        add_filter('posts_orderby_request', array( $this, 'order_matches_by_tournament_date'), 10, 100);
 
         add_filter( 'the_title', array( $this, 'pre_title_tournament_name'), 10, 2);
 
@@ -421,8 +422,31 @@ class matchCPT {
 
         if($post['post_type'] == 'match'){
 
+            /*
+             *         "content": "",
+        "parent": 0,
+        "link": "http:\/\/exodus-esports.dev\/match\/2573\/",
+        "date": "2014-07-13T07:00:49+00:00",
+        "modified": "2014-07-13T08:22:03+00:00",
+        "format": "standard",
+        "slug": "2573",
+        "guid": "http:\/\/exodus-esports.dev\/?post_type=match&#038;p=2573",
+        "excerpt": null,
+        "menu_order": 0,
+        "comment_status": "open",
+        "ping_status": "closed",
+        "sticky": false,
+        "date_tz": "UTC",
+        "date_gmt": "2014-07-13T07:00:49+00:00",
+        "modified_tz": "UTC",
+        "modified_gmt": "2014-07-13T08:22:03+00:00",*/
+
+            $remove_fields = array('author', 'parent', 'format', 'slug', 'guid', 'excerpt', 'menu_order', 'ping_status', 'sticky');
+
             //dont need author
-            unset($_post['author']);
+            foreach($remove_fields as $field){
+                unset($_post[$field]);
+            }
 
             $comments   = wp_count_comments( $post['ID']);
             $tournament = p2p_type('tournament_matches')->set_direction('to')->get_connected($post['ID']);
@@ -448,10 +472,14 @@ class matchCPT {
 
             }
 
-            $_post['meta']['players'] = $match_players;
-            $_post['meta']['comment_count'] = $comments->approved;
-            $_post['meta']['video'] =  get_match_videos($post['ID']);
-            $_post['meta']['pa_stats_id'] = get_post_meta($post['ID'], 'pa_stats_match_id', true);
+            $_post['meta']['players']        = $match_players;
+            $_post['meta']['comment_count']  = $comments->approved;
+            $_post['meta']['video']          = get_match_videos($post['ID']);
+            $_post['meta']['pa_stats_id']    = get_post_meta($post['ID'], 'pa_stats_match_id', true);
+            $_post['meta']['pa_stats_start'] = get_post_meta($post['ID'], 'pa_stats_start', true);
+            $_post['meta']['pa_stats_stop']  = get_post_meta($post['ID'], 'pa_stats_stop', true);
+            $_post['meta']['twitch']         = get_post_meta($post['ID'], 'twitch', true);
+            $_post['meta']['match_round']    = get_post_meta($post['ID'], 'match_round', true);
 
         }
 
@@ -479,24 +507,24 @@ class matchCPT {
         return $title;
     }
 
-    public  function edit_posts_join_paged($join_paged_statement, $query) {
-
+    public function edit_posts_fields($statment_fields, $query){
         global $wpdb;
 
         if($query->query_vars['orderby'] == 'tournament_date'){
 
-            //  $join_paged_statement = $wpdb->prepare("LEFT JOIN wp_gdsr_data_article gdsra ON gdsra.post_id = wp_posts.ID");
+            $statment_query  = $wpdb->prepare("(SELECT meta_value FROM $wpdb->p2p LEFT JOIN wp_postmeta ON post_id = p2p_from WHERE p2p_to = wp_posts.ID AND meta_key = 'run_date') AS tournament_date");
 
+            $statment_fields .= ', '.$statment_query;
         }
 
-        return $join_paged_statement;
+        return $statment_fields;
     }
 
-    public  function edit_posts_orderby($orderby_statement, $query) {
+    public function order_matches_by_tournament_date($orderby_statement, $query) {
 
         if($query->query_vars['orderby'] == 'tournament_date'){
 
-            //$orderby_statement = "(gdsra.user_votes_total_sum/gdsra.user_votes_count) DESC";
+            $orderby_statement = "tournament_date DESC";
 
         }
 

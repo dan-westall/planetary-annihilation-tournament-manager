@@ -42,6 +42,8 @@ class tournamentCPT {
         add_filter( 'acf/load_field/name=challonge_tournament_link', array( $this, 'filter_challonge_tournament_listing') );
         add_filter( 'acf/load_field/name=tournament_status', array( $this, 'filter_tournament_status') );
 
+        add_filter( 'json_prepare_post',  array( $this, 'extend_json_api' ), 100, 3 );
+
     }
 
 
@@ -1305,6 +1307,44 @@ class tournamentCPT {
         }
 
         return $excluded_players_list;
+
+    }
+
+    public function extend_json_api($_post, $post, $context){
+
+        if($post['post_type'] == 'tournament'){
+
+            $remove_fields = array('author', 'parent', 'format', 'slug', 'guid', 'excerpt', 'menu_order', 'ping_status', 'sticky');
+
+            //dont need author
+            foreach($remove_fields as $field){
+                unset($_post[$field]);
+            }
+            /*
+            $matches = p2p_type('tournament_matches')->get_connected($post['ID']);
+            $players    = p2p_type('tournament_players')->get_connected($post['ID']);          
+
+            foreach ($players->posts as $player) {
+
+                $match_players[] = array(
+                    'wp_player_id'       => $player->ID,
+                    'player_name'        => $player->post_title,
+                    'pa_stats_player_id' => get_post_meta($player->ID, 'pastats_player_id', true),
+                    'winner'             => p2p_get_meta($player->p2p_id, 'winner', true),
+                    'team'               => p2p_get_meta($player->p2p_id, 'team', true),
+                    'url'                => get_permalink($player->ID)
+                );
+
+            }
+
+            $_post['meta']['players']        = $match_players;
+            $_post['tournament_date'] = get_post_meta($post['ID'], 'tournament_date', true);
+            */
+        }
+
+
+
+        return $_post;
 
     }
 
