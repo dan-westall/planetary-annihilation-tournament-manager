@@ -28,6 +28,17 @@ class playerCPT {
 
         add_action( 'profile_update', array( $this, 'delete_user_caches'), 10, 2 );
 
+
+        //shortcut for pastats_id to player id
+        add_action( 'pre_get_posts', array( $this, 'pastats_converstion'), 10, 2 );
+        add_filter( 'query_vars', array( $this, 'pastats_queryvars'), 10, 1 );
+
+        add_filter( 'json_prepare_post',  array( $this, 'extend_json_api' ), 100, 3 );
+
+        add_action( 'template_redirect',  array( $this, 'pastats_player_id_to_profile' ), 100, 3 );
+
+
+
     }
 
 
@@ -51,7 +62,7 @@ class playerCPT {
             'labels'              => $playerLabel,
             'description'         => 'Tournament Players',
             'public'              => true,
-            'has_archive'         => true,
+            'has_archive'         => false,
             'show_ui'             => true,
             'menu_position'       => 10,
             'menu_icon'           => 'dashicons-id',
@@ -404,23 +415,17 @@ class playerCPT {
 
         $player_user_id = get_post_meta($player_id, 'user_id', true);
         $user           = get_userdata($player_user_id);
+        $transient_key = sprintf('player_%s_avatar_%s', $user->ID, $size);
 
         //delete_transient( 'player_' .$user->ID. '_avatar_' .$size );
 
-        if ( false === ( $user_avatar_img = get_transient( 'player_' .$user->ID. '_avatar_' .$size ) ) ) {
+        if ( false === ( $user_avatar_img = get_transient( $transient_key ) ) ) {
 
             if($player_user_id == 'null' || $player_user_id ==  false) {
                 $user_avatar_img = get_avatar($user->ID, $size);
             } else {
 
                 if (function_exists('get_wp_user_avatar')) {
-    //
-    //                $image = get_wp_user_avatar_src($user->ID, $size);
-    //
-    //                if ($image[1] < 200 || $image[2] < 200) {
-    //                    $user_avatar_img = get_avatar($user->ID, $size);
-    //                }
-
                     $user_avatar_img = get_wp_user_avatar($user->ID, $size);
                 } else {
                     $user_avatar_img = get_avatar($user->ID, $size);
@@ -428,7 +433,7 @@ class playerCPT {
 
             }
 
-            set_transient( 'player_' .$user->ID. '_avatar_' .$size, $user_avatar_img, 12 * HOUR_IN_SECONDS );
+            set_transient( $transient_key, $user_avatar_img, 12 * HOUR_IN_SECONDS );
         }
 
 
@@ -454,6 +459,69 @@ class playerCPT {
         delete_transient( 'player_' .$user_id. '_avatar' );
         delete_transient( 'player_' .$user_id. '_avatar_player-profile-thumbnail' );
         delete_transient( 'player_' .$user_id. '_avatar_small-player-profile-thumbnail' );
+
+    }
+
+    public function pastats_converstion($query){
+
+        if($query->get('pastats_player_id')){
+            $meta_query = array(
+                array(
+                    'key'   => 'pastats_player_id',
+                    'value' => $query->get('pastats_player_id')
+                )
+            );
+
+            $query->set( 'meta_query', $meta_query);
+            $query->set( 'posts_per_page', 1 );
+
+        }
+
+    }
+
+    public function pastats_queryvars($qvars){
+        $qvars[] = 'pastats_player_id';
+        return $qvars;
+    }
+
+    public function extend_json_api($_post, $post, $context){
+
+        if($post['post_type'] == self::$post_type){
+
+            $remove_fields = array('author', 'parent', 'format', 'slug', 'guid', 'excerpt', 'menu_order', 'ping_status', 'sticky');
+
+            //dont need author
+            foreach($remove_fields as $field){
+                unset($_post[$field]);
+            }
+
+        }
+
+        return $_post;
+
+    }
+
+    public function pastats_player_id_to_profile(){
+
+        if(isset($_GET['pastats_player_id']) && !empty($_GET['pastats_player_id'])){
+
+            $player = DW_Helper::get_post_by_meta('pastats_player_id', $_GET['pastats_player_id']);
+
+            if($player){
+
+                wp_redirect(get_permalink($player->ID));
+
+                exit;
+
+            } else {
+
+                wp_redirect(home_url());
+
+                exit;
+
+            }
+
+        }
 
     }
 }

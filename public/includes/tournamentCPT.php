@@ -1320,9 +1320,9 @@ class tournamentCPT {
             foreach($remove_fields as $field){
                 unset($_post[$field]);
             }
-            /*
+
             $matches = p2p_type('tournament_matches')->get_connected($post['ID']);
-            $players    = p2p_type('tournament_players')->get_connected($post['ID']);          
+            $players    = p2p_type('tournament_players')->get_connected($post['ID']);
 
             foreach ($players->posts as $player) {
 
@@ -1330,19 +1330,19 @@ class tournamentCPT {
                     'wp_player_id'       => $player->ID,
                     'player_name'        => $player->post_title,
                     'pa_stats_player_id' => get_post_meta($player->ID, 'pastats_player_id', true),
-                    'winner'             => p2p_get_meta($player->p2p_id, 'winner', true),
-                    'team'               => p2p_get_meta($player->p2p_id, 'team', true),
                     'url'                => get_permalink($player->ID)
                 );
 
             }
 
+            $_post['status'] = self::$tournament_status[get_post_meta($post['ID'], 'tournament_status', true)];
+            $_post['meta']['total_players'] = count($match_players);
+            $_post['meta']['total_matches'] = count($matches->posts);
             $_post['meta']['players']        = $match_players;
-            $_post['tournament_date'] = get_post_meta($post['ID'], 'tournament_date', true);
-            */
+            $_post['meta']['tournament_date'] = get_post_meta($post['ID'], 'tournament_date', true);
+            $_post['meta']['signup_open'] = is_tournament_signup_open($post['ID']);
+
         }
-
-
 
         return $_post;
 
