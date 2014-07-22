@@ -493,7 +493,25 @@ class matchCPT {
 
         if($query->query_vars['orderby'] == 'tournament_date'){
 
-            $statment_query  = $wpdb->prepare("(SELECT meta_value FROM $wpdb->p2p LEFT JOIN wp_postmeta ON post_id = p2p_from WHERE p2p_to = wp_posts.ID AND meta_key = 'run_date') AS tournament_date");
+
+
+            switch($query->query_vars['post_type'][0]){
+
+                case "match" :
+
+                    $statment_query  = $wpdb->prepare("(SELECT meta_value FROM $wpdb->p2p LEFT JOIN wp_postmeta ON post_id = p2p_from WHERE p2p_to = wp_posts.ID AND meta_key = 'run_date') AS tournament_date");
+
+                    break;
+
+                //todo move this out
+                case "tournament" :
+
+                    $statment_query  = $wpdb->prepare("(SELECT meta_value FROM $wpdb->postmeta WHERE post_id = wp_posts.ID AND meta_key = 'run_date') AS tournament_date");
+
+                    break;
+
+            }
+
 
             $statment_fields .= ', '.$statment_query;
         }
