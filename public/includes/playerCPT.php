@@ -513,6 +513,12 @@ class playerCPT {
 
                 exit;
 
+            } else {
+
+                wp_redirect(home_url());
+
+                exit;
+
             }
 
         }
