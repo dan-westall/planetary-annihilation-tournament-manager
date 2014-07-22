@@ -35,6 +35,8 @@ class playerCPT {
 
         add_filter( 'json_prepare_post',  array( $this, 'extend_json_api' ), 100, 3 );
 
+        add_action( 'template_redirect',  array( $this, 'pastats_player_id_to_profile' ), 100, 3 );
+
 
 
     }
@@ -496,6 +498,24 @@ class playerCPT {
         }
 
         return $_post;
+
+    }
+
+    public function pastats_player_id_to_profile(){
+
+        if(isset($_GET['pastats_player_id']) && !empty($_GET['pastats_player_id'])){
+
+            $player = DW_Helper::get_post_by_meta('pastats_player_id', $_GET['pastats_player_id']);
+
+            if($player){
+
+                wp_redirect(get_permalink($player->ID));
+
+                exit;
+
+            }
+
+        }
 
     }
 }
