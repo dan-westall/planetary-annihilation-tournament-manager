@@ -13,7 +13,8 @@ class tournamentCPT {
     function __construct() {
 
         add_action( 'init', array( $this, 'register_cpt_tournament') );
-
+        add_action( 'init', array( $this, 'register_cpt_taxonomies') );
+        
         add_action( 'widgets_init', array( $this, 'register_tournament_sidebar') );
 
         add_action( 'p2p_init', array( $this, 'register_p2p_connections' ) );
@@ -76,6 +77,35 @@ class tournamentCPT {
             );
 
         register_post_type( self::$post_type, $tournamentArgs );
+
+    }
+
+    function register_cpt_taxonomies(){
+
+        $labels = array(
+            'name'              => _x( 'Tournament Affiliation', 'taxonomy general name' ),
+            'singular_name'     => _x( 'Tournament Affiliation', 'taxonomy singular name' ),
+            'search_items'      => __( 'Search Tournament Affiliation' ),
+            'all_items'         => __( 'All Tournament Affiliation' ),
+            'parent_item'       => __( 'Parent Tournament Affiliation' ),
+            'parent_item_colon' => __( 'Parent Tournament Affiliation:' ),
+            'edit_item'         => __( 'Edit Tournament Affiliation' ),
+            'update_item'       => __( 'Update Tournament Affiliation' ),
+            'add_new_item'      => __( 'Add New Tournament Affiliation' ),
+            'new_item_name'     => __( 'New Tournament Affiliation' ),
+            'menu_name'         => __( 'Tournament Affiliation' ),
+        );
+
+        $args = array(
+            'labels'            => $labels,
+            'show_ui'           => true,
+            'show_admin_column' => true,
+            'query_var'         => true,
+            'rewrite'           => array( 'slug' => 'affiliation-type' ),
+        );
+
+        register_taxonomy( 'tournament_affiliation', self::$post_type, $args );
+
 
     }
 
