@@ -43,7 +43,7 @@ class tournamentCPT {
         add_filter( 'acf/load_field/name=challonge_tournament_link', array( $this, 'filter_challonge_tournament_listing') );
         add_filter( 'acf/load_field/name=tournament_status', array( $this, 'filter_tournament_status') );
 
-        add_filter( 'json_prepare_post',  array( $this, 'extend_json_api' ), 100, 3 );
+        add_filter( 'json_prepare_post',  array( $this, 'tournament_json_extend' ), 50, 3 );
 
     }
 
@@ -1340,7 +1340,7 @@ class tournamentCPT {
 
     }
 
-    public function extend_json_api($_post, $post, $context){
+    public function tournament_json_extend($_post, $post, $context){
 
         if($post['post_type'] == 'tournament'){
 
@@ -1351,8 +1351,8 @@ class tournamentCPT {
                 unset($_post[$field]);
             }
 
-            $matches = p2p_type('tournament_matches')->get_connected($post['ID']);
-            $players    = p2p_type('tournament_players')->get_connected($post['ID']);
+            $matches = p2p_type('tournament_matches')->get_connected($post['ID'], array( 'posts_per_page' => -1));
+            $players    = p2p_type('tournament_players')->get_connected($post['ID'], array( 'posts_per_page' => -1 ));
 
             foreach ($players->posts as $player) {
 
