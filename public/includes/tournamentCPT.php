@@ -13,7 +13,8 @@ class tournamentCPT {
     function __construct() {
 
         add_action( 'init', array( $this, 'register_cpt_tournament') );
-
+        add_action( 'init', array( $this, 'register_cpt_taxonomies') );
+        
         add_action( 'widgets_init', array( $this, 'register_tournament_sidebar') );
 
         add_action( 'p2p_init', array( $this, 'register_p2p_connections' ) );
@@ -42,7 +43,7 @@ class tournamentCPT {
         add_filter( 'acf/load_field/name=challonge_tournament_link', array( $this, 'filter_challonge_tournament_listing') );
         add_filter( 'acf/load_field/name=tournament_status', array( $this, 'filter_tournament_status') );
 
-        add_filter( 'json_prepare_post',  array( $this, 'extend_json_api' ), 100, 3 );
+        add_filter( 'json_prepare_post',  array( $this, 'tournament_json_extend' ), 50, 3 );
 
     }
 
@@ -76,6 +77,35 @@ class tournamentCPT {
             );
 
         register_post_type( self::$post_type, $tournamentArgs );
+
+    }
+
+    function register_cpt_taxonomies(){
+
+        $labels = array(
+            'name'              => _x( 'Tournament Affiliation', 'taxonomy general name' ),
+            'singular_name'     => _x( 'Tournament Affiliation', 'taxonomy singular name' ),
+            'search_items'      => __( 'Search Tournament Affiliation' ),
+            'all_items'         => __( 'All Tournament Affiliation' ),
+            'parent_item'       => __( 'Parent Tournament Affiliation' ),
+            'parent_item_colon' => __( 'Parent Tournament Affiliation:' ),
+            'edit_item'         => __( 'Edit Tournament Affiliation' ),
+            'update_item'       => __( 'Update Tournament Affiliation' ),
+            'add_new_item'      => __( 'Add New Tournament Affiliation' ),
+            'new_item_name'     => __( 'New Tournament Affiliation' ),
+            'menu_name'         => __( 'Tournament Affiliation' ),
+        );
+
+        $args = array(
+            'labels'            => $labels,
+            'show_ui'           => true,
+            'show_admin_column' => true,
+            'query_var'         => true,
+            'rewrite'           => array( 'slug' => 'affiliation-type' ),
+        );
+
+        register_taxonomy( 'tournament_affiliation', self::$post_type, $args );
+
 
     }
 
@@ -1310,7 +1340,7 @@ class tournamentCPT {
 
     }
 
-    public function extend_json_api($_post, $post, $context){
+    public function tournament_json_extend($_post, $post, $context){
 
         if($post['post_type'] == 'tournament'){
 
@@ -1321,8 +1351,8 @@ class tournamentCPT {
                 unset($_post[$field]);
             }
 
-            $matches = p2p_type('tournament_matches')->get_connected($post['ID']);
-            $players    = p2p_type('tournament_players')->get_connected($post['ID']);
+            $matches = p2p_type('tournament_matches')->get_connected($post['ID'], array( 'posts_per_page' => -1));
+            $players    = p2p_type('tournament_players')->get_connected($post['ID'], array( 'posts_per_page' => -1 ));
 
             foreach ($players->posts as $player) {
 
@@ -1339,7 +1369,7 @@ class tournamentCPT {
             $_post['meta']['total_players'] = count($match_players);
             $_post['meta']['total_matches'] = count($matches->posts);
             $_post['meta']['players']        = $match_players;
-            $_post['meta']['tournament_date'] = get_post_meta($post['ID'], 'tournament_date', true);
+            $_post['meta']['tournament_date'] = get_post_meta($post['ID'], 'run_date', true);
             $_post['meta']['signup_open'] = is_tournament_signup_open($post['ID']);
 
         }
