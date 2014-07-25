@@ -106,6 +106,30 @@ class tournamentCPT {
 
         register_taxonomy( 'tournament_affiliation', self::$post_type, $args );
 
+        $labels = array(
+            'name'              => _x( 'Tournament Series', 'taxonomy general name' ),
+            'singular_name'     => _x( 'Tournament Series', 'taxonomy singular name' ),
+            'search_items'      => __( 'Search Tournament Series' ),
+            'all_items'         => __( 'All Tournament Series' ),
+            'parent_item'       => __( 'Parent Tournament Series' ),
+            'parent_item_colon' => __( 'Parent Tournament Series:' ),
+            'edit_item'         => __( 'Edit Tournament Series' ),
+            'update_item'       => __( 'Update Tournament Series' ),
+            'add_new_item'      => __( 'Add New Tournament Series' ),
+            'new_item_name'     => __( 'New Tournament Series' ),
+            'menu_name'         => __( 'Tournament Series' ),
+        );
+
+        $args = array(
+            'labels'            => $labels,
+            'show_ui'           => true,
+            'show_admin_column' => true,
+            'query_var'         => true,
+            'rewrite'           => array( 'slug' => 'series' ),
+        );
+
+        register_taxonomy( 'tournament_series', self::$post_type, $args );
+
 
     }
 
