@@ -99,6 +99,7 @@ class tournamentCPT {
         $args = array(
             'labels'            => $labels,
             'show_ui'           => true,
+            'hierarchical'      => true,
             'show_admin_column' => true,
             'query_var'         => true,
             'rewrite'           => array( 'slug' => 'affiliation-type' ),
@@ -123,6 +124,7 @@ class tournamentCPT {
         $args = array(
             'labels'            => $labels,
             'show_ui'           => true,
+            'hierarchical'      => true,
             'show_admin_column' => true,
             'query_var'         => true,
             'rewrite'           => array( 'slug' => 'series' ),
