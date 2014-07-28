@@ -437,6 +437,7 @@ class matchCPT {
 
                 $_post['meta']['tournament']['name'] = $tournament->posts[0]->post_title;
                 $_post['meta']['tournament']['url']  = get_permalink($tournament->posts[0]->ID);
+                $_post['meta']['tournament']['tournament_date']  = get_post_meta($tournament->posts[0]->ID,'run_date',true);
 
             }
 
