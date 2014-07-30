@@ -258,6 +258,9 @@ class tournamentCPT {
             }
 
         }
+        /*
+        TODO ADD brackets-full
+        */
 
         return $template_path;
     }
@@ -997,7 +1000,7 @@ class tournamentCPT {
 
         foreach (Planetary_Annihilation_Tournament_Manager::$endpoints as $tournament_endpoint):
 
-            if($tournament_endpoint == 'countdown' || ($tournament->ID != 2564 && $tournament_endpoint == 'brackets'))
+            if($tournament_endpoint == 'countdown' || $tournament_endpoint == 'brackets-full')
                 continue 1;
 
             switch($tournament_endpoint){
@@ -1022,6 +1025,25 @@ class tournamentCPT {
 
                     break;
 
+                case "brackets":
+
+                    $template_path = get_template_directory() . "/brackets/bracket-" . $tournament->ID . ".php";
+                    
+                    if(file_exists($template_path)){
+                        $html .= sprintf('<li><a href="%1$s/%2$s">%3$s</a></li>', get_permalink(), $tournament_endpoint, ucwords($tournament_endpoint));
+                    }
+                    else
+                    {
+                        $bracketlink = get_post_meta($tournament->ID, 'brackets', true);
+                        //$html .= $bracketlink;
+
+                        if(strpos($bracketlink,"challonge.com") !== FALSE){
+                            $html .= sprintf('<li><a href="%1$s/%2$s">%3$s</a></li>', get_permalink(), $tournament_endpoint, ucwords($tournament_endpoint));       
+                        }
+
+                    }
+
+                    break;
                 default :
 
                     $html .= sprintf('<li><a href="%1$s/%2$s">%3$s</a></li>', get_permalink(), $tournament_endpoint, ucwords($tournament_endpoint));
