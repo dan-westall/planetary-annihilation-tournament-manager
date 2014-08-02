@@ -172,7 +172,7 @@ class tournament_info extends WP_Widget {
 
                     <li class="col-lg-4">
                         <?php if(get_field('irc')) : ?>
-                        <a href="<?php the_field('irc'); ?>">IRC</a>
+                        <a href="<?php the_field('irc'); ?>">Player Meeting Point</a>
                         <?php endif; ?>
                     </li>
 
