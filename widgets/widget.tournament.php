@@ -42,16 +42,16 @@ class tournament_info extends WP_Widget {
             <section class="format tournament-meta-block text">
                 <h3>Date</h3>
                 <div class="row">
+                    <div class="col-lg-12 text-center" style="margin-bottom: 15px;">
                     <?php
 
                         if(get_field('tournament_status') === '0' || get_field('tournament_status') === '4'){
                             if(get_field('run_date') && get_field('run_time')){
 
-                                echo '<div class="col-lg-12">';
+
 
                                 echo $rundate->format('l jS F Y') . ' @ <a href="http://www.timeanddate.com/worldclock/fixedtime.html?msg=Tournament&iso=' . get_field('run_date') . 'T' . str_replace(':','',get_field('run_time')) . '" target="_blank">' . get_field('run_time') . ' UTC</a><br/><br/>';
 
-                                echo '</div>';
                             }
                             else{
                                 echo "To be announced";
@@ -86,13 +86,13 @@ class tournament_info extends WP_Widget {
                                         echo $rundate->format('l jS F Y') . ' @ <a href="http://www.timeanddate.com/worldclock/fixedtime.html?msg=Tournament&iso=' . get_field('run_date') . 'T' . str_replace(':','',get_field('run_time')) . '" target="_blank">' . get_field('run_time') . ' UTC</a><br/>';
 
                                     }
-                                    echo "<br/>Finished";
+                                    echo '<h4 style="margin-top:15px;">Finished</h4>';
                                 }
                             }
                         }
                     ?>
 
-                    <br/>
+                    </div>
                 </div>
             </section>
 
@@ -131,7 +131,7 @@ class tournament_info extends WP_Widget {
 
                         $price_count = count(get_field('prize_tiers'));
 
-                        $html = '<ul style="margin-top:40px;">';
+                        $html = '<ul>';
 
                         $column = 100;
 
