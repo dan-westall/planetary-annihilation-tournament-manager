@@ -86,6 +86,8 @@ class Planetary_Annihilation_Tournament_Manager {
         new matchCPT();
         new notificationCPT();
 
+        new userWager();
+
         remove_action( 'wp_head', 'wp_generator');
         remove_action( 'wp_head', 'wp_shortlink_wp_head' );
         remove_action( 'wp_head', 'adjacent_posts_rel_link_wp_head' );
