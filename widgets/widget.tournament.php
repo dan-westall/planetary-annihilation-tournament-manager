@@ -74,8 +74,8 @@ class tournament_info extends WP_Widget {
                                     if(get_field('run_date') && get_field('run_time')){
 
                                         echo '<span  itemprop="startDate" content="'.$rundate->format('c').'2013-09-14T21:30">'.$rundate->format('l jS F Y') . '</span> @ <a href="http://www.timeanddate.com/worldclock/fixedtime.html?msg=Tournament&iso=' . get_field('run_date') . 'T' . str_replace(':','',get_field('run_time')) . '" target="_blank">' . get_field('run_time') . ' UTC</a><br/>';
-                                        echo '<meta itemprop="eventStatus" content="http://schema.org/EventCancelled">';
-                                        EventScheduled
+                                        echo '<meta itemprop="eventStatus" content="http://schema.org/EventScheduled">';
+
                                 echo "<br/>LIVE NOW";
                             }
                             else{
