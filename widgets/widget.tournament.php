@@ -18,17 +18,20 @@ class tournament_info extends WP_Widget {
         $message 	= $instance['message'];
 
         $format_in = 'Ymd';
-        $time = explode(':', get_field('run_time'));
+
 
         $rundate = new DateTime( date("Y-m-d", strtotime(get_field('run_date'))), new DateTimeZone('UTC'));
-        $rundate->setTime($time[0], $time[1]);
 
-        ?>
+        //check : is in time, because if not will mess datetime object up.
+        if(strpos(get_field('run_time'), ':') !== false){
+            $time = explode(':', get_field('run_time'));
+            $rundate->setTime($time[0], $time[1]);
+        } ?>
 
             <?php
 
             if(get_field('tournament_status') === '0' || get_field('tournament_status') === '4'){
-                if(get_field('run_date') && get_field('run_time')){ ?>
+                if(get_field('run_date') && get_field('run_time')){  ?>
 
                     <section class="text tournament-count-down">
                     <?php

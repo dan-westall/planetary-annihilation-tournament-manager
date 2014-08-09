@@ -104,6 +104,7 @@ class Planetary_Annihilation_Tournament_Manager {
         // Global filters
         add_filter( 'acf/load_field/name=signup_form', array( $this, 'filter_form_listing') );
         add_filter( 'acf/load_field/name=standard_tournament_signup_form', array( $this, 'filter_form_listing') );
+        add_filter( 'acf/load_field/name=country', array( $this, 'filter_form_country') );
 
 
 
@@ -164,6 +165,20 @@ class Planetary_Annihilation_Tournament_Manager {
         }
 
         $field['choices'] = $form_listing;
+
+        return $field;
+
+    }
+
+    public function filter_form_country($field){
+
+        foreach(DW_Helper::countryListing() As $key => $county){
+
+            $countries[$key] = $county;
+
+        }
+
+        $field['choices'] = $countries;
 
         return $field;
 
