@@ -106,7 +106,7 @@ class Planetary_Annihilation_Tournament_Manager {
         add_filter( 'acf/load_field/name=standard_tournament_signup_form', array( $this, 'filter_form_listing') );
         add_filter( 'acf/load_field/name=country', array( $this, 'filter_form_country') );
 
-        add_filter( 'json_prepare_post',  array( $this, 'clean_json_api' ), 100, 3 );
+        //add_filter( 'json_prepare_post',  array( $this, 'clean_json_api' ), 100, 3 );
 
 
 
