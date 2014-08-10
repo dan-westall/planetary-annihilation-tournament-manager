@@ -991,17 +991,28 @@ class tournamentCPT {
 
     public static function tournament_menu($post_id = 0){
 
+        global $wp_query;
+
         $html = '';
 
         $tournament        = get_post($post_id);
         $tournament_closed = get_post_meta($tournament->ID, 'signup_closed', true);
 
-        $html .= sprintf('<li><a href="%1$s">%2$s</a></li>', get_permalink(), 'Home');
+        $endpoint_set = false;
+
 
         foreach (Planetary_Annihilation_Tournament_Manager::$endpoints as $tournament_endpoint):
 
+            $classes = '';
+
             if($tournament_endpoint == 'countdown' || $tournament_endpoint == 'brackets-full')
                 continue 1;
+
+            if(isset($wp_query->query_vars[$tournament_endpoint])){
+                $classes = 'active';
+                $endpoint_set = true;
+            }
+
 
             switch($tournament_endpoint){
 
@@ -1030,7 +1041,7 @@ class tournamentCPT {
                     $template_path = get_template_directory() . "/brackets/bracket-" . $tournament->ID . ".php";
                     
                     if(file_exists($template_path)){
-                        $html .= sprintf('<li><a href="%1$s/%2$s">%3$s</a></li>', get_permalink(), $tournament_endpoint, ucwords($tournament_endpoint));
+                        $html .= sprintf('<li class="%4$s"><a href="%1$s/%2$s">%3$s</a></li>', get_permalink(), $tournament_endpoint, ucwords($tournament_endpoint), $classes);
                     }
                     else
                     {
@@ -1038,7 +1049,7 @@ class tournamentCPT {
                         //$html .= $bracketlink;
 
                         if(strpos($bracketlink,"challonge.com") !== FALSE){
-                            $html .= sprintf('<li><a href="%1$s/%2$s">%3$s</a></li>', get_permalink(), $tournament_endpoint, ucwords($tournament_endpoint));       
+                            $html .= sprintf('<li class="%4$s"><a href="%1$s/%2$s">%3$s</a></li>', get_permalink(), $tournament_endpoint, ucwords($tournament_endpoint),  $classes);
                         }
 
                     }
@@ -1046,13 +1057,21 @@ class tournamentCPT {
                     break;
                 default :
 
-                    $html .= sprintf('<li><a href="%1$s/%2$s">%3$s</a></li>', get_permalink(), $tournament_endpoint, ucwords($tournament_endpoint));
+                    $html .= sprintf('<li class="%4$s"><a href="%1$s/%2$s">%3$s</a></li>', get_permalink(), $tournament_endpoint, ucwords($tournament_endpoint), $classes);
 
                     break;
 
             }
 
         endforeach;
+
+        if(!$endpoint_set){
+            $html = sprintf('<li class="active"><a href="%1$s">%2$s</a></li>', get_permalink(), 'Home') . $html;
+        } else {
+            $html = sprintf('<li><a href="%1$s">%2$s</a></li>', get_permalink(), 'Home') . $html;
+        }
+
+
 
         return $html;
 
