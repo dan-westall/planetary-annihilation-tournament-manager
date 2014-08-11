@@ -46,9 +46,13 @@ class tournament_info extends WP_Widget {
 
             ?>
 
+            <?php if(true): ?>
+
+
+            <?php endif; ?>
+
 
         <?php echo $before_widget; ?>
-
 
 
         <div class="tournament-widget-info">

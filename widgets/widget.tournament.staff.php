@@ -100,6 +100,25 @@ class tournament_staff extends WP_Widget {
         </div>
 
             <?php echo $after_widget; ?>
+            <?php endif; ?>
+            <?php
+
+
+
+            $args = array(
+                'connected_type' => 'tournament_staff',
+                'connected_items' => $post,
+                'connected_meta' => array(
+                    array(
+                        'key' => 'role',
+                        'value' => 'Caster'
+                    )
+                )
+            );
+
+            $staff = get_users( $args );
+
+            if(!empty($staff)) :?>
             <div class="staff-casters">
             <?php echo $before_widget; ?>
             <section>
@@ -109,19 +128,6 @@ class tournament_staff extends WP_Widget {
                 <table>
 
                     <?php
-
-                    $args = array(
-                        'connected_type' => 'tournament_staff',
-                        'connected_items' => $post,
-                        'connected_meta' => array(
-                            array(
-                                'key' => 'role',
-                                'value' => 'Caster'
-                            )
-                        )
-                    );
-
-                    $staff = get_users( $args );
 
                     foreach($staff as $staff_member):
 
