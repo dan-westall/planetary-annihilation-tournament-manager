@@ -22,18 +22,18 @@ class tournament_staff extends WP_Widget {
 
         $args = array(
             'connected_type' => 'tournament_staff',
-            'connected_items' => $post
+            'connected_items' => $post,
+            'connected_meta' => array(
+                array(
+                    'key' => 'role',
+                    'value' => 'Caster',
+                    'compare' => '!='
+                )
+            )
         );
 
         $staff = get_users( $args );
 
-
-        $args = array(
-            'connected_type' => 'tournament_players',
-            'connected_items' => $post
-        );
-
-        $players = get_posts( $args );
 
 
         ?>
@@ -97,9 +97,81 @@ class tournament_staff extends WP_Widget {
                 </table>
 
             </section>
-
         </div>
-        <?php echo $after_widget; ?>
+
+            <?php echo $after_widget; ?>
+            <div class="staff-casters">
+            <?php echo $before_widget; ?>
+            <section>
+
+                <h3>Event Casters</h3>
+
+                <table>
+
+                    <?php
+
+                    $args = array(
+                        'connected_type' => 'tournament_staff',
+                        'connected_items' => $post,
+                        'connected_meta' => array(
+                            array(
+                                'key' => 'role',
+                                'value' => 'Caster'
+                            )
+                        )
+                    );
+
+                    $staff = get_users( $args );
+
+                    foreach($staff as $staff_member):
+
+                        $player_id = '';
+
+                        if($player_id = get_user_meta($staff_member->ID, 'player_id', true)){
+                            $img = get_player_avatar($player_id, 'small');
+                        } else {
+                            $img = get_player_avatar($player_id, 'small');
+                        }
+
+                        //No twitch links here link to player pages twitch is from user and ain't correct
+                        echo '<tr>';
+
+                        if(get_permalink($player_id)) : ?>
+
+                            <td class=" staff-member  small player-profile">
+                                <a href="<?php echo get_permalink($player_id); ?>">
+                                    <?php echo $img; ?>
+                                </a>
+                            </td>
+
+                            <td>
+                                <div class="name-role"><a href="<?php echo get_permalink($player_id); ?>"><?php echo $staff_member->display_name; ?></a> <strong>(<?php echo p2p_get_meta( $staff_member->data->p2p_id, 'role', true ); ?>)</strong></div>
+                                <div class="job"><?php echo p2p_get_meta( $staff_member->data->p2p_id, 'job', true ); ?></div>
+                            </td>
+
+                        <?php else : ?>
+
+                            <td class=" staff-member"><?php echo $staff_member->display_name; ?>
+
+                            </td>
+
+                            <td>
+                                <strong>(<?php echo p2p_get_meta( $staff_member->data->p2p_id, 'role', true ); ?>)</strong>
+                            </td>
+
+                        <?php endif; ?>
+
+                        </tr>
+
+                    <?php endforeach; ?>
+
+                </table>
+
+
+            </section>
+            <?php echo $after_widget; ?>
+            </div>
+
             <?php endif; ?>
     <?php
     }
