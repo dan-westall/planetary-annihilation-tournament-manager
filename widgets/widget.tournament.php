@@ -46,10 +46,26 @@ class tournament_info extends WP_Widget {
 
             ?>
 
-            <?php if(true): ?>
+            <?php if($twitch = get_post_meta($post->ID, 'twitch', true)):
+
+                $streams = explode(',', $twitch);
+
+                foreach($streams as $stream):
+
+            ?>
 
 
-            <?php endif; ?>
+            <section class="text tournament-stream">
+
+                <a href="http://www.twitch.tv/<?php echo $stream; ?>"><span>Watch Here</span></a>
+                <small>/<?php echo $stream; ?></small>
+            </section>
+
+            <?php
+
+            endforeach;
+
+            endif; ?>
 
 
         <?php echo $before_widget; ?>
