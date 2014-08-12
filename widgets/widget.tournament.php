@@ -64,7 +64,7 @@ class tournament_info extends WP_Widget {
             <section class="text tournament-stream">
 
                 <a href="http://www.twitch.tv/<?php echo $stream; ?>"><span><?php echo $title; ?></span></a>
-                <small>/<?php echo $stream; ?></small>
+                <small><?php echo $stream; ?></small>
             </section>
 
             <?php
