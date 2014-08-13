@@ -1313,7 +1313,7 @@ if(function_exists("register_field_group"))
                     'label' => 'Twitch',
                     'name' => 'twitch',
                     'type' => 'text',
-                    'instructions' => 'Twitch channels this is to be streamed on, just the name, not the url, comma separated is acceptable for multi stream tournaments',
+                    'instructions' => 'Twitch channels this is to be streamed on just the name, not the url, comma separated is acceptable for multi stream tournaments',
                     'default_value' => '',
                     'placeholder' => '',
                     'prepend' => '',
