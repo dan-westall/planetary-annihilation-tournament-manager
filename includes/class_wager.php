@@ -6,7 +6,8 @@ class userWager {
 
         add_action( 'p2p_init', array( $this, 'register_p2p_connections' ) );
 
-        add_action( 'wp_ajax_get_match_results', array( $this, 'place_wager') );
+        add_action( 'wp_ajax_get_match_results', array( $this, 'tournament_wager') );
+        add_action( 'wp_ajax_get_match_results', array( $this, 'match_wager') );
 
     }
 

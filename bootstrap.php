@@ -13,10 +13,12 @@ require_once( PLTM_PLUGIN_DIR.'/includes/functions.php');
 require_once( PLTM_PLUGIN_DIR.'/includes/xmlrpc_function.php');
 require_once( PLTM_PLUGIN_DIR.'/includes/api.php');
 require_once( PLTM_PLUGIN_DIR.'/includes/class_statistics.php');
+require_once( PLTM_PLUGIN_DIR.'/includes/class_wager.php');
 
 
 //3rd party library
 require_once( PLTM_PLUGIN_DIR.'/includes/challonge.class.php');
+require_once( PLTM_PLUGIN_DIR.'/includes/class_realtime_coms.php');
 
 // public class
 require_once( PLTM_PLUGIN_DIR.'/public/includes/planetCPT.php');

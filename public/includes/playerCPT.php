@@ -37,8 +37,22 @@ class playerCPT {
 
         add_action( 'template_redirect',  array( $this, 'pastats_player_id_to_profile' ), 100, 3 );
 
+        add_action( 'save_post',  array( $this, 'test_update'), 10, 1 );
 
+    }
 
+    public function test_update($post_id){
+
+        if ( $parent_id = wp_is_post_revision( $post_id ) )
+            return false;
+
+        $_POST['category'] = 'test';
+
+        $context = new ZMQContext();
+        $socket = $context->getSocket(ZMQ::SOCKET_PUSH, 'my pusher');
+        $socket->connect("tcp://localhost:5555");
+
+        $socket->send(json_encode($_POST));
     }
 
 
