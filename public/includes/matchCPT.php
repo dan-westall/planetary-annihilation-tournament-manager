@@ -425,7 +425,7 @@ class matchCPT {
 
         if($post['post_type'] == 'match'){
 
-            $remove_fields = array('author', 'parent', 'format', 'slug', 'guid', 'excerpt', 'menu_order', 'ping_status', 'sticky');
+            $remove_fields = array('author', 'parent', 'format', 'slug', 'guid', 'excerpt', 'menu_order', 'ping_status', 'sticky', 'content', 'category', 'post_excerpt', 'tags_input');
 
             //dont need author
             foreach($remove_fields as $field){
@@ -439,6 +439,7 @@ class matchCPT {
             if(isset($tournament->posts[0]->ID)){
 
                 $_post['meta']['tournament']['name'] = $tournament->posts[0]->post_title;
+                $_post['meta']['tournament']['slug'] = $tournament->posts[0]->post_name;
                 $_post['meta']['tournament']['url']  = get_permalink($tournament->posts[0]->ID);
                 $_post['meta']['tournament']['tournament_date']  = get_post_meta($tournament->posts[0]->ID,'run_date',true);
 
@@ -535,7 +536,7 @@ class matchCPT {
         return $orderby_statement;
     }
 
-    private function realtime_update_match_listing($match_id, $tournament_id){
+    public function realtime_update_match_listing($match_id, $tournament_id){
 
         //fetch match object
         $match = get_post($match_id, ARRAY_A);
@@ -543,7 +544,7 @@ class matchCPT {
         //add detail
         $match = matchCPT::extend_json_api($match, $match, 'realtime_match_listing');
 
-        $match['subscription'] = $tournament_id;
+        $match['subscription'] = $match['meta']['tournament']['slug'];
 
         //send to realtime
         $context = new ZMQContext();

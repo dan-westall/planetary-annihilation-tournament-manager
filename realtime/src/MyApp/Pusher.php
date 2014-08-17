@@ -21,15 +21,16 @@ class Pusher implements WampServerInterface {
         $entryData = json_decode($entry, true);
 
         // If the lookup topic object isn't set there is no one to publish to
-        if (!in_array($entryData['category'], $this->subscribedTopics)) {
+        if (!in_array($entryData['subscription'], $this->subscribedTopics)) {
             return;
         }
 
-        $topic = $this->subscribedTopics[$entryData['category']];
+        $topic = $this->subscribedTopics[$entryData['subscription']];
 
         // re-send the data to all the clients subscribed to that category
         $topic->broadcast($entryData);
     }
+
     public function onUnSubscribe(ConnectionInterface $conn, $topic) {
     }
     public function onOpen(ConnectionInterface $conn) {
