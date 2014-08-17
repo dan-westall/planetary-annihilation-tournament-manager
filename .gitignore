@@ -2,3 +2,5 @@
 
 /realtime/php-zmq/
 /realtime/vendor/
+
+/library/php-zmq
