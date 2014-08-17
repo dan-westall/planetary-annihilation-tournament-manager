@@ -1,1 +1,4 @@
 /library/vendor/
+
+/realtime/php-zmq/
+/realtime/vendor/
