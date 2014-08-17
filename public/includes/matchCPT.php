@@ -438,8 +438,8 @@ class matchCPT {
 
             if(isset($tournament->posts[0]->ID)){
 
+                $_post['meta']['tournament']['wp_id'] = $tournament->posts[0]->ID;
                 $_post['meta']['tournament']['name'] = $tournament->posts[0]->post_title;
-                $_post['meta']['tournament']['slug'] = $tournament->posts[0]->post_name;
                 $_post['meta']['tournament']['url']  = get_permalink($tournament->posts[0]->ID);
                 $_post['meta']['tournament']['tournament_date']  = get_post_meta($tournament->posts[0]->ID,'run_date',true);
 
@@ -544,7 +544,8 @@ class matchCPT {
         //add detail
         $match = matchCPT::extend_json_api($match, $match, 'realtime_match_listing');
 
-        $match['subscription'] = $match['meta']['tournament']['slug'];
+        //setsub
+        $match['subscription'] = $match['meta']['tournament']['wp_id'];
 
         //send to realtime
         $context = new ZMQContext();
