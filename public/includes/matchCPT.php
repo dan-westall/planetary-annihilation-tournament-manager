@@ -505,21 +505,22 @@ class matchCPT {
 
                 case "match" :
 
-                    $statment_query  = $wpdb->prepare("(SELECT meta_value FROM $wpdb->p2p LEFT JOIN wp_postmeta ON post_id = p2p_from WHERE p2p_to = wp_posts.ID AND meta_key = 'run_date') AS tournament_date", '', '');
+                    $statment_query[]  = $wpdb->prepare("(SELECT meta_value FROM $wpdb->p2p LEFT JOIN wp_postmeta ON post_id = p2p_from WHERE p2p_to = wp_posts.ID AND meta_key = 'run_date') AS tournament_date", '', '');
 
                     break;
 
                 //todo move this out
                 case "tournament" :
 
-                    $statment_query  = $wpdb->prepare("(SELECT meta_value FROM $wpdb->postmeta WHERE post_id = wp_posts.ID AND meta_key = 'run_date') AS tournament_date", '', '');
+                    $statment_query[]  = $wpdb->prepare("(SELECT meta_value FROM $wpdb->postmeta WHERE post_id = wp_posts.ID AND meta_key = 'run_date') AS tournament_date", '', '');
+                    $statment_query[]  = $wpdb->prepare("(SELECT meta_value FROM $wpdb->postmeta WHERE post_id = wp_posts.ID AND meta_key = 'run_time') AS tournament_time", '', '');
 
                     break;
 
             }
 
 
-            $statment_fields .= ', '.$statment_query;
+            $statment_fields .= ', '.implode(', ', $statment_query);
         }
 
         return $statment_fields;
@@ -529,9 +530,18 @@ class matchCPT {
 
         if($query->query_vars['orderby'] == 'tournament_date'){
 
-            $orderby_statement = "tournament_date DESC, ".$orderby_statement;
+            if($query->query_vars['post_type'][0] == tournamentCPT::$post_type){
+
+                $orderby_statement = "tournament_date DESC, tournament_time DESC, ".$orderby_statement;
+            } else {
+
+
+                $orderby_statement = "tournament_date DESC, ".$orderby_statement;
+            }
 
         }
+
+
 
 
         return $orderby_statement;
