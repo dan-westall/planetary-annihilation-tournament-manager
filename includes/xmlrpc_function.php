@@ -154,7 +154,7 @@ function pltm_add_match( $data ){
 
     }
 
-    do_action('match_updated', $match_id);
+    do_action('match_updated', $match_id, $args["wp_tournament_id"]);
 
     return get_permalink( $match_id );
 

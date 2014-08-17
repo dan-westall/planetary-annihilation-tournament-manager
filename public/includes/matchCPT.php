@@ -29,6 +29,9 @@ class matchCPT {
 
         add_filter( 'the_title', array( $this, 'pre_title_tournament_name'), 10, 2);
 
+        add_action( 'match_updated', array( $this, 'realtime_update_match_listing'), 10, 2);
+        add_action( 'save_post',  array( $this, 'realtime_update_match_listing'), 10, 1 );
+
         //moved outside to our own api endpoint
 //        add_action('wp_ajax_pltm_get_match_results',  array( $this, 'get_match_json') );
 //        add_action('wp_ajax_nopriv_pltm_get_match_results',  array( $this, 'get_match_json') );
@@ -532,5 +535,24 @@ class matchCPT {
         return $orderby_statement;
     }
 
+    private function realtime_update_match_listing($match_id, $tournament_id){
+
+        //fetch match object
+        $match = get_post($match_id, ARRAY_A);
+
+        //add detail
+        $match = matchCPT::extend_json_api($match, $match, 'realtime_match_listing');
+
+        $match['subscription'] = $tournament_id;
+
+        //send to realtime
+        $context = new ZMQContext();
+        $socket = $context->getSocket(ZMQ::SOCKET_PUSH, 'my pusher');
+        $socket->connect("tcp://localhost:5555");
+
+        $socket->send(json_encode($match));
+
+
+    }
 
 }
