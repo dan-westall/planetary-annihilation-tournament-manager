@@ -162,26 +162,26 @@ class tournamentCPT {
             )
         ) );
 
-        p2p_register_connection_type( array(
-            'name' => 'tournament_planets',
-            'from' => self::$post_type,
-            'to' => planetCPT::$post_type,
-            'sortable' => 'from',
-            'admin_box' => array(
-                'show' => 'from',
-                'context' => 'advanced'
-            ),
-            'title' => array(
-                'from' => __( 'Tournament Planets', 'my-textdomain' )
-            ),
-            'fields' => array(
-                'role' => array(
-                    'title' => 'Round',
-                    'type' => 'select',
-                    'values' => apply_filters('tournament_rounds', array( ) )
-                )
-            )
-        ) );
+//        p2p_register_connection_type( array(
+//            'name' => 'tournament_planets',
+//            'from' => self::$post_type,
+//            'to' => planetCPT::$post_type,
+//            'sortable' => 'from',
+//            'admin_box' => array(
+//                'show' => 'from',
+//                'context' => 'advanced'
+//            ),
+//            'title' => array(
+//                'from' => __( 'Tournament Planets', 'my-textdomain' )
+//            ),
+//            'fields' => array(
+//                'role' => array(
+//                    'title' => 'Round',
+//                    'type' => 'select',
+//                    'values' => apply_filters('tournament_rounds', array( ) )
+//                )
+//            )
+//        ) );
 
 
         p2p_register_connection_type( array(
@@ -464,6 +464,7 @@ class tournamentCPT {
         $tournament_slots         = get_post_meta($tournament_id, 'slots', true);
         $tournament_reserve_slots = get_post_meta($tournament_id, 'reserve_slots', true);
         $total_tournament_slots   = ($tournament_slots + $tournament_reserve_slots);
+        $connection_meta = [];
 
         //if tournament 0 bin
         if ($tournament_id === 0)
@@ -484,6 +485,8 @@ class tournamentCPT {
 //        if (count(get_tournament_players($tournament_id, array(self::$tournament_player_status[0], self::$tournament_player_status[1]))) >= $total_tournament_slots)
 //            return false;
 
+        //SELECT user_email, ID, (SELECT meta_value FROM wp_usermeta  WHERE user_id = user.ID AND meta_key = 'player_id') AS player_id  FROM wp_users AS user WHERE user_email = 'dan.westall@googlemail.com'
+
 
         //todo move out to general function file as this is a useful snippit
         foreach ($form['fields'] as $field) {
@@ -497,6 +500,8 @@ class tournamentCPT {
         //if email is in excluded players bin
         if (in_array($values['email']['value'], self::players_excluded_from_tournament($tournament_id)))
             return false;
+
+        $user = $wpdb->get_row( $wpdb->prepare("SELECT user_email, ID AS user_id, (SELECT meta_value FROM wp_usermeta  WHERE user_id = user.ID AND meta_key = 'player_id') AS player_id  FROM $wpdb->users AS user WHERE user_email = %s", $values['email']['value']) );
 
 
         //todo email shouldnt be stored with the player profile CTP should be linked either by p2p or meta int
@@ -522,33 +527,7 @@ class tournamentCPT {
             $p2p_id = p2p_type('tournament_players')->get_p2p_id($tournament_id, $player_id);
 
             if ($p2p_id) {
-
                 return $form;
-
-            }
-
-            //add player to current challonge tournament
-            $challonge_result = $this->challonge_add_player_to_tournament($challonge_tournament_id, $values['email']['value'], $values['ign']['value']);
-
-            //error check
-            if (isset($challonge_result->id)) {
-
-                //player found add player to tornament
-                $p2p_result = $this->action_add_player_to_tournament($player_id, $tournament_id, $challonge_tournament_id, $challonge_result);
-
-                if ($p2p_result) {
-
-                    $action = "player_added_to_tournament_{$this->player_tournament_status}";
-
-                    //GFCommon::send_notification($notification, $form, $lead);
-                    do_action( "tournament_signup_{$this->player_tournament_status}", array( 'player_id' => $player_id, 'tournament_id' => $tournament_id ) );
-
-                } else {
-                    //email admins let them know something went wrong.
-                }
-
-            } else {
-                //error here
             }
 
         } else {
@@ -570,54 +549,22 @@ class tournamentCPT {
                 $user_id = $user->ID;
             }
 
-            //create new player post
-            $new_player = array(
-                'post_title'  => $values['ign']['value'],
-                'post_status' => 'publish',
-                'post_author' => $user_id,
-                'post_type'   => playerCPT::$post_type
-            );
+            $player_id = playerCPT::action_new_player_profile($user_id, $values);
 
-            // Insert the post into the database
-            $player_id = wp_insert_post($new_player);
+        }
 
-            update_post_meta($player_id, 'player_email', $values['email']['value']);
-            update_post_meta($player_id, 'user_id', $user_id);
-
-            update_user_meta($user_id, 'player_id', $player_id);
-
-
-            //add player to current challonge tournament
+        //add player to current challonge tournament
+        if($challonge_tournament_id){
             $challonge_result = $this->challonge_add_player_to_tournament($challonge_tournament_id, $values['email']['value'], $values['ign']['value']);
 
-            //error check, if challonge was correct lets do p2p
-            if (isset($challonge_result->id)) {
+            $connection_meta = ['challonge_tournament_id' => $challonge_tournament_id, 'challonge_result' => $challonge_result];
+        }
 
-                $p2p_result = $this->action_add_player_to_tournament($player_id, $tournament_id, $challonge_tournament_id, $challonge_result);
+        $p2p_result = $this->action_add_player_to_tournament($player_id, $tournament_id, $connection_meta);
 
-                if ($p2p_result) {
+        if ($p2p_result) {
 
-                    //update the player signup entry at this point
-                    //$success = GFAPI::update_entry($entry);
-
-                    //GFCommon::send_notification($notification, $form, $lead);
-
-                    $action = "player_added_to_tournament_{$this->player_tournament_status}";
-
-                    do_action( "tournament_signup_{$this->player_tournament_status}", array( 'player_id' => $player_id, 'tournament_id' => $tournament_id ) );
-
-                } else {
-                    //email admins let them know something went wrong.
-                }
-
-            } else {
-                //error here
-
-                //change confirmation message
-
-                //email admins let them know something went wrong.
-
-            }
+            do_action( "tournament_signup", array( 'player_id' => $player_id, 'tournament_id' => $tournament_id ) );
 
         }
 
@@ -683,21 +630,21 @@ class tournamentCPT {
 
     public function filter_p2p_tournament_player_requirements($args){
 
-        switch($_POST['p2p_type']){
-
-            case "tournament_players" :
-
-                //player profiles must have emails for challonge intergration
-                $args['meta_query'] = array(
-                    array(
-                        'key' => 'player_email',
-                        'compare' => 'EXISTS'
-                    )
-                );
-
-                break;
-
-        }
+//        switch($_POST['p2p_type']){
+//
+//            case "tournament_players" :
+//
+//                //player profiles must have emails for challonge intergration
+//                $args['meta_query'] = array(
+//                    array(
+//                        'key' => 'player_email',
+//                        'compare' => 'EXISTS'
+//                    )
+//                );
+//
+//                break;
+//
+//        }
 
         return $args;
 
@@ -718,7 +665,6 @@ class tournamentCPT {
         $c->verify_ssl = false;
 
         $params = array(
-//            "participant[email]"              => $email,
             'participant[name]'               => $ign
         );
 
@@ -749,6 +695,8 @@ class tournamentCPT {
 
         if ( 'tournament_players' == $connection->p2p_type && is_admin()) {
 
+            $tournament_id = $connection->p2p_from;
+
             $challonge_tournament_id = $this->get_the_challonge_tournament_id($connection->p2p_from);
 
             $player = get_post($connection->p2p_to);
@@ -757,18 +705,20 @@ class tournamentCPT {
             $ign   = $player->post_title;
 
             //add player to current challonge tournament
-            $challonge_result = $this->challonge_add_player_to_tournament($challonge_tournament_id, $email, $ign);
+            if($challonge_tournament_id){
+                $challonge_result = $this->challonge_add_player_to_tournament($challonge_tournament_id, $email, $ign);
 
-            p2p_add_meta( $p2p_id, 'challonge_tournament_id', $challonge_tournament_id);
-            p2p_add_meta( $p2p_id, 'challonge_participant_id', $challonge_result->id);
+                p2p_add_meta( $p2p_id, 'challonge_tournament_id', $challonge_tournament_id);
+                p2p_add_meta( $p2p_id, 'challonge_participant_id', $challonge_result->id);
+
+                //save the return to db as this has useful info in it
+                update_post_meta($connection->p2p_to, 'challonge_data', $challonge_result);
+
+                //easy search
+                update_post_meta($connection->p2p_to, 'challonge_participant_id', $challonge_result->id);
+            }
+
             p2p_add_meta( $p2p_id, 'date', current_time('mysql') );
-
-            //save the return to db as this has useful info in it
-            update_post_meta($connection->p2p_to, 'challonge_data', $challonge_result);
-
-            //easy search
-            update_post_meta($connection->p2p_to, 'challonge_participant_id', $challonge_result->id);
-
 
             $this->delete_tournament_caches($tournament_id);
 
@@ -784,10 +734,14 @@ class tournamentCPT {
 
             //todo tournament remove reason and history will be to be done.
 
+            $tournament_id = $connection->p2p_from;
             $challonge_tournament_id = $this->get_the_challonge_tournament_id($connection->p2p_from);
             $challonge_participant_id = p2p_get_meta( $connection->p2p_id, 'challonge_participant_id', true );
 
-            $challonge_result = $this->challonge_remove_player_from_tournament($challonge_tournament_id, $challonge_participant_id);
+            if($challonge_tournament_id){
+                $challonge_result = $this->challonge_remove_player_from_tournament($challonge_tournament_id, $challonge_participant_id);
+            }
+
 
             //save the return to db as this has useful info in it
             delete_post_meta($connection->p2p_to, 'challonge_data' );
@@ -800,7 +754,7 @@ class tournamentCPT {
         }
     }
 
-    public function action_add_player_to_tournament($player_id, $tournament_id, $challonge_tournament_id, $challonge_result){
+    public function action_add_player_to_tournament($player_id, $tournament_id, $meta = []){
 
         $status                   = self::$tournament_player_status[0];
         $tournament_slots         = get_post_meta($tournament_id, 'slots', true);
@@ -810,10 +764,21 @@ class tournamentCPT {
 
         //TODO not sure the challonge stuff should be in here
         //save the return to db as this has useful info in it
-        update_post_meta($player_id, 'challonge_data', $challonge_result);
 
-        //easy search
-        update_post_meta($player_id, 'challonge_participant_id', $challonge_result->id);
+        $connection_meta = array(
+            'date'                     => current_time('mysql'),
+            'status'                   => $status
+        );
+
+        if(isset($meta['challonge_result'])){
+            update_post_meta($player_id, 'challonge_data', $meta['challonge_result']);
+
+            //easy search
+            update_post_meta($player_id, 'challonge_participant_id', $meta['challonge_result']->id);
+
+            $connection_meta = array_merge($connection_meta, [ 'challonge_tournament_id'  => $meta['challonge_tournament_id'], 'challonge_participant_id' => $meta['challonge_result']->id ] );
+
+        }
 
         //if therere are more players then slots reserve, any logic should have been done by this point
         if($current_player_count >= $tournament_slots){
@@ -821,13 +786,6 @@ class tournamentCPT {
             $status = self::$tournament_player_status[1];
 
         }
-
-        $connection_meta = array(
-            'date'                     => current_time('mysql'),
-            'challonge_tournament_id'  => $challonge_tournament_id,
-            'challonge_participant_id' => $challonge_result->id,
-            'status'                   => $status
-        );
 
         $this->player_tournament_status = $status;
 
@@ -1386,22 +1344,18 @@ class tournamentCPT {
 
     public static function players_excluded_from_tournament($tournament_id){
 
-        $excluded_players_list = array();
+        global $wpdb;
 
-        $args = array(
-            'connected_type'   => 'tournament_excluded_players',
-            'connected_items'  => $tournament_id,
-            'nopaging'         => true,
-            'suppress_filters' => false
+        $excluded_players_list = $wpdb->query(
+            $wpdb->prepare(
+                "
+                SELECT
+                user_email
+                    FROM $wpdb->users AS user WHERE user.ID IN ( SELECT ( SELECT meta_value FROM $wpdb->postmeta WHERE post_id = p2p_to AND meta_key = 'user_id') FROM wp_p2p  WHERE p2p_type = 'tournament_excluded_players' AND p2p_from = %s)
+                ",
+                $tournament_id
+            )
         );
-
-        $excluded_players = get_posts($args);
-
-        foreach($excluded_players as $player){
-
-            $excluded_players_list[] = get_post_meta($player->ID, 'player_email', true);
-
-        }
 
         return $excluded_players_list;
 

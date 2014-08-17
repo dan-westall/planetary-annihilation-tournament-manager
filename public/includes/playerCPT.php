@@ -8,7 +8,7 @@ class playerCPT {
 
         add_action('init', array($this, 'register_cpt_player'));
 
-        add_action( 'user_register', array( $this, 'action_new_player_profile' ) );
+        //add_action( 'user_register', array( $this, 'action_new_player_profile' ) );
         add_action( 'after_setup_theme', array( $this, 'add_news_caps_to_admin') );
 
         add_action( 'p2p_init', array( $this, 'register_p2p_connections' ) );
@@ -95,9 +95,31 @@ class playerCPT {
 
     }
 
-    public function action_new_player_profile($user_id){
+    public static function action_new_player_profile($user_id, $values = []){
 
+        //todo need a better signup form before we can do this automatically
 
+        if(empty($values)){
+            $user = get_user_by( 'id', $user_id );
+        }
+
+        //create new player post
+        $new_player = array(
+            'post_title'  => $values['ign']['value'],
+            'post_status' => 'publish',
+            'post_author' => $user_id,
+            'post_type'   => playerCPT::$post_type
+        );
+
+        // Insert the post into the database
+        $player_id = wp_insert_post($new_player);
+
+        update_post_meta($player_id, 'player_email', $values['email']['value']);
+        update_post_meta($player_id, 'user_id', $user_id);
+
+        update_user_meta($user_id, 'player_id', $player_id);
+
+        return $player_id;
 
 
     }
