@@ -297,24 +297,6 @@ class matchCPT {
 
     }
 
-    public static function match_listing_template($vars = array()) {
-        ob_start();
-
-        include( PLTM_PLUGIN_DIR . '/public/views/matchlisting_shortcode.php');
-
-        return ob_get_clean();
-    }
-
-    public static function match_listing_js_deps() {
-        //wp_register_script('knockout',plugins_url('/public/js/ko.min.js',__FILE__) );
-        wp_enqueue_script('custom.knockout');
-        wp_enqueue_script('custom.lodash');
-        //wp_register_script('socketio',":5000/socket.io/socket.io.js");
-        //wp_enqueue_script('socketio');
-        wp_register_script('match_listing', PLTM_PLUGIN_URI . 'public/assets/js/matchlisting.js' );
-        wp_enqueue_script('match_listing');
-    }
-
     public static function get_match_by($id, $switch = 'challonge_match_id'){
 
         switch($switch) {
@@ -361,6 +343,23 @@ class matchCPT {
 
         $players = p2p_type('match_players')->get_connected($match_id);
 
+        $player_card = '<div class="col-lg-5">
+                    <div class="player-match-card %5$s">
+                        <div class="player-match-card-inner row text">
+                            <div class="player-avatar col-lg-4">
+                                <a href="%2$s">%1$s</a>
+                            </div>
+                            <div class="player-details col-lg-7">
+                                <h4 class="player-name"><a href="%2$s">%3$s</a></h4>
+                                %4$s
+                            </div>
+                            <div class="match-result col-lg-1">Winner</div>
+                        </div>
+                    </div>
+                </div>';
+
+
+
         foreach($players->posts as $player){
 
             $winner               = $title = '';
@@ -375,22 +374,8 @@ class matchCPT {
                 $title = sprintf('<span>%s</span>', get_user_meta($player_user_id, 'title', true));
             }
 
-
-            $match_card[] = sprintf(
-                '<div class="col-lg-5">
-                    <div class="player-match-card %5$s">
-                        <div class="player-match-card-inner row text">
-                            <div class="player-avatar col-lg-4">
-                                <a href="%2$s">%1$s</a>
-                            </div>
-                            <div class="player-details col-lg-7">
-                                <h4 class="player-name"><a href="%2$s">%3$s</a></h4>
-                                %4$s
-                            </div>
-                            <div class="match-result col-lg-1">Winner</div>
-                        </div>
-                    </div>
-                </div>',
+            $teams[p2p_get_meta($player->p2p_id, 'team', true)][] = $match_card[] = sprintf(
+                $player_card,
                 $player_profile_image,
                 get_permalink($player->ID),
                 $player->post_title,
@@ -400,14 +385,50 @@ class matchCPT {
 
         }
 
-        $vs = '<div class="vs col-lg-2"><h2>VS</h2></div>';
 
-        $match_cards = implode($vs, $match_card);
+        switch(matchCPT::match_format($match_id)){
 
-        $html = sprintf(
-            '<section class="player-matchup row">%s</section>',
-            $match_cards
-        );
+            case "format-vs" :
+
+                $vs = '<div class="vs col-lg-2"></div>';
+
+                $match_cards = implode($vs, $match_card);
+
+                $html = sprintf(
+                    '<h3 class="text-center">VS</h3><section class="player-matchup row">%s</section>',
+                    $match_cards
+                );
+
+                break;
+
+            case "format-ffs" :
+
+                $vs = '<div class="vs col-lg-2"></div>';
+
+                foreach(array_chunk($match_card, 2) as $pair) {
+
+                    $match_cards .= '<div class="row" style="margin-bottom: 15px;">';
+
+                    foreach ($pair as $item) {
+                        if ($item === end($pair) && count($pair) > 1){
+                            $match_cards .= $vs. $item ;
+                        } else {
+                            $match_cards .= $item ;
+                        }
+                    }
+
+                    $match_cards .= '</div>';
+                }
+
+                $html = sprintf(
+                    '<h3 class="text-center">%s Player FFA </h3><section class="player-matchup">%s</section>',
+                    count($players->posts),
+                    $match_cards
+                );
+
+                break;
+
+        }
 
         return $html;
 
@@ -564,6 +585,29 @@ class matchCPT {
         $socket->connect("tcp://localhost:5555");
 
         $socket->send(json_encode($match));
+
+
+    }
+
+    public static function match_format($match_id = 0){
+
+        $match = get_post($match_id);
+        $teams = [];
+        $players    = p2p_type('match_players')->get_connected($match->ID);
+
+        foreach ($players->posts as $player) {
+
+            $teams[p2p_get_meta($player->p2p_id, 'team', true)] ++;
+        }
+
+
+        if(count($players->posts) == 2){
+            return 'format-vs';
+        } else if(count($teams) == count($players->posts)){
+            return 'format-ffs';
+        } else if(count($teams) < count($players->posts)){
+            return 'format-vs-team';
+        }
 
 
     }

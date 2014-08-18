@@ -860,8 +860,6 @@ class tournamentCPT {
 
     function filter_post_type_feedback_messages( $messages ) {
 
-
-
         $post             = get_post();
         $post_type        = get_post_type( $post );
         $post_type_object = get_post_type_object( $post_type );
@@ -1033,23 +1031,6 @@ class tournamentCPT {
 
         return $html;
 
-    }
-
-    public static function player_listing_template($vars = array()) {
-        ob_start();
-
-        include( PLTM_PLUGIN_DIR . '/public/views/playerlisting_shortcode.php');
-
-        return ob_get_clean();
-    }
-
-    public static function player_listing_js_deps() {
-        //wp_register_script('knockout',plugins_url('/public/js/ko.min.js',__FILE__) );
-        wp_enqueue_script('custom.knockout');
-        //wp_register_script('socketio',":5000/socket.io/socket.io.js");
-        //wp_enqueue_script('socketio');
-        wp_register_script('player_listing', PLTM_PLUGIN_URI . 'public/assets/js/playerlisting.js' );
-        wp_enqueue_script('player_listing');
     }
 
     public static function get_tournament_players($attr) {

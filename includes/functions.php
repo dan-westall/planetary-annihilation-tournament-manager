@@ -60,6 +60,12 @@ function get_match_player_cards($match_id){
 
 }
 
+function get_match_format($match_id){
+
+    return matchCPT::match_format($match_id);
+
+}
+
 function is_tournament_in_progress(){
 
     $page_id = get_option('page_on_front');
