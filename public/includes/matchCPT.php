@@ -343,7 +343,9 @@ class matchCPT {
 
         $players = p2p_type('match_players')->get_connected($match_id);
 
-        $player_card = '<div class="col-lg-5">
+        $match_cards = '';
+
+        $player_card = '
                     <div class="player-match-card %5$s">
                         <div class="player-match-card-inner row text">
                             <div class="player-avatar col-lg-4">
@@ -355,8 +357,7 @@ class matchCPT {
                             </div>
                             <div class="match-result col-lg-1">Winner</div>
                         </div>
-                    </div>
-                </div>';
+                    </div>';
 
 
 
@@ -374,7 +375,7 @@ class matchCPT {
                 $title = sprintf('<span>%s</span>', get_user_meta($player_user_id, 'title', true));
             }
 
-            $teams[p2p_get_meta($player->p2p_id, 'team', true)][] = $match_card[] = sprintf(
+            $card = sprintf(
                 $player_card,
                 $player_profile_image,
                 get_permalink($player->ID),
@@ -383,8 +384,15 @@ class matchCPT {
                 $winner
             );
 
-        }
+            $teams[p2p_get_meta($player->p2p_id, 'team', true)] .= $card;
 
+            if(matchCPT::match_format($match_id) == "format-vs"){
+                $match_card[] = '<div class="col-lg-5">'.$card.'</div>';
+            } else {
+                $match_card[] = $card;
+            }
+
+        }
 
         switch(matchCPT::match_format($match_id)){
 
@@ -407,13 +415,13 @@ class matchCPT {
 
                 foreach(array_chunk($match_card, 2) as $pair) {
 
-                    $match_cards .= '<div class="row" style="margin-bottom: 15px;">';
+                    $match_cards .= '<div class="row">';
 
                     foreach ($pair as $item) {
                         if ($item === end($pair) && count($pair) > 1){
-                            $match_cards .= $vs. $item ;
+                            $match_cards .= $vs . '<div class="col-lg-5">'.$item.'</div>' ;
                         } else {
-                            $match_cards .= $item ;
+                            $match_cards .= '<div class="col-lg-5">'.$item.'</div>' ;
                         }
                     }
 
@@ -426,6 +434,37 @@ class matchCPT {
                     $match_cards
                 );
 
+                break;
+
+            case "format-vs-team" :
+
+                $vs = '<div class="vs col-lg-2"></div>';
+
+                $team_count = 1;
+
+                foreach(array_chunk($teams, 2) as $pair) {
+
+                    $match_cards .= '<div class="row">';
+
+                    foreach ($pair as $team) {
+
+                        if ($team === end($pair) && count($pair) > 1){
+                            $match_cards .= $vs.  '<div class="col-lg-5"><h3 class="text-center">Team '.$team_count.'</h3>'.$team.'</div>' ;
+                        } else {
+                            $match_cards .=  '<div class="col-lg-5"><h3 class="text-center">Team '.$team_count.'</h3>'.$team.'</div>' ;
+                        }
+
+                        $team_count ++;
+                    }
+
+                    $match_cards .= '</div>';
+                }
+
+                $html = sprintf(
+                    '<h3 class="text-center">%s Player - Team VS</h3><section class="player-matchup">%s</section>',
+                    count($players->posts),
+                    $match_cards
+                );
                 break;
 
         }
