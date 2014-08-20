@@ -234,6 +234,27 @@ class statistic {
 
     }
 
+    public function site_match_average_time(){
+
+        global $wpdb;
+
+        $average = $wpdb->query(
+            $wpdb->prepare(
+                "
+                SELECT
+                    count(post.ID),
+                    SEC_TO_TIME(AVG(((SELECT meta_value FROM wp_postmeta WHERE post_id = post.ID AND meta_key = 'pa_stats_stop') - (SELECT meta_value FROM wp_postmeta WHERE post_id = post.ID AND meta_key = 'pa_stats_start')))/1000) AS duration
+                      FROM $wpdb->posts as post WHERE post_type = 'match'
+		        "
+            )
+        );
+
+
+
+
+
+    }
+
 
 
 }

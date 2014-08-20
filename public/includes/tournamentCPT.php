@@ -48,8 +48,8 @@ class tournamentCPT {
 
         add_filter( 'json_prepare_post',  array( $this, 'tournament_json_extend' ), 50, 3 );
 
-    }
 
+    }
 
     function register_cpt_tournament(){
 
@@ -191,6 +191,10 @@ class tournamentCPT {
             'name' => 'tournament_players',
             'from' => self::$post_type,
             'to' => 'player',
+            'sortable' => 'from',
+            'title' => array(
+                'from' => __( 'Players', 'PLTM' )
+            ),
             'admin_box' => array(
                 'show' => 'from',
                 'context' => 'advanced'
@@ -392,6 +396,8 @@ class tournamentCPT {
 
     public function signup_form_validation($validation_result){
 
+        global $wpdb;
+
         $values = array();
 
         $signup_form_id    = get_field('standard_tournament_signup_form', 'option');
@@ -421,12 +427,15 @@ class tournamentCPT {
             );
         }
 
-        $player = DW_Helper::get_post_by_meta('player_email', $values['email']['value']);
+        $player = $wpdb->get_row( $wpdb->prepare("SELECT user_email, ID AS user_id, (SELECT meta_value FROM wp_usermeta  WHERE user_id = user.ID AND meta_key = 'player_id') AS player_id  FROM $wpdb->users AS user WHERE user_email = %s", $values['email']['value']) );
+
+
+        //$player = DW_Helper::get_post_by_meta('player_email', $values['email']['value']);
 
         //is player
-        if(is_object($player)){
+        if(isset($player->player_id)){
 
-            $p2p_id = p2p_type('tournament_players')->get_p2p_id($tournament_id, $player->ID);
+            $p2p_id = p2p_type('tournament_players')->get_p2p_id($tournament_id, $player->player_id);
 
             //is linked to tournament
             if ($p2p_id) {
@@ -435,6 +444,13 @@ class tournamentCPT {
                 $validation_result['form']['cssClass'] = 'already-in-tournament';
 
             }
+
+        }
+
+        if(!is_user_logged_in() && isset($player->user_email)){
+
+            $validation_result['is_valid'] = false;
+            $validation_result['form']['cssClass'] = 'please-login-to-signup';
 
         }
 
@@ -457,6 +473,9 @@ class tournamentCPT {
 
         if(strpos($form['cssClass'], 'player-is-excluded') !== false)
             $message = '<span class="validation_error">Very Sorry but you are excluded from this tournament, if you think this is in error please contact us via the contact form.</span>';
+
+        if(strpos($form['cssClass'], 'please-login-to-signup') !== false)
+            $message = '<span class="validation_error">Please login to your account to signup.</span> <a href="'. wp_login_url( get_permalink() ).'/signup" title="Login">Login</a>';
 
         return $message;
 
@@ -489,13 +508,6 @@ class tournamentCPT {
         if ($signup_form_id != $entry['form_id'])
             return false;
 
-//        //count both reserve and active players
-//        if (count(get_tournament_players($tournament_id, array(self::$tournament_player_status[0], self::$tournament_player_status[1]))) >= $total_tournament_slots)
-//            return false;
-
-        //SELECT user_email, ID, (SELECT meta_value FROM wp_usermeta  WHERE user_id = user.ID AND meta_key = 'player_id') AS player_id  FROM wp_users AS user WHERE user_email = 'dan.westall@googlemail.com'
-
-
         //todo move out to general function file as this is a useful snippit
         foreach ($form['fields'] as $field) {
             $values[$field['field_mapField']] = array(
@@ -511,25 +523,10 @@ class tournamentCPT {
 
         $user = $wpdb->get_row( $wpdb->prepare("SELECT user_email, ID AS user_id, (SELECT meta_value FROM wp_usermeta  WHERE user_id = user.ID AND meta_key = 'player_id') AS player_id  FROM $wpdb->users AS user WHERE user_email = %s", $values['email']['value']) );
 
-
-        //todo email shouldnt be stored with the player profile CTP should be linked either by p2p or meta int
-        $find_player = array(
-            'post_type'      => playerCPT::$post_type,
-            'meta_query'     => array(
-                array(
-                    'key'   => 'player_email',
-                    'value' => $values['email']['value']
-                )
-            ),
-            'posts_per_page' => 1
-        );
-
-        $players = get_posts($find_player);
-
         //existing player
-        if (!empty($players)) {
+        if (!empty($user)) {
 
-            $player_id = $players[0]->ID;
+            $player_id = $user->player_id;
 
             //check to make sure they are not aleady in tournament
             $p2p_id = p2p_type('tournament_players')->get_p2p_id($tournament_id, $player_id);
@@ -537,6 +534,8 @@ class tournamentCPT {
             if ($p2p_id) {
                 return $form;
             }
+
+            wp_update_post( ['ID' => $player_id, 'post_title' => $values['ign']['value'] ] );
 
         } else {
 
@@ -561,6 +560,9 @@ class tournamentCPT {
 
         }
 
+        if($values['clan']['value'])
+            $connection_meta['clan'] = $values['clan']['value'];
+
         //add player to current challonge tournament
         if($challonge_tournament_id){
             $challonge_result = $this->challonge_add_player_to_tournament($challonge_tournament_id, $values['email']['value'], $values['ign']['value']);
@@ -575,6 +577,12 @@ class tournamentCPT {
             do_action( "tournament_signup", array( 'player_id' => $player_id, 'tournament_id' => $tournament_id ) );
 
         }
+
+        //update details, clan tag ingame
+
+        update_post_meta($player_id, 'clan', $values['clan']['value']);
+        update_post_meta($player_id, 'clan_contact', $values['clan_contact']['value']);
+
 
     }
 
@@ -777,7 +785,7 @@ class tournamentCPT {
         }
     }
 
-    public function action_add_player_to_tournament($player_id, $tournament_id, $meta = []){
+    public function action_add_player_to_tournament($player_id, $tournament_id, $connection_meta = []){
 
         $status                   = self::$tournament_player_status[0];
         $tournament_slots         = get_post_meta($tournament_id, 'slots', true);
@@ -793,13 +801,13 @@ class tournamentCPT {
             'status'                   => $status
         );
 
-        if(isset($meta['challonge_result'])){
-            update_post_meta($player_id, 'challonge_data', $meta['challonge_result']);
+        if(isset($connection_meta['challonge_result'])){
+            update_post_meta($player_id, 'challonge_data', $connection_meta['challonge_result']);
 
             //easy search
             update_post_meta($player_id, 'challonge_participant_id', $meta['challonge_result']->id);
 
-            $connection_meta = array_merge($connection_meta, [ 'challonge_tournament_id'  => $meta['challonge_tournament_id'], 'challonge_participant_id' => $meta['challonge_result']->id ] );
+            $connection_meta = array_merge($connection_meta, [ 'challonge_tournament_id'  => $connection_meta['challonge_tournament_id'], 'challonge_participant_id' => $connection_meta['challonge_result']->id ] );
 
         }
 
@@ -815,11 +823,6 @@ class tournamentCPT {
         //if ladder information is entered then add that to the connection meta
         if (false) {
             $connection_meta['ladder'] = 0;
-        }
-
-        //log clan at current time
-        if (!empty($entry['2'])) {
-            $connection_meta['clan'] = 0;
         }
 
         //player found add player to tornament

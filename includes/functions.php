@@ -82,6 +82,17 @@ function get_player_avatar($player_id, $size = 100){
 
 }
 
+function is_player_in_tournament($tournament_id, $player_id ){
+
+    $p2p_id = p2p_type( 'tournament_players' )->get_p2p_id( $tournament_id, $player_id );
+
+    if ( $p2p_id )
+        return true;
+
+    return false;
+
+}
+
 function get_match_commentators($match_id){
 
     $commentators = get_users( array(
