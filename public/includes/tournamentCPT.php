@@ -6,6 +6,8 @@ class tournamentCPT {
 
     public static $tournament_status = array('Signup', 'In Progress', 'Cancelled', 'Finished', 'Preparation');
 
+    public static $tournament_format = array('standard' => 'Standard', 'clanwars' => 'Clan Wars', 'kotp' => 'King of the planet', 'teamtournament' => 'Team Tournament');
+
     public static $tournament_player_status = array( 'Active', 'Reserve', 'No Show', 'Banned', 'Disqualify');
 
     private $player_tournament_status = '';
@@ -42,6 +44,7 @@ class tournamentCPT {
 
         add_filter( 'acf/load_field/name=challonge_tournament_link', array( $this, 'filter_challonge_tournament_listing') );
         add_filter( 'acf/load_field/name=tournament_status', array( $this, 'filter_tournament_status') );
+        add_filter( 'acf/load_field/name=tournament_format', array( $this, 'filter_tournament_format') );
 
         add_filter( 'json_prepare_post',  array( $this, 'tournament_json_extend' ), 50, 3 );
 
@@ -198,10 +201,15 @@ class tournamentCPT {
                     'type' => 'select',
                     'values' => apply_filters('tournament_player_status', self::$tournament_player_status )
                 ),
+                'clan' => array(
+                    'title' => 'Clan',
+                    'type' => 'custom',
+                    'render' => 'tournamentCPT::p2p_display_clan'
+                ),
                 'note' => array(
                     'title' => 'Note',
                     'type' => 'text',
-                ),
+                )
             )
         ) );
 
@@ -653,6 +661,21 @@ class tournamentCPT {
     public function filter_tournament_status($field){
 
         $field['choices'] = self::$tournament_status;
+
+        return $field;
+
+    }
+
+    public function filter_tournament_format($field){
+
+
+        foreach(self::$tournament_format as $key => $format){
+
+            $format_listing[$key] = $format;
+
+        }
+
+        $field['choices'] = $format_listing;
 
         return $field;
 
@@ -1377,6 +1400,25 @@ class tournamentCPT {
         }
 
         return $_post;
+
+    }
+
+    public static function p2p_display_clan($connection, $direction){
+
+        global $wpdb;
+
+        $query = $wpdb->prepare("SELECT (SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = 'clan' AND post_id = p2p.p2p_to) As clan FROM $wpdb->p2p AS p2p WHERE p2p_id = %s AND p2p_type = 'tournament_players'", $direction->name[1]);
+
+        $clan = $wpdb->get_var($query);
+
+//        $key = ( 'from' == $direction ) ? 'p2p_to' : 'p2p_from';
+//
+//        $post = get_post( $connection->$key );
+//
+//        var_dump($direction->name[1]);
+//        $id = $direction->args['name'][1];
+
+        return $clan;
 
     }
 
