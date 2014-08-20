@@ -574,7 +574,11 @@ class tournamentCPT {
 
         if ($p2p_result) {
 
-            do_action( "tournament_signup", array( 'player_id' => $player_id, 'tournament_id' => $tournament_id ) );
+            //$this->player_tournament_status active or reserve
+
+            $action = "tournament_signup_$this->player_tournament_status";
+
+            do_action( $action, array( 'player_id' => $player_id, 'tournament_id' => $tournament_id ) );
 
         }
 
