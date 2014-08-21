@@ -569,9 +569,9 @@ class playerCPT {
 
         global $wpdb;
 
-        if($query->query_vars['post_type'][0] == self::$post_type){
+        if($query->query_vars['post_type'][0] == self::$post_type && $query->is_main_query()){
 
-            $new_fields[]  = $wpdb->prepare("(SELECT meta_value FROM $wpdb->postmeta WHERE post_id = $wpdb->posts.ID AND meta_key = 'clan') AS clan", '', '');
+            $new_fields[]  = "(SELECT meta_value FROM $wpdb->postmeta WHERE post_id = $wpdb->posts.ID AND meta_key = 'clan') AS clan";
 
             $fields .= ', '.implode(', ', $new_fields);
         }
