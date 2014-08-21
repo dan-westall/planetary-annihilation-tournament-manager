@@ -39,6 +39,8 @@ class playerCPT {
 
         add_action( 'save_post',  array( $this, 'test_update'), 10, 1 );
 
+        add_action( 'posts_fields', array( $this, 'extend_player_object'), 10, 100 );
+
     }
 
     public function test_update($post_id){
@@ -531,6 +533,8 @@ class playerCPT {
                 unset($_post[$field]);
             }
 
+            $_post['meta']['clan']        = '';;
+
         }
 
         return $_post;
@@ -559,5 +563,19 @@ class playerCPT {
 
         }
 
+    }
+
+    public function extend_player_object($fields, $query){
+
+        global $wpdb;
+
+        if($query->query_vars['post_type'][0] == self::$post_type){
+
+            $new_fields[]  = $wpdb->prepare("(SELECT meta_value FROM $wpdb->postmeta WHERE post_id = $wpdb->posts.ID AND meta_key = 'clan') AS clan", '', '');
+
+            $fields .= ', '.implode(', ', $new_fields);
+        }
+
+        return $fields;
     }
 }
