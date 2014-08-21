@@ -596,10 +596,19 @@ class matchCPT {
     public function realtime_update_match_listing($match_id, $tournament_id){
 
         //fetch match object
-        $match = get_post($match_id, ARRAY_A);
+        $_match = get_post($match_id, ARRAY_A);
+
+
+
+        foreach($_match as $key => $match){
+
+            $new_match[str_replace('post_', '', $key)] = $match;
+
+        }
+
 
         //add detail
-        $match = matchCPT::extend_json_api($match, $match, 'realtime_match_listing');
+        $match = matchCPT::extend_json_api($new_match, $_match, 'realtime_match_listing');
 
         //setsub
         $match['subscription'] = 't'.$match['meta']['tournament']['wp_id'];
