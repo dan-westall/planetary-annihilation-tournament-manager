@@ -116,6 +116,11 @@ class playerCPT {
         // Insert the post into the database
         $player_id = wp_insert_post($new_player);
 
+        //fix!
+        if(get_post_type($player_id) != playerCPT::$post_type){
+            wp_update_post( ['ID' => $player_id, 'post_type' => playerCPT::$post_type, 'post_author' => $user_id ] );
+        }
+
         update_post_meta($player_id, 'player_email', $values['email']['value']);
         update_post_meta($player_id, 'user_id', $user_id);
 
