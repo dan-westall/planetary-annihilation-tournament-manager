@@ -21,7 +21,7 @@ class tournament_signup extends WP_Widget {
 
             <?php echo $before_widget; ?>
 
-                    <a href="<?php the_permalink(); ?>/signup" class='custom-button'><span>Signup to tournament</span></a>
+                    <a href="<?php the_permalink(); ?>/signup" class='custom-button'><span>Sign up</span></a>
 
             <?php echo $after_widget; ?>
 
