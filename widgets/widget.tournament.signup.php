@@ -19,11 +19,11 @@ class tournament_signup extends WP_Widget {
         ?>
         <?php if(!isset($wp_query->query_vars['signup']) && is_tournament_signup_open($post->ID)): ?>
 
-            <?php echo $before_widget; ?>
+            <?php// echo $before_widget; ?>
 
-                    <a href="<?php the_permalink(); ?>/signup" class='custom-button'><span>Signup to tournament</span></a>
+                    <a href="<?php the_permalink(); ?>signup" class=' tournament-signup-button'><span>Signup to tournament</span></a>
 
-            <?php echo $after_widget; ?>
+            <?php //echo $after_widget; ?>
 
         <?php endif; ?>
 
