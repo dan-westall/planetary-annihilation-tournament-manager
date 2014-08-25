@@ -180,13 +180,15 @@ class notificationCPT {
                             $find = array(
                                 '<TOURNAMENT NAME>',
                                 '<TOURNAMENT URL>',
-                                '<PLAYER IGN>'
+                                '<PLAYER IGN>',
+                                '<TOURNAMENT RULES>'
                             );
 
                             $replace = array(
                                 get_the_title($args['tournament_id']),
                                 sprintf('<a href="%s">%s</a>', get_permalink($args['tournament_id']), get_the_title($args['player_id'])),
-                                get_the_title($args['player_id'])
+                                get_the_title($args['player_id']),
+                                sprintf('<a href="%s/rules">%s</a>', get_permalink($args['tournament_id']), 'rules'),
                             );
 
                             $html_message = apply_filters( 'message_html', html_entity_decode( $message ) );
