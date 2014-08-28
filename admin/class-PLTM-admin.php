@@ -335,7 +335,9 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
                 $user = get_userdata($player_user_id);
 
                 if($player_user_id){
-                    echo $user->display_name;
+
+                    echo sprintf('<a href="%s">%s</a>', get_edit_user_link($player_user_id), $user->display_name);
+
                 } else {
                     echo 'Account not linked';
                 }
