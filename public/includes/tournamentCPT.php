@@ -523,6 +523,8 @@ class tournamentCPT {
 
         $user = $wpdb->get_row( $wpdb->prepare("SELECT user_email, ID AS user_id, (SELECT meta_value FROM wp_usermeta  WHERE user_id = user.ID AND meta_key = 'player_id') AS player_id  FROM $wpdb->users AS user WHERE user_email = %s", $values['email']['value']) );
 
+
+
         //existing player
         if (!empty($user)) {
 
@@ -544,13 +546,17 @@ class tournamentCPT {
 
             if(!$user){
 
+                $password = wp_generate_password();
+
                 $userdata = array(
                     'user_login' => $values['ign']['value'],
                     'user_email' => $values['email']['value'],
-                    'user_pass'  => wp_generate_password()
+                    'user_pass'  => $password
                 );
 
                 $user_id = wp_insert_user($userdata);
+
+                wp_new_user_notification($user_id, $password);
 
             } else {
                 $user_id = $user->ID;
