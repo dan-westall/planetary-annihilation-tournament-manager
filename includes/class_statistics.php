@@ -447,7 +447,7 @@ class statistic {
 
         return sprintf(
             $template,
-            __('AVG Tournament match time'),
+            __('AVG Tournament play time'),
             'javascript:void(0);',
             ($average_players_per_tournament/60),
             'Hrs'
@@ -482,7 +482,7 @@ class statistic {
 
         return sprintf(
             $template,
-            __('Longest Event match time'),
+            __('Longest Event play time'),
             'javascript:void(0);',
             ($tournament_player_totals[0]->duration/60),
             'Hrs'
