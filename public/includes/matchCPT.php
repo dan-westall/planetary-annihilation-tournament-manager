@@ -38,6 +38,8 @@ class matchCPT {
 
         add_filter( 'template_include',  array( $this, 'roster_management' ) );
 
+        add_action('wp_ajax_pltm_get_match_results',  array( $this, 'update_team_roster') );
+
     }
 
     function register_cpt_match(){
@@ -120,6 +122,7 @@ class matchCPT {
             'show_ui'           => true,
             'show_admin_column' => true,
             'query_var'         => true,
+            'hierarchical'      => true,
             'rewrite'           => array( 'slug' => 'match-format' ),
         );
 
@@ -656,6 +659,23 @@ class matchCPT {
         } else {
             return $original_template;
         }
+
+    }
+
+    public static function update_team_roster(){
+
+        foreach($_POST['players'] as $player){
+
+            $p2p_result = p2p_type('match_players')->connect($_POST['match_id'], $player['wp_player_id'], array(
+                'date'                     => current_time('mysql'),
+                'team'                     => $player['team']
+            ));
+
+        }
+
+        echo json_encode(array('matches_string' => $matches_String, 'updated_at' => date('d.m.Y H:i:s')));
+
+        die();
 
     }
 
