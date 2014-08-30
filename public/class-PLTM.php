@@ -47,7 +47,9 @@ class Planetary_Annihilation_Tournament_Manager {
 
     //todo move tournament endpoint functionality down into the tournament cpt class
     //public static $endpoints = array('signup', 'matches', 'players', 'results', 'schedule', 'rules', 'planets');
-    public static $endpoints = array('signup', 'rules', 'matches', 'players', 'countdown', 'brackets', 'brackets-full', 'roster');
+    public static $tournament_endpoints = array('signup', 'rules', 'matches', 'players', 'countdown', 'brackets', 'brackets-full');
+
+    public static $match_endpoints = array('roster');
 
 	/**
 	 * Instance of this class.
@@ -118,7 +120,7 @@ class Planetary_Annihilation_Tournament_Manager {
 
     public function register_tournament_endpoints(){
 
-        foreach(self::$endpoints as $endpoint){
+        foreach(array_merge(self::$tournament_endpoints, self::$match_endpoints) as $endpoint){
             add_rewrite_endpoint($endpoint, EP_PERMALINK);
 
         }
@@ -127,7 +129,7 @@ class Planetary_Annihilation_Tournament_Manager {
 
     public function register_query_vars($vars){
 
-        foreach(self::$endpoints as $endpoint){
+        foreach(array_merge(self::$tournament_endpoints, self::$match_endpoints) as $endpoint){
             $vars[] = $endpoint;
         }
 
@@ -146,9 +148,9 @@ class Planetary_Annihilation_Tournament_Manager {
 
         global $wp, $post;
 
-        foreach(self::$endpoints as $endpoint){
+        foreach(array_merge(self::$tournament_endpoints, self::$match_endpoints) as $endpoint){
 
-            if ($post->post_type == 'tournament' && isset( $wp->query_vars[$endpoint] )) {
+            if (isset( $wp->query_vars[$endpoint] )) {
 
                 $classes[] = $endpoint;
 
