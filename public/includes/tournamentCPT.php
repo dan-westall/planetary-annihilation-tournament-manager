@@ -196,7 +196,7 @@ class tournamentCPT {
                 'from' => __( 'Players', 'PLTM' )
             ),
             'admin_box' => array(
-                'show' => 'from',
+                'show' => 'any',
                 'context' => 'advanced'
             ),
             'fields' => array(
@@ -283,7 +283,7 @@ class tournamentCPT {
 
         $template_path = PLTM_PLUGIN_DIR . "/includes/templates/section-content.php";
 
-        foreach(Planetary_Annihilation_Tournament_Manager::$endpoints as $endpoint){
+        foreach(Planetary_Annihilation_Tournament_Manager::$tournament_endpoints as $endpoint){
 
             if ($post->post_type == 'tournament' && isset( $wp_query->query_vars[$endpoint] )) {
 
@@ -335,7 +335,7 @@ class tournamentCPT {
         if(!is_object($post) && !isset($id) || (is_admin() || !in_the_loop()))
             return $title;
 
-        foreach(Planetary_Annihilation_Tournament_Manager::$endpoints as $endpoint){
+        foreach(Planetary_Annihilation_Tournament_Manager::$tournament_endpoints as $endpoint){
 
             if ($post->post_type == 'tournament' && isset( $wp_query->query_vars[$endpoint] )) {
 
@@ -987,7 +987,7 @@ class tournamentCPT {
         $endpoint_set = false;
 
 
-        foreach (Planetary_Annihilation_Tournament_Manager::$endpoints as $tournament_endpoint):
+        foreach (Planetary_Annihilation_Tournament_Manager::$tournament_endpoints as $tournament_endpoint):
 
             $classes = '';
 
