@@ -664,18 +664,62 @@ class matchCPT {
 
     public static function update_team_roster(){
 
+        $total_teams = range(0, 10);
+
+        $teams = self::get_clan_team_from_match($_POST['match_id']);
+
         foreach($_POST['players'] as $player){
+
+            if (array_key_exists($_POST['clan'], $teams)) {
+
+                $team = $teams[$_POST['clan']];
+
+            } else {
+
+                $team = array_shift(array_diff($total_teams, $teams));
+
+            }
 
             $p2p_result = p2p_type('match_players')->connect($_POST['match_id'], $player['wp_player_id'], array(
                 'date'                     => current_time('mysql'),
-                'team'                     => $player['team']
+                'team'                     => $team
             ));
+
+            do_action('clan_match_roster_change_add', $_POST['match_id'], $player['wp_player_id']);
 
         }
 
-        echo json_encode(array('matches_string' => $matches_String, 'updated_at' => date('d.m.Y H:i:s')));
+        //echo json_encode(array('matches_string' => $matches_String, 'updated_at' => date('d.m.Y H:i:s')));
 
         die();
+
+    }
+
+    public static function get_clan_team_from_match($match_id){
+
+        global $wpdb;
+
+        $clan_teams = [];
+
+        $query = $wpdb->prepare(
+            "
+                SELECT
+                    p2p_from as match_id,
+                    p2p_to as player_id,
+                    (SELECT meta_value FROM wp_p2pmeta WHERE p2p_id = p2p.p2p_id AND meta_key = 'team') AS team,
+                    (SELECT meta_value FROM wp_postmeta WHERE post_id = p2p.p2p_to AND meta_key = 'clan') as clan
+                      FROM wp_p2p as p2p WHERE p2p_type = 'match_players' AND p2p_from = %s
+                ",
+            $match_id
+        );
+
+        $match_teams = $wpdb->get_results( $query );
+
+        foreach($match_teams as $team){
+            $clan_teams[$team->clan] = $team->team;
+        }
+
+        return $clan_teams;
 
     }
 
