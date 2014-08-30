@@ -37,7 +37,7 @@ function get_the_tournament_endpoint(){
 
     global $wp_query, $post;
 
-    foreach(Planetary_Annihilation_Tournament_Manager::$endpoints as $endpoint){
+    foreach(Planetary_Annihilation_Tournament_Manager::$tournament_endpoints as $endpoint){
 
         if ($post->post_type == 'tournament' && isset( $wp_query->query_vars[$endpoint] )) {
 
