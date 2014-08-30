@@ -47,7 +47,7 @@ class Planetary_Annihilation_Tournament_Manager {
 
     //todo move tournament endpoint functionality down into the tournament cpt class
     //public static $endpoints = array('signup', 'matches', 'players', 'results', 'schedule', 'rules', 'planets');
-    public static $endpoints = array('signup', 'rules', 'matches', 'players', 'countdown', 'brackets', 'brackets-full');
+    public static $endpoints = array('signup', 'rules', 'matches', 'players', 'countdown', 'brackets', 'brackets-full', 'roster');
 
 	/**
 	 * Instance of this class.
@@ -79,7 +79,7 @@ class Planetary_Annihilation_Tournament_Manager {
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
 
-        new planetCPT();
+//        new planetCPT();
         //new sponsorCPT();
         new playerCPT();
         new tournamentCPT();

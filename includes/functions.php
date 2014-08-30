@@ -1,8 +1,9 @@
 <?php
 
-function get_tournament_players($tournament_id, $status = array('active')){
+function get_tournament_players($tournament_id, $status = array('active'), $args = []){
 
-    $players = get_posts(array(
+
+    $players = get_posts(array_merge(array(
         'connected_type'   => 'tournament_players',
         'connected_items'  => $tournament_id,
         'connected_meta' => array(
@@ -14,7 +15,7 @@ function get_tournament_players($tournament_id, $status = array('active')){
         ),
         'nopaging'         => true,
         'suppress_filters' => false
-    ));
+    ), $args));
 
     return $players;
 

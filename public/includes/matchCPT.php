@@ -36,6 +36,8 @@ class matchCPT {
 //        add_action('wp_ajax_pltm_get_match_results',  array( $this, 'get_match_json') );
 //        add_action('wp_ajax_nopriv_pltm_get_match_results',  array( $this, 'get_match_json') );
 
+        add_filter( 'template_include',  array( $this, 'roster_management' ) );
+
     }
 
     function register_cpt_match(){
@@ -643,6 +645,17 @@ class matchCPT {
             return 'format-vs-team';
         }
 
+    }
+
+    public static function roster_management($original_template){
+
+        global $wp_query;
+
+        if ( $wp_query->get('post_type') == 'match' && isset( $wp_query->query_vars['roster'] )) {
+            return get_template_directory().'/single-match-roster-management.php';
+        } else {
+            return $original_template;
+        }
 
     }
 
