@@ -6,8 +6,12 @@ class statistic {
     public $players = array();
     public $matches = array();
 
-    function __construct() {
+    private $cache;
+
+    function __construct($cache = false) {
         global $wpdb;
+
+        $this->cache = $cache;
 
     }
 
@@ -234,27 +238,257 @@ class statistic {
 
     }
 
-    public function site_match_average_time(){
+
+    //dream of doing $statistic->site->match->play->time->average($template);
+
+    public function site_match_average_time($template = '<div><div>%1$s</div><a href="%2$s"><span>%3$s</span></a></div>'){
 
         global $wpdb;
 
-        $average = $wpdb->query(
-            $wpdb->prepare(
+        if ( false === ( $average = get_transient( __FUNCTION__ ) ) ) {
+
+            $query = $wpdb->prepare(
                 "
-                SELECT
-                    count(post.ID),
-                    SEC_TO_TIME(AVG(((SELECT meta_value FROM wp_postmeta WHERE post_id = post.ID AND meta_key = 'pa_stats_stop') - (SELECT meta_value FROM wp_postmeta WHERE post_id = post.ID AND meta_key = 'pa_stats_start')))/1000) AS duration
-                      FROM $wpdb->posts as post WHERE post_type = 'match'
-		        "
-            )
+                    SELECT
+                        count(post.ID),
+                        SEC_TO_TIME(AVG(((SELECT meta_value FROM wp_postmeta WHERE post_id = post.ID AND meta_key = 'pa_stats_stop') - (SELECT meta_value FROM wp_postmeta WHERE post_id = post.ID AND meta_key = 'pa_stats_start')))/1000) AS duration
+                          FROM $wpdb->posts as post WHERE post_type = 'match'
+                    ",
+                ''
+            );
+
+            $average = $wpdb->get_row( $query );
+
+            set_transient( __FUNCTION__ , $average, 12 * HOUR_IN_SECONDS );
+        }
+
+        $time = new DateTime($average->duration);
+
+        return sprintf(
+            $template,
+            __('Average Match Time'),
+            'javascript:void(0);',
+            $time->format('i'),
+            'Mins'
         );
-
-
-
-
 
     }
 
+    //dream of doing $statistic->site->match->total($template);
+
+    public function site_match_total($template = '<div><div>%1$s</div><a href="%2$s"><span>%3$s</span></a></div>'){
+
+        global $wpdb;
+
+
+        if ( false === ( $totals = get_transient( __FUNCTION__ ) ) ) {
+
+
+            $query = $wpdb->prepare(
+                "
+                    SELECT
+                        count(post.ID) as total_matches
+                          FROM $wpdb->posts as post WHERE post_type = 'match'
+                    ",
+                ''
+            );
+
+            $totals = $wpdb->get_row( $query );
+
+
+            set_transient( __FUNCTION__ , $totals, 12 * HOUR_IN_SECONDS );
+        }
+
+        return sprintf(
+            $template,
+            __('Total Tournament Matches'),
+            'javascript:void(0);',
+            $totals->total_matches
+        );
+    }
+
+    public function site_tournament_total($template = '<div><div>%1$s</div><a href="%2$s"><span>%3$s</span></a></div>'){
+
+        global $wpdb;
+
+
+        if ( false === ( $totals = get_transient( __FUNCTION__ ) ) ) {
+
+            $query = $wpdb->prepare(
+                "
+                    SELECT
+                        count(post.ID) as total_tournaments
+                          FROM $wpdb->posts as post WHERE post_type = 'tournament'
+                    ",
+                ''
+            );
+
+            $totals = $wpdb->get_row( $query );
+
+            set_transient( __FUNCTION__ , $totals, 12 * HOUR_IN_SECONDS );
+        }
+
+        return sprintf(
+            $template,
+            __('Total Tournaments on record'),
+            'javascript:void(0);',
+            $totals->total_tournaments
+        );
+    }
+
+    public function site_average_players_per_tournament($template = '<div><div>%1$s</div><a href="%2$s"><span>%3$s</span></a></div>'){
+
+        global $wpdb;
+
+        $total_tournaments_players = 0;
+
+        if ( false === ( $average_players_per_tournament = get_transient( __FUNCTION__ ) ) ) {
+
+            $query = $wpdb->prepare(
+                "
+                    SELECT
+                        post_title AS tournament,
+                        count(p2p_to) AS players
+                                              FROM $wpdb->p2p LEFT JOIN $wpdb->posts AS post ON p2p_from = post.ID WHERE p2p_type = 'tournament_players' GROUP BY p2p_from
+                    ",
+                ''
+            );
+
+            $tournament_player_totals = $wpdb->get_results( $query );
+
+            $total_tournaments = count($tournament_player_totals);
+
+            foreach($tournament_player_totals as $tournament_totals){
+                $total_tournaments_players += $tournament_totals->players;
+            }
+
+            $average_players_per_tournament = ceil($total_tournaments_players/$total_tournaments);
+
+            set_transient( __FUNCTION__ , $average_players_per_tournament, 12 * HOUR_IN_SECONDS );
+        }
+
+        return sprintf(
+            $template,
+            __('Average players per tournament'),
+            'javascript:void(0);',
+            $average_players_per_tournament
+        );
+    }
+
+    public function site_average_matches_per_tournament($template = '<div><div>%1$s</div><a href="%2$s"><span>%3$s</span></a></div>'){
+
+        global $wpdb;
+
+        $total_tournaments_players = 0;
+
+        if ( false === ( $average_players_per_tournament = get_transient( __FUNCTION__ ) ) ) {
+
+            $query = $wpdb->prepare(
+                "
+                    SELECT
+                        post_title AS tournament,
+                        count(p2p_to) AS players
+                                              FROM $wpdb->p2p LEFT JOIN $wpdb->posts AS post ON p2p_from = post.ID WHERE p2p_type = 'tournament_matches' GROUP BY p2p_from
+                    ",
+                ''
+            );
+
+            $tournament_player_totals = $wpdb->get_results( $query );
+
+            $total_tournaments = count($tournament_player_totals);
+
+            foreach($tournament_player_totals as $tournament_totals){
+                $total_tournaments_players += $tournament_totals->players;
+            }
+
+            $average_players_per_tournament = ceil($total_tournaments_players/$total_tournaments);
+
+            set_transient( __FUNCTION__ , $average_players_per_tournament, 12 * HOUR_IN_SECONDS );
+        }
+
+        return sprintf(
+            $template,
+            __('Average matches per tournament'),
+            'javascript:void(0);',
+            $average_players_per_tournament
+        );
+    }
+
+    public function site_tournaments_match_average_time($template = '<div><div>%1$s</div><a href="%2$s"><span>%3$s</span></a></div>'){
+
+        global $wpdb;
+
+        $total_tournaments_players = 0;
+
+        if ( false === ( $average_players_per_tournament = get_transient( __FUNCTION__ ) ) ) {
+
+            $query = $wpdb->prepare(
+                "
+                SELECT
+                    COUNT(p2p_to) as match_total,
+                    ceil(SUM(SEC_TO_TIME(((SELECT meta_value FROM $wpdb->postmeta WHERE post_id = p2p_to AND meta_key = 'pa_stats_stop') - (SELECT meta_value FROM $wpdb->postmeta WHERE post_id = p2p_to AND meta_key = 'pa_stats_start'))/1000))/60) AS duration
+                        FROM $wpdb->p2p WHERE p2p_type = 'tournament_matches' GROUP BY p2p_from
+                    ",
+                ''
+            );
+
+            $tournament_player_totals = $wpdb->get_results( $query );
+
+            $total_tournaments = count($tournament_player_totals);
+
+            foreach($tournament_player_totals as $tournament_totals){
+                $total_tournaments_players += $tournament_totals->duration;
+            }
+
+            $average_players_per_tournament = ceil($total_tournaments_players/$total_tournaments);
+
+            set_transient( __FUNCTION__ , $average_players_per_tournament, 12 * HOUR_IN_SECONDS );
+        }
+
+        return sprintf(
+            $template,
+            __('AVG Tournament match time'),
+            'javascript:void(0);',
+            ($average_players_per_tournament/60),
+            'Hrs'
+        );
+
+    }
+
+
+    public function site_tournaments_longest_match_average($template = '<div><div>%1$s</div><a href="%2$s"><span>%3$s</span></a></div>'){
+
+        global $wpdb;
+
+        $total_tournaments_players = 0;
+
+
+        if ( false === ( $tournament_player_totals = get_transient( __FUNCTION__ ) ) ) {
+
+            $query = $wpdb->prepare(
+                "
+            SELECT
+                COUNT(p2p_to) as match_total,
+                ceil(SUM(SEC_TO_TIME(((SELECT meta_value FROM $wpdb->postmeta WHERE post_id = p2p_to AND meta_key = 'pa_stats_stop') - (SELECT meta_value FROM $wpdb->postmeta WHERE post_id = p2p_to AND meta_key = 'pa_stats_start'))/1000))/60) AS duration
+                    FROM $wpdb->p2p WHERE p2p_type = 'tournament_matches' GROUP BY p2p_from ORDER BY duration DESC
+                ",
+                ''
+            );
+
+            $tournament_player_totals = $wpdb->get_results( $query );
+
+            set_transient( __FUNCTION__ , $tournament_player_totals, 12 * HOUR_IN_SECONDS );
+        }
+
+        return sprintf(
+            $template,
+            __('Longest Event match time'),
+            'javascript:void(0);',
+            ($tournament_player_totals[0]->duration/60),
+            'Hrs'
+        );
+
+    }
 
 
 }
