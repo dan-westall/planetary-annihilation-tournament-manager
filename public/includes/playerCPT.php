@@ -116,6 +116,11 @@ class playerCPT {
         // Insert the post into the database
         $player_id = wp_insert_post($new_player);
 
+        //fix!
+        if(get_post_type($player_id) != playerCPT::$post_type){
+            wp_update_post( ['ID' => $player_id, 'post_type' => playerCPT::$post_type, 'post_author' => $user_id ] );
+        }
+
         update_post_meta($player_id, 'player_email', $values['email']['value']);
         update_post_meta($player_id, 'user_id', $user_id);
 
@@ -456,8 +461,8 @@ class playerCPT {
         $transient_key     = sprintf('player_%s_avatar_%s', $user->ID, $size);
         $logged_in_user_id = get_current_user_id();
 
-        if((is_user_logged_in() && DW_Helper::is_site_administrator()) || ($logged_in_user_id == $player_user_id))
-            delete_transient( 'player_' .$user->ID. '_avatar_' .$size );
+//        if((is_user_logged_in() && DW_Helper::is_site_administrator()) || ($logged_in_user_id == $player_user_id))
+//            delete_transient( 'player_' .$user->ID. '_avatar_' .$size );
 
         if ( false === ( $user_avatar_img = get_transient( $transient_key ) ) ) {
 
@@ -473,7 +478,7 @@ class playerCPT {
 
             }
 
-            set_transient( $transient_key, $user_avatar_img, 12 * HOUR_IN_SECONDS );
+            set_transient( $transient_key, $user_avatar_img, 1 * HOUR_IN_SECONDS );
         }
 
         return $user_avatar_img;
@@ -596,16 +601,9 @@ class playerCPT {
 
         global $wpdb;
 
-        if($query->query_vars['post_type'][0] == self::$post_type && $query->is_main_query()){
+        if($query->query_vars['post_type'][0] == self::$post_type){
 
-            $new_fields[]  = $wpdb->prepare("(SELECT meta_value FROM $wpdb->postmeta WHERE post_id = $wpdb->posts.ID AND meta_key = 'clan') AS clan", '', '');
-
-            $fields .= ', '.implode(', ', $new_fields);
-        }
-
-        if(in_array(self::$post_type, $query->query_vars['post_type']) && isset($query->query_vars['tournament_players'])){
-
-            $new_fields[]  = $wpdb->prepare("(SELECT meta_value FROM $wpdb->postmeta WHERE post_id = $wpdb->posts.ID AND meta_key = 'clan') AS clan", '', '');
+            $new_fields[]  = "(SELECT meta_value FROM $wpdb->postmeta WHERE post_id = $wpdb->posts.ID AND meta_key = 'clan') AS clan";
 
             $fields .= ', '.implode(', ', $new_fields);
         }

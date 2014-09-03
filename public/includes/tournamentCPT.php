@@ -525,6 +525,8 @@ class tournamentCPT {
 
         $user = $wpdb->get_row( $wpdb->prepare("SELECT user_email, ID AS user_id, (SELECT meta_value FROM wp_usermeta  WHERE user_id = user.ID AND meta_key = 'player_id') AS player_id  FROM $wpdb->users AS user WHERE user_email = %s", $values['email']['value']) );
 
+
+
         //existing player
         if (!empty($user)) {
 
@@ -546,13 +548,17 @@ class tournamentCPT {
 
             if(!$user){
 
+                $password = wp_generate_password();
+
                 $userdata = array(
                     'user_login' => $values['ign']['value'],
                     'user_email' => $values['email']['value'],
-                    'user_pass'  => wp_generate_password()
+                    'user_pass'  => $password
                 );
 
                 $user_id = wp_insert_user($userdata);
+
+                wp_new_user_notification($user_id, $password);
 
             } else {
                 $user_id = $user->ID;
@@ -757,7 +763,7 @@ class tournamentCPT {
 
             p2p_add_meta( $p2p_id, 'date', current_time('mysql') );
 
-            $this->delete_tournament_caches($tournament_id);
+            self::delete_tournament_caches($tournament_id);
 
         }
 
@@ -775,7 +781,7 @@ class tournamentCPT {
             $challonge_tournament_id = $this->get_the_challonge_tournament_id($connection->p2p_from);
             $challonge_participant_id = p2p_get_meta( $connection->p2p_id, 'challonge_participant_id', true );
 
-            if($challonge_tournament_id){
+            if($challonge_tournament_id && !empty($challonge_participant_id)){
                 $challonge_result = $this->challonge_remove_player_from_tournament($challonge_tournament_id, $challonge_participant_id);
             }
 
@@ -786,7 +792,7 @@ class tournamentCPT {
             //easy search
             delete_post_meta($connection->p2p_to, 'challonge_participant_id');
 
-            $this->delete_tournament_caches($tournament_id);
+            self::delete_tournament_caches($tournament_id);
 
         }
     }
@@ -833,6 +839,8 @@ class tournamentCPT {
 
         //player found add player to tornament
         $p2p_result = p2p_type('tournament_players')->connect($tournament_id, $player_id, $connection_meta);
+
+        self::delete_tournament_caches($tournament_id);
 
         return $p2p_result;
 
@@ -1336,15 +1344,17 @@ class tournamentCPT {
 
     }
 
-    public function delete_tournament_caches($post_id){
+    public static function delete_tournament_caches($post_id){
 
         if ( wp_is_post_revision( $post_id ) )
             return;
 
-        $tournament_id = matchCPT::get_match_tournament_id($post_id);
 
         //todo is this being used?
         if ( matchCPT::$post_type != get_post_type($post_id) ) {
+
+            $tournament_id = matchCPT::get_match_tournament_id($post_id);
+
             delete_transient( 'tournament_result_' . $tournament_id );
         }
 

@@ -1317,6 +1317,7 @@ if(function_exists("register_field_group"))
                     'type' => 'select',
                     'instructions' => 'Will default to the system default signup form, unless a new form is selected here.',
                     'choices' => array (
+                        17 => 'Clanwars - Signup',
                         6 => 'Community Cup',
                         2 => 'Contact',
                         5 => 'Livestream - Survey',
@@ -1403,6 +1404,21 @@ if(function_exists("register_field_group"))
                     'formatting' => 'html',
                     'maxlength' => '',
                 ),
+                array (
+                    'key' => 'field_53f4bf023fe75',
+                    'label' => 'Tournament format',
+                    'name' => 'tournament_format',
+                    'type' => 'select',
+                    'choices' => array (
+                        'standard' => 'Standard',
+                        'clanwars' => 'Clan Wars',
+                        'kotp' => 'King of the planet',
+                        'teamtournament' => 'Team Tournament',
+                    ),
+                    'default_value' => '',
+                    'allow_null' => 1,
+                    'multiple' => 0,
+                ),
             ),
             'location' => array (
                 array (
@@ -1424,6 +1440,7 @@ if(function_exists("register_field_group"))
             'menu_order' => 0,
         ));
     }
+
     register_field_group(array (
         'id' => 'acf_user-profile',
         'title' => 'User profile',
