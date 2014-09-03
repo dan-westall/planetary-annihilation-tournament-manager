@@ -28,6 +28,9 @@ class PLTM_API_Endpoint{
         $vars[] = 'id_type';
         $vars[] = 'videos';
         $vars[] = 'test';
+        $vars[] = 'tournament_players';
+        $vars[] = 'clan';
+        $vars[] = 'match_players';
         return $vars;
     }
 
