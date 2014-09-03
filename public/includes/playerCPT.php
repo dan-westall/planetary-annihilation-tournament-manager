@@ -558,6 +558,10 @@ class playerCPT {
                 $_post['meta']['statistic']['tournament_plays']        = 0;
             }
 
+            if($pa_stats_id = get_post_meta($post['ID'], 'pastats_player_id', true)){
+                $_post['meta']['pastats_player_id'] = $pa_stats_id;
+            }
+
         }
 
         return $_post;
