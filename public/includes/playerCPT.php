@@ -567,6 +567,22 @@ class playerCPT {
                 $_post['meta']['pastats_player_id'] = $pa_stats_id;
             }
 
+            if($post['user_id']){
+
+                delete_transient('player_user_avatar_' .$post['ID']. '_src');
+
+                if ( false === ( $avatar_src = get_transient( 'player_user_avatar_' .$post['ID']. '_src'  ) ) ) {
+
+                    $avatar_src = get_wp_user_avatar_src($post->user_id, 'medium-player-profile-thumbnail');
+
+                    set_transient( 'player_user_avatar_' .$post['ID']. '_src', $avatar_src, ( HOUR_IN_SECONDS / 1 ) );
+
+                }
+
+            }
+
+            $_post['avatar'] = $avatar_src;
+
         }
 
         return $_post;
@@ -604,6 +620,7 @@ class playerCPT {
         if($query->query_vars['post_type'][0] == self::$post_type){
 
             $new_fields[]  = "(SELECT meta_value FROM $wpdb->postmeta WHERE post_id = $wpdb->posts.ID AND meta_key = 'clan') AS clan";
+            $new_fields[]  = "IFNULL((SELECT meta_value FROM $wpdb->postmeta WHERE post_id = $wpdb->posts.ID AND meta_key = 'user_id'), 0) AS user_id";
 
             $fields .= ', '.implode(', ', $new_fields);
         }
