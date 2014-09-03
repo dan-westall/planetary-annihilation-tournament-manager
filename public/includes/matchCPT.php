@@ -38,7 +38,7 @@ class matchCPT {
 
         add_filter( 'template_include',  array( $this, 'roster_management' ) );
 
-        add_action('wp_ajax_pltm_get_match_results',  array( $this, 'update_team_roster') );
+        add_action( 'wp_ajax_update_team_roster',  array( $this, 'update_team_roster') );
 
         add_action( 'parse_query',   array( $this, 'match_api_filter'));
 
@@ -682,12 +682,12 @@ class matchCPT {
 
             }
 
-            $p2p_result = p2p_type('match_players')->connect($_POST['match_id'], $player['wp_player_id'], array(
+            $p2p_result = p2p_type('match_players')->connect($_POST['match_id'], $player, array(
                 'date'                     => current_time('mysql'),
                 'team'                     => $team
             ));
 
-            do_action('clan_match_roster_change_add', $_POST['match_id'], $player['wp_player_id']);
+            do_action('clan_match_roster_change_add', $_POST['match_id'], $player);
 
         }
 
