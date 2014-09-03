@@ -761,7 +761,7 @@ class tournamentCPT {
 
             p2p_add_meta( $p2p_id, 'date', current_time('mysql') );
 
-            $this->delete_tournament_caches($tournament_id);
+            self::delete_tournament_caches($tournament_id);
 
         }
 
@@ -790,7 +790,7 @@ class tournamentCPT {
             //easy search
             delete_post_meta($connection->p2p_to, 'challonge_participant_id');
 
-            $this->delete_tournament_caches($tournament_id);
+            self::delete_tournament_caches($tournament_id);
 
         }
     }
@@ -837,6 +837,8 @@ class tournamentCPT {
 
         //player found add player to tornament
         $p2p_result = p2p_type('tournament_players')->connect($tournament_id, $player_id, $connection_meta);
+
+        self::delete_tournament_caches($tournament_id);
 
         return $p2p_result;
 
@@ -1340,15 +1342,17 @@ class tournamentCPT {
 
     }
 
-    public function delete_tournament_caches($post_id){
+    public static function delete_tournament_caches($post_id){
 
         if ( wp_is_post_revision( $post_id ) )
             return;
 
-        $tournament_id = matchCPT::get_match_tournament_id($post_id);
 
         //todo is this being used?
         if ( matchCPT::$post_type != get_post_type($post_id) ) {
+
+            $tournament_id = matchCPT::get_match_tournament_id($post_id);
+
             delete_transient( 'tournament_result_' . $tournament_id );
         }
 
