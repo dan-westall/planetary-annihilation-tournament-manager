@@ -48,6 +48,8 @@ class tournamentCPT {
 
         add_filter( 'json_prepare_post',  array( $this, 'tournament_json_extend' ), 50, 3 );
 
+        add_action( 'parse_query',   array( $this, 'tournament_api_filter'));
+
 
     }
 
@@ -1418,14 +1420,29 @@ class tournamentCPT {
 
         $clan = $wpdb->get_var($query);
 
-//        $key = ( 'from' == $direction ) ? 'p2p_to' : 'p2p_from';
-//
-//        $post = get_post( $connection->$key );
-//
-//        var_dump($direction->name[1]);
-//        $id = $direction->args['name'][1];
-
         return $clan;
+
+    }
+
+    public static function tournament_api_filter($wp_query){
+
+        if(isset($wp_query->query_vars['tournament_players']) && in_array('player', $wp_query->query_vars['post_type'])){
+
+            $tournament_id = $wp_query->query_vars['tournament_players'];
+
+            $wp_query->set('connected_type', 'tournament_players');
+            $wp_query->set('connected_items', $tournament_id);
+            $wp_query->set('connected_meta', [[ 'key' => 'status', 'value' => ['Active', 'Reserve'], 'compare' => 'IN']]);
+            $wp_query->set('nopaging', true);
+            $wp_query->set('suppress_filters', false);
+
+            if(isset($wp_query->query_vars['clan'])){
+                $clan = $wp_query->query_vars['clan'];
+                $wp_query->set('meta_query', [[ 'key' => 'clan', 'value' => $clan]]);
+            }
+        }
+
+        return $wp_query;
 
     }
 
