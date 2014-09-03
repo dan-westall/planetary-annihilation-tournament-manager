@@ -524,16 +524,39 @@ class playerCPT {
 
     public function extend_json_api($_post, $post, $context){
 
+        global $wp_query;
+
         if($post['post_type'] == self::$post_type){
 
-            $remove_fields = array('author', 'parent', 'format', 'slug', 'guid', 'excerpt', 'menu_order', 'ping_status', 'sticky');
+            $remove_fields = array('status', 'date', 'modified', 'comment_status', 'date_tz', 'date_gmt', 'modified_tz', 'modified_gmt', 'author', 'parent', 'format', 'slug', 'guid', 'excerpt', 'menu_order', 'ping_status', 'sticky', 'content', 'category', 'post_excerpt', 'tags_input', 'terms');
 
             //dont need author
             foreach($remove_fields as $field){
                 unset($_post[$field]);
+
             }
 
-            $_post['meta']['clan']        = '';;
+            unset($_post['meta']['links']);
+
+            $_post['meta']['clan']        = get_post_meta($post['ID'], 'clan', true);
+
+            if ( false === ( $win_percentage = get_transient( 'statistic_win_percentage_' .$post['ID']. '_api'  ) ) ) {
+
+                $statistic = new statistic();
+                $statistic->add_player($post['ID']);
+                $statistic->get_matches();
+
+                $win_percentage = $statistic->average_win_rate('%3$s');
+
+                set_transient( 'statistic_win_percentage_' .$post['ID']. '_api', $win_percentage, ( HOUR_IN_SECONDS / 1 ) );
+
+            }
+
+            $_post['meta']['statistic']['wins_percentage']        = (int) $win_percentage;
+
+            if(isset($_GET['filter']['tournament_players'])){
+                $_post['meta']['statistic']['tournament_plays']        = 0;
+            }
 
         }
 
@@ -570,6 +593,13 @@ class playerCPT {
         global $wpdb;
 
         if($query->query_vars['post_type'][0] == self::$post_type && $query->is_main_query()){
+
+            $new_fields[]  = $wpdb->prepare("(SELECT meta_value FROM $wpdb->postmeta WHERE post_id = $wpdb->posts.ID AND meta_key = 'clan') AS clan", '', '');
+
+            $fields .= ', '.implode(', ', $new_fields);
+        }
+
+        if(in_array(self::$post_type, $query->query_vars['post_type']) && isset($query->query_vars['tournament_players'])){
 
             $new_fields[]  = $wpdb->prepare("(SELECT meta_value FROM $wpdb->postmeta WHERE post_id = $wpdb->posts.ID AND meta_key = 'clan') AS clan", '', '');
 
