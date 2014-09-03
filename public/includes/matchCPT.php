@@ -40,6 +40,8 @@ class matchCPT {
 
         add_action('wp_ajax_pltm_get_match_results',  array( $this, 'update_team_roster') );
 
+        add_action( 'parse_query',   array( $this, 'match_api_filter'));
+
     }
 
     function register_cpt_match(){
@@ -720,6 +722,28 @@ class matchCPT {
         }
 
         return $clan_teams;
+
+    }
+
+
+    public static function match_api_filter($wp_query){
+
+        if(isset($wp_query->query_vars['match_players']) && in_array('player', $wp_query->query_vars['post_type'])){
+
+            $match_id = $wp_query->query_vars['match_players'];
+
+            $wp_query->set('connected_type', 'match_players');
+            $wp_query->set('connected_items', $match_id);
+            $wp_query->set('nopaging', true);
+            $wp_query->set('suppress_filters', false);
+
+            if(isset($wp_query->query_vars['clan'])){
+                $clan = $wp_query->query_vars['clan'];
+                $wp_query->set('meta_query', [[ 'key' => 'clan', 'value' => $clan]]);
+            }
+        }
+
+        return $wp_query;
 
     }
 
