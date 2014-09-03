@@ -2,8 +2,7 @@
 
 function get_tournament_players($tournament_id, $status = array('active'), $args = []){
 
-
-    $players = get_posts(array_merge(array(
+    $arg = array_merge(array(
         'connected_type'   => 'tournament_players',
         'connected_items'  => $tournament_id,
         'connected_meta' => array(
@@ -15,7 +14,9 @@ function get_tournament_players($tournament_id, $status = array('active'), $args
         ),
         'nopaging'         => true,
         'suppress_filters' => false
-    ), $args));
+    ), $args);
+
+    $players = get_posts($arg);
 
     return $players;
 
@@ -30,6 +31,17 @@ function get_tournament_matches($tournament_id){
     ));
 
     return $matches;
+
+}
+
+function get_current_user_clan(){
+
+
+        global $current_user;
+
+        $player_id = $current_user->player_id;
+
+        return get_post_meta($player_id, 'clan', true);
 
 }
 
