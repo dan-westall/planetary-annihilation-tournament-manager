@@ -148,6 +148,11 @@ class matchCPT {
                     'title' => 'Winner',
                     'type' => 'checkbox'
                 ),
+                'clan' => array(
+                    'title' => 'Clan',
+                    'type' => 'custom',
+                    'render' => 'matchCPT::p2p_display_clan'
+                ),
                 'team' => array(
                     'title' => 'Team',
                     'type' => 'select',
@@ -744,6 +749,18 @@ class matchCPT {
         }
 
         return $wp_query;
+
+    }
+
+    public static function p2p_display_clan($connection, $direction){
+
+        global $wpdb;
+
+        $query = $wpdb->prepare("SELECT (SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = 'clan' AND post_id = p2p.p2p_to) As clan FROM $wpdb->p2p AS p2p WHERE p2p_id = %s AND p2p_type = 'match_players'", $direction->name[1]);
+
+        $clan = $wpdb->get_var($query);
+
+        return $clan;
 
     }
 
