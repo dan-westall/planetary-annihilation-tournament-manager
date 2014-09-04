@@ -6,7 +6,7 @@ class matchCPT {
 
     public static $match_status = array( 'Open', 'Pending', 'Complete');
 
-    public static $match_format = array('Verses', 'FFA', 'Team');
+    public static $match_format = array( 'Verses', 'FFA', 'Team');
 
     function __construct() {
 
@@ -36,7 +36,7 @@ class matchCPT {
 //        add_action('wp_ajax_pltm_get_match_results',  array( $this, 'get_match_json') );
 //        add_action('wp_ajax_nopriv_pltm_get_match_results',  array( $this, 'get_match_json') );
 
-        add_filter( 'template_include',  array( $this, 'roster_management' ) );
+        //add_filter( 'template_include',  array( $this, 'roster_management' ) );
 
         add_action( 'wp_ajax_update_team_roster',  array( $this, 'update_team_roster') );
 
