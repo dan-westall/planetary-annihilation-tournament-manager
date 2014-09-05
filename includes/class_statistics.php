@@ -266,7 +266,7 @@ class statistic {
 
         return sprintf(
             $template,
-            __('Average Match Time'),
+            __('Avg Match Time'),
             'javascript:void(0);',
             $time->format('i'),
             'Mins'
@@ -369,7 +369,7 @@ class statistic {
 
         return sprintf(
             $template,
-            __('Average players per tournament'),
+            __('Avg players per tournament'),
             'javascript:void(0);',
             $average_players_per_tournament
         );
@@ -408,7 +408,7 @@ class statistic {
 
         return sprintf(
             $template,
-            __('Average matches per tournament'),
+            __('Avg matches per tournament'),
             'javascript:void(0);',
             $average_players_per_tournament
         );
@@ -447,7 +447,7 @@ class statistic {
 
         return sprintf(
             $template,
-            __('AVG Tournament play time'),
+            __('Avg Tournament play time'),
             'javascript:void(0);',
             ($average_players_per_tournament/60),
             'Hrs'

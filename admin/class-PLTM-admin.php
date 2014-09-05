@@ -395,6 +395,7 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
             fieldSettings["text"] += ", .field_map_setting";
             fieldSettings["email"] += ", .field_map_setting";
             fieldSettings["textarea"] += ", .field_map_setting";
+            fieldSettings["checkbox"] += ", .field_map_setting";
 
             //binding to the load field settings event to initialize the checkbox
             jQuery(document).bind("gform_load_field_settings", function (event, field, form) {
