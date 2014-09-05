@@ -567,7 +567,7 @@ class playerCPT {
                 $_post['meta']['pastats_player_id'] = $pa_stats_id;
             }
 
-            if($post['user_id']){
+            if(get_post_meta($post['ID'], 'user_id', true)){
 
                 delete_transient('player_user_avatar_' .$post['ID']. '_src');
 
