@@ -39,7 +39,7 @@ class playerCPT {
 
         add_action( 'save_post',  array( $this, 'test_update'), 10, 1 );
 
-        add_action( 'posts_fields', array( $this, 'extend_player_object'), 10, 100 );
+        //add_action( 'posts_fields', array( $this, 'extend_player_object'), 10, 100 );
 
     }
 

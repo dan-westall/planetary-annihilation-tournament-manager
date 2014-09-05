@@ -212,6 +212,11 @@ class tournamentCPT {
                     'type' => 'custom',
                     'render' => 'tournamentCPT::p2p_display_clan'
                 ),
+                'clan-contact' => array(
+                    'title' => 'Clan Contact',
+                    'type' => 'custom',
+                    'render' => 'tournamentCPT::p2p_display_clan_contact'
+                ),
                 'note' => array(
                     'title' => 'Note',
                     'type' => 'text',
@@ -1423,6 +1428,18 @@ class tournamentCPT {
     }
 
     public static function p2p_display_clan($connection, $direction){
+
+        global $wpdb;
+
+        $query = $wpdb->prepare("SELECT (SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = 'clan' AND post_id = p2p.p2p_to) As clan FROM $wpdb->p2p AS p2p WHERE p2p_id = %s AND p2p_type = 'tournament_players'", $direction->name[1]);
+
+        $clan = $wpdb->get_var($query);
+
+        return $clan;
+
+    }
+
+    public static function p2p_display_clan_contact($connection, $direction){
 
         global $wpdb;
 
