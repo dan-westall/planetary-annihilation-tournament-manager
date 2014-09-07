@@ -142,6 +142,8 @@ class tournamentCPT {
 
     public function register_p2p_connections() {
 
+        global $post;
+
         p2p_register_connection_type( array(
             'name' => 'tournament_staff',
             'from' => self::$post_type,
@@ -167,29 +169,7 @@ class tournamentCPT {
             )
         ) );
 
-//        p2p_register_connection_type( array(
-//            'name' => 'tournament_planets',
-//            'from' => self::$post_type,
-//            'to' => planetCPT::$post_type,
-//            'sortable' => 'from',
-//            'admin_box' => array(
-//                'show' => 'from',
-//                'context' => 'advanced'
-//            ),
-//            'title' => array(
-//                'from' => __( 'Tournament Planets', 'my-textdomain' )
-//            ),
-//            'fields' => array(
-//                'role' => array(
-//                    'title' => 'Round',
-//                    'type' => 'select',
-//                    'values' => apply_filters('tournament_rounds', array( ) )
-//                )
-//            )
-//        ) );
-
-
-        p2p_register_connection_type( array(
+        $tournament_players_args = array(
             'name' => 'tournament_players',
             'from' => self::$post_type,
             'to' => 'player',
@@ -211,18 +191,29 @@ class tournamentCPT {
                     'title' => 'Clan',
                     'type' => 'custom',
                     'render' => 'tournamentCPT::p2p_display_clan'
-                ),
-                'clan-contact' => array(
-                    'title' => 'Clan Contact',
-                    'type' => 'custom',
-                    'render' => 'tournamentCPT::p2p_display_clan_contact'
-                ),
-                'note' => array(
-                    'title' => 'Note',
-                    'type' => 'text',
                 )
             )
-        ) );
+        );
+
+        if(get_tournament_type($_GET['post']) == 'clanwars'){
+
+            $tournament_players_args = array_merge_recursive($tournament_players_args, [ 'fields' => [
+                'clan_contact' => array(
+                    'title' => 'Clan Contact',
+                    'type' => 'checkbox'
+                )
+            ]]);
+
+        }
+
+        $tournament_players_args = array_merge_recursive($tournament_players_args, [ 'fields' => [
+            'note' => array(
+                'title' => 'Note',
+                'type' => 'text',
+            )
+        ]]);
+
+        p2p_register_connection_type( $tournament_players_args );
 
         p2p_register_connection_type( array(
             'name' => 'tournament_excluded_players',
@@ -576,6 +567,9 @@ class tournamentCPT {
         if($values['clan']['value'])
             $connection_meta['clan'] = $values['clan']['value'];
 
+        if(!empty($values['clan_contact']['value']))
+            $connection_meta['clan_contact'] = $values['clan_contact']['value'];
+
         //add player to current challonge tournament
         if($challonge_tournament_id){
             $challonge_result = $this->challonge_add_player_to_tournament($challonge_tournament_id, $values['email']['value'], $values['ign']['value']);
@@ -598,8 +592,6 @@ class tournamentCPT {
         //update details, clan tag ingame
 
         update_post_meta($player_id, 'clan', $values['clan']['value']);
-        update_post_meta($player_id, 'clan_contact', $values['clan_contact']['value']);
-
 
     }
 
@@ -1443,7 +1435,7 @@ class tournamentCPT {
 
         global $wpdb;
 
-        $query = $wpdb->prepare("SELECT (SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = 'clan' AND post_id = p2p.p2p_to) As clan FROM $wpdb->p2p AS p2p WHERE p2p_id = %s AND p2p_type = 'tournament_players'", $direction->name[1]);
+        $query = $wpdb->prepare("SELECT (SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = 'clan_contact' AND post_id = p2p.p2p_to) As clan FROM $wpdb->p2p AS p2p WHERE p2p_id = %s AND p2p_type = 'tournament_players'", $direction->name[1]);
 
         $clan = $wpdb->get_var($query);
 
