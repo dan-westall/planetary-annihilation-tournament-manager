@@ -16,6 +16,8 @@ class tournamentCPT {
 
         add_action( 'init', array( $this, 'register_cpt_tournament') );
         add_action( 'init', array( $this, 'register_cpt_taxonomies') );
+
+        add_action( 'after_setup_theme', array( $this, 'ctp_permission') );
         
         add_action( 'widgets_init', array( $this, 'register_tournament_sidebar') );
 
@@ -78,11 +80,42 @@ class tournamentCPT {
                 'show_ui'             => true,
                 'menu_position'       => 10,
                 'menu_icon'           => 'dashicons-networking',
+                'capability_type'     => array('tournament','tournaments'),
                 'supports'            => array('title', 'editor', 'thumbnail')
             );
 
         register_post_type( self::$post_type, $tournamentArgs );
 
+    }
+
+    function ctp_permission(){
+
+        $roles = array(
+            get_role('administrator')
+        );
+
+
+        $caps  = array(
+            'read',
+            'read_'.self::$post_type.'',
+            'read_private_'.self::$post_type.'s',
+            'edit_'.self::$post_type,
+            'edit_'.self::$post_type.'s',
+            'edit_private_'.self::$post_type.'s',
+            'edit_published_'.self::$post_type.'s',
+            'edit_others_'.self::$post_type.'s',
+            'publish_'.self::$post_type.'s',
+            'delete_'.self::$post_type.'s',
+            'delete_private_'.self::$post_type.'s',
+            'delete_published_'.self::$post_type.'s',
+            'delete_others_'.self::$post_type.'s',
+        );
+
+        foreach ($roles as $role) {
+            foreach ($caps as $cap) {
+                $role->add_cap($cap);
+            }
+        }
     }
 
     function register_cpt_taxonomies(){

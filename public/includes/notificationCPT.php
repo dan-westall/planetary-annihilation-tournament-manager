@@ -17,6 +17,8 @@ class notificationCPT {
         add_action( 'init', array( $this, 'register_notification_actions') );
         //add_action( 'template_include', array( $this, 'get_notification_results') );
 
+        add_action( 'after_setup_theme', array( $this, 'ctp_permission') );
+
         add_action( 'p2p_init', array( $this, 'register_p2p_connections' ) );
 
         add_action( 'tournament_signup_Active', array( $this, 'email_notification' ), 10, 3);
@@ -63,11 +65,42 @@ class notificationCPT {
             'show_ui'             => true,
             'menu_position'       => 10,
             'menu_icon'           => 'dashicons-email-alt',
+            'capability_type'     => array('notification','notifications'),
             'supports'            => array('title', 'editor')
         );
 
         register_post_type( self::$post_type, $notificationArgs );
 
+    }
+
+    function ctp_permission(){
+
+        $roles = array(
+            get_role('administrator')
+        );
+
+
+        $caps  = array(
+            'read',
+            'read_'.self::$post_type.'',
+            'read_private_'.self::$post_type.'s',
+            'edit_'.self::$post_type,
+            'edit_'.self::$post_type.'s',
+            'edit_private_'.self::$post_type.'s',
+            'edit_published_'.self::$post_type.'s',
+            'edit_others_'.self::$post_type.'s',
+            'publish_'.self::$post_type.'s',
+            'delete_'.self::$post_type.'s',
+            'delete_private_'.self::$post_type.'s',
+            'delete_published_'.self::$post_type.'s',
+            'delete_others_'.self::$post_type.'s',
+        );
+
+        foreach ($roles as $role) {
+            foreach ($caps as $cap) {
+                $role->add_cap($cap);
+            }
+        }
     }
 
     public function register_p2p_connections(){

@@ -15,6 +15,8 @@ class matchCPT {
         add_action( 'init', array( $this, 'populate_taxonomy_terms') );
         //add_action( 'template_include', array( $this, 'get_match_results') );
 
+        add_action( 'after_setup_theme', array( $this, 'ctp_permission') );
+
         add_action( 'p2p_init', array( $this, 'register_p2p_connections' ) );
 
         add_shortcode('tournament-matches', array( $this, 'get_match_results') );
@@ -47,17 +49,17 @@ class matchCPT {
     function register_cpt_match(){
 
         $matchLabel = array(
-            'name'               => __('Matchs'),
+            'name'               => __('Matches'),
             'menu_name'          => __('Match'),
-            'all_items'          => __('All Matchs'),
+            'all_items'          => __('All Matches'),
             'singular_name'      => __('Match'),
             'add_new_item'       => __('Add New Match'),
             'edit_item'          => __('Edit Match'),
             'new_item'           => __('New Match'),
             'view_item'          => __('View Match'),
-            'search_items'       => __('Search Matchs'),
-            'not_found'          => __('No Matchs found'),
-            'not_found_in_trash' => __('No Matchs found in trash')
+            'search_items'       => __('Search Matches'),
+            'not_found'          => __('No Matches found'),
+            'not_found_in_trash' => __('No Matches found in trash')
         );
 
         $matchArgs = array(
@@ -70,6 +72,7 @@ class matchCPT {
                 'show_in_json'        => true,
                 'menu_position'       => 10,
                 'menu_icon'           => 'dashicons-video-alt3',
+                'capability_type'     => array('match','matches'),
                 'supports'            => array('title', 'thumbnail', 'comments')
             );
 
@@ -77,6 +80,36 @@ class matchCPT {
 
 
 
+    }
+    
+    function ctp_permission(){
+
+        $roles = array(
+            get_role('administrator')
+        );
+
+
+        $caps  = array(
+            'read',
+            'read_'.self::$post_type.'',
+            'read_private_'.self::$post_type.'es',
+            'edit_'.self::$post_type,
+            'edit_'.self::$post_type.'es',
+            'edit_private_'.self::$post_type.'es',
+            'edit_published_'.self::$post_type.'es',
+            'edit_others_'.self::$post_type.'es',
+            'publish_'.self::$post_type.'es',
+            'delete_'.self::$post_type.'es',
+            'delete_private_'.self::$post_type.'es',
+            'delete_published_'.self::$post_type.'es',
+            'delete_others_'.self::$post_type.'es',
+        );
+
+        foreach ($roles as $role) {
+            foreach ($caps as $cap) {
+                $role->add_cap($cap);
+            }
+        }
     }
 
     function register_cpt_taxonomies(){
