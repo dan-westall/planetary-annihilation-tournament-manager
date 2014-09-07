@@ -106,6 +106,25 @@ function is_player_in_tournament($tournament_id, $player_id ){
 
 }
 
+function is_tournament_clan_contact($tournament_id, $clan_tag){
+
+
+
+
+}
+
+function is_clan_leader($clan_tag){
+
+}
+
+
+function get_tournament_type($tournament_id){
+
+    return get_post_meta($tournament_id, 'tournament_format', true);
+
+}
+
+
 function get_match_commentators($match_id){
 
     $commentators = get_users( array(
