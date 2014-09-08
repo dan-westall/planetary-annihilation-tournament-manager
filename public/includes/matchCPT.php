@@ -638,7 +638,9 @@ class matchCPT {
         return $orderby_statement;
     }
 
-    public function realtime_update_match_listing($match_id, $tournament_id){
+    public function realtime_update_match_listing($match_id){
+
+        $tournament_id = self::get_match_tournament_id($match_id);
 
         //fetch match object
         $_match = get_post($match_id, ARRAY_A);

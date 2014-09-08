@@ -797,6 +797,8 @@ class tournamentCPT {
 
         }
 
+
+
     }
 
     public function action_p2p_delete_connection($p2p_id){

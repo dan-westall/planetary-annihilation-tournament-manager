@@ -33,8 +33,6 @@ class notificationCPT {
 
         //mass notifications
         add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
-        add_action( 'save_post', array( $this, 'save' ) );
-
         add_action('wp_ajax_tournament_2_day_notice', array($this,'tournament_2_day_notice'));
         add_action('wp_ajax_tournament_wrap_up', array($this,'tournament_wrap_up'));
 
