@@ -461,8 +461,8 @@ class playerCPT {
         $transient_key     = sprintf('player_%s_avatar_%s', $user->ID, $size);
         $logged_in_user_id = get_current_user_id();
 
-//        if((is_user_logged_in() && DW_Helper::is_site_administrator()) || ($logged_in_user_id == $player_user_id))
-//            delete_transient( 'player_' .$user->ID. '_avatar_' .$size );
+        if(is_user_logged_in() && DW_Helper::is_site_administrator())
+            delete_transient( $transient_key );
 
         if ( false === ( $user_avatar_img = get_transient( $transient_key ) ) ) {
 
