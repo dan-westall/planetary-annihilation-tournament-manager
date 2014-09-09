@@ -624,7 +624,8 @@ class tournamentCPT {
 
         //update details, clan tag ingame
 
-        update_post_meta($player_id, 'clan', $values['clan']['value']);
+        if(!empty($values['clan']['value']))
+            update_post_meta($player_id, 'clan', $values['clan']['value']);
 
     }
 
