@@ -376,6 +376,8 @@ class matchCPT {
 
         $match_cards = '';
 
+        $match_format = matchCPT::match_format($match_id);
+
         $player_card = '
                     <div class="player-match-card %5$s">
                         <div class="player-match-card-inner row text">
@@ -417,7 +419,13 @@ class matchCPT {
 
             $teams[p2p_get_meta($player->p2p_id, 'team', true)] .= $card;
 
-            if(matchCPT::match_format($match_id) == "format-vs"){
+            if($clan = get_post_meta($player->ID, 'clan', true)){
+
+                $clans[$clan] .= $card;
+
+            }
+
+            if($match_format == "format-vs"){
                 $match_card[] = '<div class="col-lg-5">'.$card.'</div>';
             } else {
                 $match_card[] = $card;
@@ -425,7 +433,7 @@ class matchCPT {
 
         }
 
-        switch(matchCPT::match_format($match_id)){
+        switch($match_format){
 
             case "format-vs" :
 
@@ -468,6 +476,7 @@ class matchCPT {
                 break;
 
             case "format-vs-team" :
+            case "format-vs-team-clan" :
 
                 $vs = '<div class="vs col-lg-2"></div>';
 
@@ -477,12 +486,32 @@ class matchCPT {
 
                     $match_cards .= '<div class="row">';
 
-                    foreach ($pair as $team) {
+                    foreach ($pair as $key => $team) {
+
+                        $team_label = $team_count;
 
                         if ($team === end($pair) && count($pair) > 1){
-                            $match_cards .= $vs.  '<div class="col-lg-5"><h3 class="text-center">Team '.$team_count.'</h3>'.$team.'</div>' ;
+
+                            //todo remove nasty!!
+                            if($match_format == "format-vs-team-clan"){
+                                if(false !== $key = array_search($team, $clans)){
+                                    $team_label = $key;
+                                }
+
+                            }
+
+                            $match_cards .= $vs.  '<div class="col-lg-5"><h3 class="text-center">Team '.$team_label.'</h3>'.$team.'</div>' ;
                         } else {
-                            $match_cards .=  '<div class="col-lg-5"><h3 class="text-center">Team '.$team_count.'</h3>'.$team.'</div>' ;
+
+                            //todo remove nasty!!
+                            if($match_format == "format-vs-team-clan"){
+                                if(false !== $key = array_search($team, $clans)){
+                                    $team_label = $key;
+                                }
+
+                            }
+
+                            $match_cards .=  '<div class="col-lg-5"><h3 class="text-center">Team '.$team_label.'</h3>'.$team.'</div>' ;
                         }
 
                         $team_count ++;
@@ -492,8 +521,9 @@ class matchCPT {
                 }
 
                 $html = sprintf(
-                    '<h3 class="text-center">%s Player - Team VS</h3><section class="player-matchup">%s</section>',
+                    '<h3 class="text-center">%s Player - Team VS</h3><section class="player-matchup %s">%s</section>',
                     count($players->posts),
+                    $match_format,
                     $match_cards
                 );
                 break;
@@ -558,6 +588,7 @@ class matchCPT {
             $_post['meta']['pa_stats_stop']  = get_post_meta($post['ID'], 'pa_stats_stop', true);
             $_post['meta']['twitch']         = get_post_meta($post['ID'], 'twitch', true);
             $_post['meta']['match_round']    = get_post_meta($post['ID'], 'match_round', true);
+            $_post['meta']['team_filter']    = get_post_meta($post['ID'], 'team_filter', true);
 
         }
 
@@ -645,14 +676,11 @@ class matchCPT {
         //fetch match object
         $_match = get_post($match_id, ARRAY_A);
 
-
-
         foreach($_match as $key => $match){
 
             $new_match[str_replace('post_', '', $key)] = $match;
 
         }
-
 
         //add detail
         $match = matchCPT::extend_json_api($new_match, $_match, 'realtime_match_listing');
@@ -674,11 +702,16 @@ class matchCPT {
 
         $match = get_post($match_id);
         $teams = [];
+        $clans = [];
         $players    = p2p_type('match_players')->get_connected($match->ID);
 
         foreach ($players->posts as $player) {
 
             $teams[p2p_get_meta($player->p2p_id, 'team', true)] ++;
+
+            if($clan = get_post_meta($player->ID, 'clan', true)){
+                $clans[$clan] = true;
+            }
         }
 
 
@@ -686,6 +719,8 @@ class matchCPT {
             return 'format-vs';
         } else if(count($teams) == count($players->posts)){
             return 'format-ffs';
+        } else if(count($teams) < count($players->posts) && count($teams) == count($clans)) {
+            return 'format-vs-team-clan';
         } else if(count($teams) < count($players->posts)){
             return 'format-vs-team';
         }
@@ -694,9 +729,11 @@ class matchCPT {
 
     public static function roster_management($original_template){
 
-        global $wp_query;
+        global $wp_query, $post;
 
-        if ( $wp_query->get('post_type') == 'match' && isset( $wp_query->query_vars['roster'] )) {
+        $tournament_id = self::get_match_tournament_id($post->ID);
+
+        if ( $wp_query->get('post_type') == 'match' && isset( $wp_query->query_vars['roster'] ) && (can_edit_match_roster($tournament_id, get_current_user_clan()) && in_array(get_current_user_clan(), explode(',',get_post_meta($post->ID, 'team_filter', true))) )) {
             return get_template_directory().'/single-match-roster-management.php';
         } else {
             return $original_template;
@@ -706,9 +743,47 @@ class matchCPT {
 
     public static function update_team_roster(){
 
-        $total_teams = range(0, 10);
+        $total_teams   = range(0, 10);
+        $tournament_id = self::get_match_tournament_id($_POST['match_id']);
 
-        $teams = self::get_clan_team_from_match($_POST['match_id']);
+        if(!can_edit_match_roster($tournament_id, get_current_user_clan()) && !in_array(get_current_user_clan(), explode(',',get_post_meta($_POST['match_id'], 'team_filter', true))) )
+            die();
+
+        //if winners have been declared then no changes to roster are allowed.
+        if( count(self::get_match_winners($_POST['match_id'])) !== 0 ){
+
+            json_encode(['message' => 'This match has winners declared, roster cannot be changed']);
+
+            die();
+        }
+
+        if( get_post_meta($_POST['match_id'], 'pa_stats_start', true) != ''){
+
+            json_encode(['message' => 'This match has started, roster cannot be changed']);
+
+            die();
+        }
+
+        if( get_post_meta($_POST['match_id'], 'pa_stats_match_id', true) != '' ){
+
+            json_encode(['message' => 'This match has a pa match ID, roster cannot be changed']);
+
+            die();
+        }
+
+        $teams     = self::get_clan_team_from_match($_POST['match_id']);
+        $user_clan = get_current_user_clan();
+
+
+        //todo change to diff for better action notifications
+        $players    = p2p_type('match_players')->get_connected( $_POST['match_id'] );
+
+        foreach ($players->posts as $player) {
+
+            if(get_post_meta($player->ID, 'clan', true) == $user_clan)
+                p2p_type( 'match_players' )->disconnect( $_POST['match_id'], $player->ID );
+
+        }
 
         foreach($_POST['players'] as $player){
 
@@ -731,7 +806,7 @@ class matchCPT {
 
         }
 
-        //echo json_encode(array('matches_string' => $matches_String, 'updated_at' => date('d.m.Y H:i:s')));
+        json_encode(['message' => 'This match roster updated']);
 
         die();
 
@@ -783,7 +858,40 @@ class matchCPT {
             }
         }
 
+        if(isset($wp_query->query_vars['match_statuss']) && in_array(self::$post_type, $wp_query->query_vars['post_type'])){
+
+            $match_status = $wp_query->query_vars['match_statuss'];
+
+            switch($match_status) {
+                case "played" :
+
+                    $wp_query->set('meta_query', [
+                        'relation' => 'OR',
+                        [ 'key' => 'schedule_date', 'value' => date('Ymd') , 'type' => 'date', 'compare' => '<'],
+                        [ 'key' => 'schedule_date', 'value' => ''],
+                        [ 'key' => 'schedule_date', 'value' => '', 'compare' => 'NOT EXISTS']
+                    ]);
+
+                    break;
+            }
+
+        }
+
+
         return $wp_query;
+
+    }
+
+
+    public static function get_match_winners($match_id){
+
+        global $wpdb;
+
+        $query = $wpdb->prepare("SELECT p2p.p2p_to as player_id FROM $wpdb->p2p AS p2p WHERE p2p_from = %s AND ( SELECT meta_value FROM $wpdb->p2pmeta WHERE meta_key = 'winner' AND p2p_id = p2p.p2p_id ) = 1  AND p2p_type = 'match_players';", $match_id);
+
+        $winners = $wpdb->get_var($query);
+
+        return $winners;
 
     }
 

@@ -228,7 +228,7 @@ class tournamentCPT {
             )
         );
 
-        if(get_tournament_type($_GET['post']) == 'clanwars'){
+        if(get_tournament_type($_GET['post']) == 'clanwars' || get_tournament_type($_REQUEST['post_ID']) == 'clanwars'){
 
             $tournament_players_args = array_merge_recursive($tournament_players_args, [ 'fields' => [
                 'clan_contact' => array(

@@ -108,15 +108,43 @@ function is_player_in_tournament($tournament_id, $player_id ){
 
 function is_tournament_clan_contact($tournament_id, $clan_tag){
 
+    global $current_user;
 
+    $player_id = $current_user->player_id;
 
+    $p2p_id = p2p_type( 'tournament_players' )->get_p2p_id( $tournament_id, $player_id );
+
+    $clan_contact = p2p_get_meta( $p2p_id, 'clan_contact', true );
+    $current_clan = get_current_user_clan();
+
+    if ( $clan_contact == 1 && $current_clan === $clan_tag)
+        return true;
+
+    return false;
 
 }
 
 function is_clan_leader($clan_tag){
 
+    global $current_user;
+
+    $player_id = $current_user->player_id;
+
+    if(get_post_meta($player_id, 'clan', true) === $clan_tag && get_post_meta($player_id, 'clan_leader', true))
+        return true;
+
+    return false;
+
 }
 
+function can_edit_match_roster($tournament_id, $clan_tag){
+
+    if(is_tournament_clan_contact($tournament_id, $clan_tag) || is_clan_leader($clan_tag))
+        return true;
+
+    return false;
+
+}
 
 function get_tournament_type($tournament_id){
 

@@ -31,6 +31,7 @@ class PLTM_API_Endpoint{
         $vars[] = 'tournament_players';
         $vars[] = 'clan';
         $vars[] = 'match_players';
+        $vars[] = 'match_statuss';
         return $vars;
     }
 
