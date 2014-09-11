@@ -752,21 +752,21 @@ class matchCPT {
         //if winners have been declared then no changes to roster are allowed.
         if( count(self::get_match_winners($_POST['match_id'])) !== 0 ){
 
-            json_encode(['message' => 'This match has winners declared, roster cannot be changed']);
+            echo  json_encode(['message' => 'This match has winners declared, roster cannot be changed']);
 
             die();
         }
 
         if( get_post_meta($_POST['match_id'], 'pa_stats_start', true) != ''){
 
-            json_encode(['message' => 'This match has started, roster cannot be changed']);
+            echo json_encode(['message' => 'This match has started, roster cannot be changed']);
 
             die();
         }
 
         if( get_post_meta($_POST['match_id'], 'pa_stats_match_id', true) != '' ){
 
-            json_encode(['message' => 'This match has a pa match ID, roster cannot be changed']);
+            echo json_encode(['message' => 'This match has a pa match ID, roster cannot be changed']);
 
             die();
         }
@@ -806,7 +806,7 @@ class matchCPT {
 
         }
 
-        json_encode(['message' => 'This match roster updated']);
+        echo json_encode(['message' => 'This match roster has been updated']);
 
         die();
 
