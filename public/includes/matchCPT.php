@@ -731,14 +731,22 @@ class matchCPT {
 
         global $wp_query, $post;
 
-        $tournament_id = self::get_match_tournament_id($post->ID);
+        if($wp_query->get('post_type') == 'match'){
 
-        if ( $wp_query->get('post_type') == 'match' && isset( $wp_query->query_vars['roster'] ) && (can_edit_match_roster($tournament_id, get_current_user_clan()) && in_array(get_current_user_clan(), explode(',',get_post_meta($post->ID, 'team_filter', true))) )) {
-            return get_template_directory().'/single-match-roster-management.php';
-        } else {
-            return $original_template;
+            $tournament_id = self::get_match_tournament_id($post->ID);
+            $currentClan   = get_current_user_clan();
+            $canEdit       = can_edit_match_roster($tournament_id, $currentClan);
+            $inclan        = in_array($currentClan, explode(',', get_post_meta($post->ID, 'team_filter', true)));
+
+            if (isset( $wp_query->query_vars['roster'] ) && ($canEdit == true && $inclan == true )) {
+                return get_template_directory().'/single-match-roster-management.php';
+            } else {
+                return $original_template;
+            }
+
         }
 
+        return $original_template;
     }
 
     public static function update_team_roster(){

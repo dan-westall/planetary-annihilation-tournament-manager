@@ -160,6 +160,9 @@ function get_match_commentators($match_id){
         'connected_items' => $match_id
     ) );
 
+    if(count($commentators) == 0)
+        return '';
+
     foreach($commentators as $commentator){
 
         if($player_id = get_user_meta($commentator->ID, 'player_id', true)){
@@ -169,6 +172,8 @@ function get_match_commentators($match_id){
         }
 
     }
+
+
 
     return implode(', ', $commentators_str);
 

@@ -199,18 +199,24 @@ class statistic {
         $matches = $this->matches;
         $win     = $lose = 0;
 
-        foreach ($matches as $match_id) {
+        if(count($matches > 0)){
 
-            $p2p_id = p2p_type('match_players')->get_p2p_id($match_id, $this->players[0]);
+            foreach ($matches as $match_id) {
 
-            $result = p2p_get_meta($p2p_id, 'winner', true);
+                $p2p_id = p2p_type('match_players')->get_p2p_id($match_id, $this->players[0]);
 
-            if ($result) {
-                $win ++;
-            } else {
-                $lose = 0;
+                $result = p2p_get_meta($p2p_id, 'winner', true);
+
+                if ($result) {
+                    $win ++;
+                } else {
+                    $lose = 0;
+                }
+
             }
 
+        } else {
+            $matches = 0;
         }
 
         $ratio = round( ( $win / count($matches) ) * 100 );
