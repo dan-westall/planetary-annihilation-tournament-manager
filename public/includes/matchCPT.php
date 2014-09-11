@@ -731,7 +731,7 @@ class matchCPT {
 
         global $wp_query, $post;
 
-        if($wp_query->get('post_type') == 'match'){
+        if($wp_query->get('post_type') == 'match' && !is_admin()){
 
             $tournament_id = self::get_match_tournament_id($post->ID);
             $currentClan   = get_current_user_clan();
