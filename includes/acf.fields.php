@@ -722,6 +722,22 @@ if(function_exists("register_field_group"))
                 'type' => 'tab',
             ),
             array (
+                'key' => 'field_54121b60e5de0',
+                'label' => 'Tournament Status',
+                'name' => 'tournament_status',
+                'type' => 'select',
+                'choices' => array (
+                    0 => 'Signup',
+                    1 => 'In Progress',
+                    2 => 'Cancelled',
+                    3 => 'Finished',
+                    4 => 'Preparation',
+                ),
+                'default_value' => '',
+                'allow_null' => 0,
+                'multiple' => 0,
+            ),
+            array (
                 'key' => 'field_531a31bfb8693',
                 'label' => 'Run Date',
                 'name' => 'run_date',
