@@ -460,6 +460,12 @@ class tournamentCPT {
 
         $player = $wpdb->get_row( $wpdb->prepare("SELECT user_email, ID AS user_id, (SELECT meta_value FROM wp_usermeta  WHERE user_id = user.ID AND meta_key = 'player_id') AS player_id  FROM $wpdb->users AS user WHERE user_email = %s", $values['email']['value']) );
 
+        //do name check
+        if(!isset($player->player_id)){
+
+            $player = $wpdb->get_row( $wpdb->prepare("SELECT user_email, post.ID, (SELECT meta_value FROM wp_postmeta  WHERE post_id = post.ID AND meta_key = 'user_id') AS user_id  FROM wp_posts AS post LEFT JOIN wp_users AS user ON user.ID = (SELECT meta_value FROM wp_postmeta  WHERE post_id = post.ID AND meta_key = 'user_id') WHERE post_title = '%s' AND user_email != ''", $values['ign']['value']) );
+
+        }
 
         //$player = DW_Helper::get_post_by_meta('player_email', $values['email']['value']);
 
