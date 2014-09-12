@@ -574,7 +574,7 @@ class tournamentCPT {
                 return $form;
             }
 
-            wp_update_post( ['ID' => $player_id, 'post_title' => $values['ign']['value'] ] );
+            //wp_update_post( ['ID' => $player_id, 'post_title' => $values['ign']['value'] ] );
 
         } else {
 
