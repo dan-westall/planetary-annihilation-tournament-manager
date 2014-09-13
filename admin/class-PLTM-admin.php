@@ -93,11 +93,15 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
         //admin dashboard widgets
         add_action('wp_dashboard_setup', array($this, 'tournament_player_management') );
 
-        acf_add_options_sub_page(array(
-            'title' => 'PLTM Signatures',
-            'parent' => 'options-general.php',
-            'capability' => 'manage_options'
-        ));
+
+        if(function_exists('acf_add_options_sub_page')){
+            acf_add_options_sub_page(array(
+                'title' => 'PLTM Signatures',
+                'parent' => 'options-general.php',
+                'capability' => 'manage_options'
+            ));
+
+        }
 
         add_filter( 'parse_query', array($this, 'player_table_filter') );
         add_action( 'restrict_manage_posts', array($this, 'player_table_filtering') );
