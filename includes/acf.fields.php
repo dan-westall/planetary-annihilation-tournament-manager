@@ -1,5 +1,6 @@
 <?php
 
+
 if(function_exists("register_field_group"))
 {
     register_field_group(array (
@@ -296,6 +297,28 @@ if(function_exists("register_field_group"))
                 'message' => '',
                 'default_value' => 0,
             ),
+            array (
+                'key' => 'field_54146c74d0f8e',
+                'label' => 'Commentary Profile',
+                'name' => 'commentary_profile',
+                'type' => 'textarea',
+                'conditional_logic' => array (
+                    'status' => 1,
+                    'rules' => array (
+                        array (
+                            'field' => 'field_53e0156cac47e',
+                            'operator' => '==',
+                            'value' => '1',
+                        ),
+                    ),
+                    'allorany' => 'all',
+                ),
+                'default_value' => 'Keep it small',
+                'placeholder' => '',
+                'maxlength' => '',
+                'rows' => 3,
+                'formatting' => 'br',
+            ),
         ),
         'location' => array (
             array (
@@ -345,29 +368,6 @@ if(function_exists("register_field_group"))
                 'default_value' => '',
                 'toolbar' => 'full',
                 'media_upload' => 'yes',
-            ),
-            array (
-                'key' => 'field_53e015b0fabdc',
-                'label' => 'Commentary Profile',
-                'name' => 'commentary_profile',
-                'type' => 'textarea',
-                'instructions' => 'Will appear on a tournament in progress page when your are a match Commentator. (125 Character Limit)',
-                'conditional_logic' => array (
-                    'status' => 1,
-                    'rules' => array (
-                        array (
-                            'field' => 'null',
-                            'operator' => '==',
-                            'value' => '',
-                        ),
-                    ),
-                    'allorany' => 'all',
-                ),
-                'default_value' => '',
-                'placeholder' => '',
-                'maxlength' => 125,
-                'rows' => '',
-                'formatting' => 'br',
             ),
             array (
                 'key' => 'field_53e614f15669e',
