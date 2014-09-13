@@ -657,7 +657,7 @@ class tournamentCPT {
 
         }
 
-        if(is_int($tournament_status) && $tournament_status > 0){
+        if($tournament_status >= 1){
 
             return false;
 
