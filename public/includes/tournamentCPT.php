@@ -105,6 +105,7 @@ class tournamentCPT {
             'edit_published_'.self::$post_type.'s',
             'edit_others_'.self::$post_type.'s',
             'publish_'.self::$post_type.'s',
+            'delete_'.self::$post_type,
             'delete_'.self::$post_type.'s',
             'delete_private_'.self::$post_type.'s',
             'delete_published_'.self::$post_type.'s',

@@ -99,6 +99,7 @@ class matchCPT {
             'edit_published_'.self::$post_type.'es',
             'edit_others_'.self::$post_type.'es',
             'publish_'.self::$post_type.'es',
+            'delete_'.self::$post_type,
             'delete_'.self::$post_type.'es',
             'delete_private_'.self::$post_type.'es',
             'delete_published_'.self::$post_type.'es',

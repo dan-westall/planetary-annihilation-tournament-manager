@@ -11,6 +11,8 @@ class playerCPT {
         //add_action( 'user_register', array( $this, 'action_new_player_profile' ) );
         add_action( 'after_setup_theme', array( $this, 'add_news_caps_to_admin') );
 
+        add_action( 'after_setup_theme', array( $this, 'ctp_permission') );
+
         add_action( 'p2p_init', array( $this, 'register_p2p_connections' ) );
 
 //        //admin menu removed create new player for non admins
@@ -74,6 +76,38 @@ class playerCPT {
 
         register_post_type( self::$post_type, $playerArgs );
 
+    }
+
+
+    function ctp_permission(){
+
+        $roles = array(
+            get_role('administrator')
+        );
+
+
+        $caps  = array(
+            'read',
+            'read_'.self::$post_type.'',
+            'read_private_'.self::$post_type.'s',
+            'edit_'.self::$post_type,
+            'edit_'.self::$post_type.'s',
+            'edit_private_'.self::$post_type.'s',
+            'edit_published_'.self::$post_type.'s',
+            'edit_others_'.self::$post_type.'s',
+            'publish_'.self::$post_type.'s',
+            'delete_'.self::$post_type,
+            'delete_'.self::$post_type.'s',
+            'delete_private_'.self::$post_type.'s',
+            'delete_published_'.self::$post_type.'s',
+            'delete_others_'.self::$post_type.'s',
+        );
+
+        foreach ($roles as $role) {
+            foreach ($caps as $cap) {
+                $role->add_cap($cap);
+            }
+        }
     }
 
     public function register_p2p_connections() {
