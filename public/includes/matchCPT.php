@@ -671,6 +671,9 @@ class matchCPT {
 
     public function realtime_update_match_listing($match_id){
 
+        if(get_post_type($match_id) != self::$post_type)
+            return false;
+
         $tournament_id = self::get_match_tournament_id($match_id);
 
         //fetch match object
