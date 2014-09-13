@@ -640,6 +640,7 @@ class tournamentCPT {
         $tournament_closed        = get_post_meta($tournament_id, 'signup_closed', true);
         $tournament_slots         = get_post_meta($tournament_id, 'slots', true);
         $tournament_reserve_slots = get_post_meta($tournament_id, 'reserve_slots', true);
+        $tournament_status        = get_post_meta($tournament_id, 'tournament_status', true);
         $total_tournament_slots   = ($tournament_slots + $tournament_reserve_slots);
 
         $current_player_total     = count(get_tournament_players($tournament_id, array(self::$tournament_player_status[0], self::$tournament_player_status[1])));
@@ -656,6 +657,11 @@ class tournamentCPT {
 
         }
 
+        if(is_int($tournament_status) && $tournament_status > 0){
+
+            return false;
+
+        }
 
         return true;
 
@@ -1390,7 +1396,7 @@ class tournamentCPT {
 
 
         //todo is this being used?
-        if ( matchCPT::$post_type != get_post_type($post_id) ) {
+        if ( matchCPT::$post_type == get_post_type($post_id) ) {
 
             $tournament_id = matchCPT::get_match_tournament_id($post_id);
 
