@@ -492,11 +492,15 @@ class tournamentCPT {
 
         }
 
+        //if we have any excluded players
+        if(is_array(self::players_excluded_from_tournament($tournament_id))){
 
-        if (in_array($values['email']['value'], self::players_excluded_from_tournament($tournament_id))){
+            if (in_array($values['email']['value'], self::players_excluded_from_tournament($tournament_id))){
 
-            $validation_result['is_valid'] = false;
-            $validation_result['form']['cssClass'] = 'player-is-excluded';
+                $validation_result['is_valid'] = false;
+                $validation_result['form']['cssClass'] = 'player-is-excluded';
+
+            }
 
         }
 
@@ -555,9 +559,12 @@ class tournamentCPT {
             );
         }
 
-        //if email is in excluded players bin
-        if (in_array($values['email']['value'], self::players_excluded_from_tournament($tournament_id)))
-            return false;
+        //if email is in excluded players bin, if there are any
+        if(is_array(self::players_excluded_from_tournament($tournament_id))){
+            if (in_array($values['email']['value'], self::players_excluded_from_tournament($tournament_id)))
+                return false;
+
+        }
 
         $user = $wpdb->get_row( $wpdb->prepare("SELECT user_email, ID AS user_id, (SELECT meta_value FROM wp_usermeta  WHERE user_id = user.ID AND meta_key = 'player_id') AS player_id  FROM $wpdb->users AS user WHERE user_email = %s", $values['email']['value']) );
 
@@ -596,11 +603,22 @@ class tournamentCPT {
 
                 wp_new_user_notification($user_id, $password);
 
-            } else {
-                $user_id = $user->ID;
-            }
+                $player_id = playerCPT::action_new_player_profile($user_id, $values);
 
-            $player_id = playerCPT::action_new_player_profile($user_id, $values);
+            } else {
+
+                $user_id = $user->ID;
+
+                //user doesnt have a profile!!!!
+                if(!is_int(get_user_meta($user_id, 'player_id', true))){
+
+                    $player_id = playerCPT::action_new_player_profile($user_id, $values);
+
+                } else {
+                    $player_id = get_user_meta($user_id, 'player_id', true);
+                }
+
+            }
 
         }
 
