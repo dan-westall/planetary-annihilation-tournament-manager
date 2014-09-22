@@ -919,4 +919,18 @@ class matchCPT {
 
     }
 
+    public static function get_match_players_by($by = 'team', $match_id){
+
+
+        return [];
+
+    }
+
+    public function get_match_player_team(){
+
+
+
+
+    }
+
 }
