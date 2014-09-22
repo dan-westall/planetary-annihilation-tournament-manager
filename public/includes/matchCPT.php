@@ -347,22 +347,12 @@ class matchCPT {
 
     public static function get_match_tournament_id($match_id){
 
-        $tournament_id = tournamentCPT::get_tournament_id_by(get_post_meta($match_id, 'challonge_tournament_id', true));
+        global $wpdb;
 
-        //Cheap way if fail fail back to p2p
-        if(!$tournament_id){
-
-            $tournament = p2p_type( 'tournament_matches' )->set_direction( 'to' )->get_connected( $match_id );
-
-            if(isset($tournament->posts[0]->ID)){
-
-                $tournament_id = $tournament->posts[0]->ID;
-
-            }
-
-        }
+        $tournament_id = $wpdb->get_var( $wpdb->prepare( "SELECT p2p.p2p_from AS tournament_id FROM wp_p2p AS p2p WHERE p2p_to = %s AND p2p_type = 'tournament_matches'", $match_id));
 
         return $tournament_id;
+
     }
 
     public static function match_up($attr){
@@ -920,6 +910,19 @@ class matchCPT {
     }
 
     public static function get_match_players_by($by = 'team', $match_id){
+
+        switch($by){
+
+            case "team" :
+
+                
+
+
+
+
+                break;
+
+        }
 
 
         return [];
