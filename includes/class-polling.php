@@ -22,6 +22,9 @@ class userPolling {
      */
     private $team_id;
 
+    private $user_id;
+
+
     /**
      *
      */
@@ -104,6 +107,22 @@ class userPolling {
      */
     public function setTournamentId($tournament_id) {
         $this->tournament_id = $tournament_id;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUserId() {
+        return $this->user_id;
+    }
+
+    /**
+     * @param mixed $user_id
+     */
+    public function setUserId($user_id) {
+        $this->user_id = $user_id;
 
         return $this;
     }
@@ -230,6 +249,18 @@ class userPolling {
 
     }
 
+    public function has_voted(){
+
+
+
+    }
+
+    public function get_vote(){
+
+
+
+    }
+
 
 }
 
@@ -244,4 +275,7 @@ class userPolling {
 $votes = new userPolling();
 
 $votes->setMatchId(0)->get_match_votes();
+//$votes->setMatchId(0)->get_match_votes();
 
+
+//$votes->setTournamentId()->setPlayerId()->get_vote();
