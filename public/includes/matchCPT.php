@@ -814,34 +814,6 @@ class matchCPT {
 
     }
 
-    public static function get_clan_team_from_match($match_id){
-
-        global $wpdb;
-
-        $clan_teams = [];
-
-        $query = $wpdb->prepare(
-            "
-                SELECT
-                    p2p_from as match_id,
-                    p2p_to as player_id,
-                    (SELECT meta_value FROM wp_p2pmeta WHERE p2p_id = p2p.p2p_id AND meta_key = 'team') AS team,
-                    (SELECT meta_value FROM wp_postmeta WHERE post_id = p2p.p2p_to AND meta_key = 'clan') as clan
-                      FROM wp_p2p as p2p WHERE p2p_type = 'match_players' AND p2p_from = %s
-                ",
-            $match_id
-        );
-
-        $match_teams = $wpdb->get_results( $query );
-
-        foreach($match_teams as $team){
-            $clan_teams[$team->clan] = $team->team;
-        }
-
-        return $clan_teams;
-
-    }
-
 
     public static function match_api_filter($wp_query){
 
@@ -909,30 +881,65 @@ class matchCPT {
 
     }
 
-    public static function get_match_players_by($by = 'team', $match_id){
+    public static function get_match_players($match_id){
+
+        global $wpdb;
+
+        $query = $wpdb->prepare(
+            "
+                SELECT
+                    p2p_from as match_id,
+                    p2p_to as player_id,
+                    (SELECT meta_value FROM wp_p2pmeta WHERE p2p_id = p2p.p2p_id AND meta_key = 'team') AS team,
+                    (SELECT meta_value FROM wp_postmeta WHERE post_id = p2p.p2p_to AND meta_key = 'clan') as clan
+                      FROM wp_p2p as p2p WHERE p2p_type = 'match_players' AND p2p_from = %s
+                ",
+            $match_id
+        );
+
+        $match_teams = $wpdb->get_results( $query );
+
+        return $match_teams;
+
+    }
+
+    public static function get_clan_team_from_match($match_id){
+
+        global $wpdb;
+
+        $clan_teams = [];
+
+        $match_teams = self::get_match_players($match_id);
+
+        foreach($match_teams as $team){
+            $clan_teams[$team->clan] = $team->team;
+        }
+
+        return $clan_teams;
+
+    }
+
+    public static function get_match_players_by($by = 'team', $match_id, $args = []){
 
         switch($by){
 
             case "team" :
 
-                
-
-
-
+                $team = array_filter(self::get_match_players($match_id), function($player) {  if($player->team == $args['team']){ return $player; }; });
 
                 break;
 
         }
 
-
-        return [];
+        return $team;
 
     }
 
-    public function get_match_player_team(){
+    public static function get_player_match_team($match_id, $player_id){
 
+        $team = array_filter(self::get_match_players($match_id), function($player) {  if($player->player_id == $player_id){ return $player; }; });
 
-
+        return $team[0]->team;
 
     }
 
