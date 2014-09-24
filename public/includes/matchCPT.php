@@ -919,13 +919,17 @@ class matchCPT {
 
     }
 
-    public static function get_match_players_by($by = 'team', $match_id, $args = []){
+    public static function get_match_players_by($by = 'team', $match_id, $args = []) {
 
-        switch($by){
+        switch ($by) {
 
             case "team" :
 
-                $team = array_filter(self::get_match_players($match_id), function($player) {  if($player->team == $args['team']){ return $player; }; });
+                $team = array_filter(self::get_match_players($match_id), function ($player) {
+                        if ($player->team == $args['team']) {
+                            return $player;
+                        };
+                    });
 
                 break;
 
@@ -935,9 +939,13 @@ class matchCPT {
 
     }
 
-    public static function get_player_match_team($match_id, $player_id){
+    public static function get_player_match_team($match_id, $player_id) {
 
-        $team = array_filter(self::get_match_players($match_id), function($player) {  if($player->player_id == $player_id){ return $player; }; });
+        $team = array_filter(self::get_match_players($match_id), function ($player) {
+                if ($player->player_id == $player_id) {
+                    return $player;
+                };
+            });
 
         return $team[0]->team;
 
