@@ -24,6 +24,7 @@ class userPolling {
 
     private $user_id;
 
+    public static $vote_type = array('tournament_win' => 'Tournament Win', 'match_win' => 'Match Win');
 
     /**
      *
@@ -135,9 +136,28 @@ class userPolling {
         p2p_register_connection_type(array(
             'name'      => 'player_vote',
             'from'      => 'user',
-            'to'        => self::$post_type,
+            'to'        => playerCPT::$post_type,
             'admin_box' => array(
-                'show' => false
+                'show'    => 'to',
+                'context' => 'advanced'
+            ),
+            'title' => array(
+                'to' => __( 'Polling - Vote', 'PLTM' )
+            ),
+            'fields'    => array(
+                'tournament_id' => array(
+                    'title' => 'Tournament ID',
+                    'type'  => 'text',
+                ),
+                'match_id'      => array(
+                    'title' => 'Match ID',
+                    'type'  => 'text',
+                ),
+                'vote'          => array(
+                    'title'  => 'Vote Type',
+                    'type'   => 'select',
+                    'values' => apply_filters('tournament_player_status', self::$vote_type)
+                )
             )
         ));
 
@@ -233,6 +253,19 @@ class userPolling {
 
         global $wpdb;
 
+        $connected = get_posts( array(
+            'connected_type' => 'player_vote',
+            'connected_meta' => array(
+                array(
+                    'key' => 'match_id',
+                    'value' => $this->match_id
+                )
+            ),
+            'nopaging' => true,
+            'suppress_filters' => false
+        ) );
+
+
         return [];
 
     }
@@ -241,11 +274,39 @@ class userPolling {
      * @param $match_id
      * @return array
      */
-    public function get_tournament_votes($match_id) {
+    public function get_tournament_votes() {
 
         global $wpdb;
 
+        $connected = get_posts( array(
+            'connected_type' => 'player_vote',
+            'connected_meta' => array(
+                array(
+                    'key' => 'tournament_id',
+                    'value' => $this->tournament_id
+                )
+            ),
+            'nopaging' => true,
+            'suppress_filters' => false
+        ) );
+
         return [];
+
+    }
+
+    public function get_vote(){
+
+        $connected = get_posts( array(
+            'connected_type' => 'player_vote',
+            'connected_meta' => array(
+                array(
+                    'key' => 'tournament_id',
+                    'value' => $this->tournament_id
+                )
+            ),
+            'nopaging' => true,
+            'suppress_filters' => false
+        ) );
 
     }
 
@@ -253,14 +314,8 @@ class userPolling {
 
 
 
-    }
-
-    public function get_vote(){
-
-
 
     }
-
 
 }
 
