@@ -67,9 +67,9 @@ function is_tournament_signup_open($tournament_id){
 
 }
 
-function get_match_player_cards($match_id){
+function get_match_player_cards($match_id, $polling = false){
 
-    return matchCPT::match_up(array( 'match_id' => $match_id ));
+    return matchCPT::match_up(array( 'match_id' => $match_id, 'polling' => $polling ));
 
 }
 

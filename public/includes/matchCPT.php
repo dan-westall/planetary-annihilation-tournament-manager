@@ -44,6 +44,27 @@ class matchCPT {
 
         add_action( 'parse_query',   array( $this, 'match_api_filter'));
 
+        add_filter( 'p2p_connection_type_args' ,   array( $this, 'test_args'), 10, 2);
+
+    }
+
+    public static function test_args($args, $sides){
+
+        //
+
+        if((get_post_type($_GET['post']) == matchCPT::$post_type || get_post_type($_REQUEST['post_ID']) == matchCPT::$post_type || get_post_type($_POST['from']) == matchCPT::$post_type) && $args['name'] == 'player_vote'){
+
+            $args['fields']['team'] = [
+                'title' => 'Team',
+                'type' => 'select',
+                'values' => range(0, 10)
+            ];
+
+        }
+
+
+        return $args;
+
     }
 
     function register_cpt_match(){
@@ -383,6 +404,11 @@ class matchCPT {
                         </div>
                     </div>';
 
+        $vote_button = '';
+
+        if(is_user_logged_in()){
+            $vote_button = '<a href="javascript:void(0);" class="large-vote-button team-%s" data-team-id="%s">Vote For %s</a>';
+        }
 
 
         foreach($players->posts as $player){
@@ -485,24 +511,29 @@ class matchCPT {
 
                             //todo remove nasty!!
                             if($match_format == "format-vs-team-clan"){
-                                if(false !== $key = array_search($team, $clans)){
-                                    $team_label = $key;
+                                if(false !== $clan_label = array_search($team, $clans)){
+                                    $team_label = $clan_label;
                                 }
 
                             }
 
-                            $match_cards .= $vs.  '<div class="col-lg-5"><h3 class="text-center">Team '.$team_label.'</h3>'.$team.'</div>' ;
+                            $vote_button_string = sprintf($vote_button, $key, $key, $team_label);
+
+                            $match_cards .= $vs.  '<div class="col-lg-5"><h3 class="text-center">Team '.$team_label.'</h3>'.$team.$vote_button_string.'</div>' ;
                         } else {
 
                             //todo remove nasty!!
                             if($match_format == "format-vs-team-clan"){
-                                if(false !== $key = array_search($team, $clans)){
-                                    $team_label = $key;
+                                if(false !== $clan_label = array_search($team, $clans)){
+                                    $team_label = $clan_label;
                                 }
 
                             }
 
-                            $match_cards .=  '<div class="col-lg-5"><h3 class="text-center">Team '.$team_label.'</h3>'.$team.'</div>' ;
+
+                            $vote_button_string = sprintf($vote_button, $key, $key, $team_label);
+
+                            $match_cards .=  '<div class="col-lg-5"><h3 class="text-center">Team '.$team_label.'</h3>'.$team.$vote_button_string.'</div>' ;
                         }
 
                         $team_count ++;

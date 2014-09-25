@@ -33,10 +33,12 @@ class userPolling {
 
         $plugin = new self();
 
-        add_action('p2p_init', [$plugin, 'register_p2p_connections']);
+        add_action('p2p_init', [ $plugin, 'register_p2p_connections']);
 
-        add_action('wp_ajax_get_match_results', [$plugin, 'tournament_vote']);
-        add_action('wp_ajax_get_match_results', [$plugin, 'match_vote']);
+        add_action('wp_ajax_tournament_vote', [ $plugin, 'tournament_vote']);
+        add_action('wp_ajax_match_vote', [ $plugin, 'match_vote']);
+
+        add_action( 'p2p_created_connection', [ $plugin, 'action_p2p_new_connection' ] );
 
     }
 
@@ -136,22 +138,19 @@ class userPolling {
         p2p_register_connection_type(array(
             'name'      => 'player_vote',
             'from'      => 'user',
-            'to'        => playerCPT::$post_type,
+            'to'        => [matchCPT::$post_type, playerCPT::$post_type],
             'admin_box' => array(
                 'show'    => 'to',
                 'context' => 'advanced'
             ),
-            'title' => array(
-                'to' => __( 'Polling - Vote', 'PLTM' )
+            'title'     => array(
+                'to' => __('Polling - Vote', 'PLTM')
             ),
             'fields'    => array(
                 'tournament_id' => array(
-                    'title' => 'Tournament ID',
-                    'type'  => 'text',
-                ),
-                'match_id'      => array(
-                    'title' => 'Match ID',
-                    'type'  => 'text',
+                    'title'  => 'Tournament',
+                    'type'   => 'custom',
+                    'render' => 'userPolling::p2p_display_tournament'
                 ),
                 'vote'          => array(
                     'title'  => 'Vote Type',
@@ -160,6 +159,8 @@ class userPolling {
                 )
             )
         ));
+
+
 
     }
 
@@ -218,18 +219,12 @@ class userPolling {
 
                 $team = $_POST['team'];
 
-                $players = matchCPT::get_match_players_by($team, $match_id);
-
-                foreach ($players as $player) {
-
-                    $result = p2p_type('player_vote')->connect($_POST['current_user_id'], $player, array(
-                        'date'          => current_time('mysql'),
-                        'tournament_id' => $_POST['tournament_id'],
-                        'match_id'      => $match_id,
-                        'vote'          => 'match_win'
-                    ));
-
-                }
+                $result = p2p_type('player_vote')->connect($_POST['current_user_id'], $player, array(
+                    'date'          => current_time('mysql'),
+                    'tournament_id' => $_POST['tournament_id'],
+                    'match_id'      => $match_id,
+                    'vote'          => 'match_win'
+                ));
 
                 do_action('match_team_vote_made', $team, $match_id);
 
@@ -314,6 +309,45 @@ class userPolling {
 
 
 
+
+    }
+
+    public static function is_polling(){
+
+        global $post;
+
+        if(get_post_meta($post->ID, 'polling_enabled', true))
+            return true;
+
+        return false;
+
+    }
+
+    public function action_p2p_new_connection( $p2p_id ){
+
+        if(!is_admin())
+            return;
+
+        $connection = p2p_get_connection( $p2p_id );
+
+        switch($connection->p2p_type){
+
+            case "player_vote" :
+
+                $tournament_id = matchCPT::get_match_tournament_id($connection->p2p_to);
+
+                p2p_add_meta( $p2p_id, 'tournament_id', $tournament_id );
+
+                break;
+
+
+        }
+
+    }
+
+    public static function p2p_display_tournament($connection, $direction){
+
+        return get_the_title(p2p_get_meta($direction->name[1], 'tournament_id', true));
 
     }
 

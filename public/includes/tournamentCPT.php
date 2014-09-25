@@ -240,10 +240,10 @@ class tournamentCPT {
 
         }
 
-        $tournament_players_args = array_merge_recursive($tournament_players_args, [ 'fields' => [
+        $tournament_players_args = array_merge_recursive($tournament_players_args, ['fields' => [
             'note' => array(
                 'title' => 'Note',
-                'type' => 'text',
+                'type'  => 'text',
             )
         ]]);
 
