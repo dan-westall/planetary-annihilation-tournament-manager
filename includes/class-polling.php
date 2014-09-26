@@ -33,11 +33,11 @@ class userPolling {
 
         $plugin = new self();
 
-        add_action( 'p2p_init', [ $plugin, 'register_p2p_connections']);
+        add_action('p2p_init', [$plugin, 'register_p2p_connections']);
 
-        add_action( 'wp_ajax_vote', [ $plugin, 'vote']);
+        add_action('wp_ajax_vote', [$plugin, 'vote']);
 
-        add_action( 'p2p_created_connection', [ $plugin, 'action_p2p_new_connection' ] );
+        add_action('p2p_created_connection', [$plugin, 'action_p2p_new_connection']);
 
     }
 
@@ -160,7 +160,6 @@ class userPolling {
         ));
 
 
-
     }
 
 
@@ -171,7 +170,8 @@ class userPolling {
 
         check_ajax_referer('security-' . date('dmy'), 'security');
 
-        global $current_user; get_currentuserinfo();
+        global $current_user;
+        get_currentuserinfo();
 
         $tournament_id = $_POST['tournament_id'];
         $vote_on       = $_POST['vote_on'];
@@ -179,23 +179,28 @@ class userPolling {
 
         $vote_type = self::get_vote_type($vote_on);
 
-
-        $result = p2p_type('player_vote')->connect($current_user->ID, $vote_on, array(
+        $meta = [
             'date'          => current_time('mysql'),
             'tournament_id' => $tournament_id,
-            'team'          => $team_id,
             'vote'          => $vote_type
-        ));
+        ];
 
-        do_action('match_vote_made', $current_user->ID, $_POST['vote_on'], self::get_vote_type($vote_on));
+        if(!empty($team_id)){
+            $meta['team'] = $team_id;
+        }
 
-        if ( is_wp_error( $result ) ) {
+        $result = p2p_type('player_vote')->connect($current_user->ID, $vote_on, $meta);
+
+        if (is_wp_error($result)) {
 
             echo json_encode(array('result' => false, 'message' => $result->get_error_message()));
 
             die();
 
         } else {
+
+            do_action('match_vote_made', $current_user->ID, $_POST['vote_on'], self::get_vote_type($vote_on));
+
             echo json_encode(array('result' => true, 'message' => 'Vote has been placed.'));
 
             die();
@@ -203,11 +208,11 @@ class userPolling {
         }
     }
 
-    public static function get_vote_type($object_id){
+    public static function get_vote_type($object_id) {
 
         $keys = array_keys(self::$vote_type);
 
-        switch(get_post_type($object_id)){
+        switch (get_post_type($object_id)) {
 
             case matchCPT::$post_type :
 
@@ -232,17 +237,17 @@ class userPolling {
 
         global $wpdb;
 
-        $connected = get_posts( array(
-            'connected_type' => 'player_vote',
-            'connected_meta' => array(
+        $connected = get_posts(array(
+            'connected_type'   => 'player_vote',
+            'connected_meta'   => array(
                 array(
-                    'key' => 'match_id',
+                    'key'   => 'match_id',
                     'value' => $this->match_id
                 )
             ),
-            'nopaging' => true,
+            'nopaging'         => true,
             'suppress_filters' => false
-        ) );
+        ));
 
 
         return [];
@@ -257,70 +262,68 @@ class userPolling {
 
         global $wpdb;
 
-        $connected = get_posts( array(
-            'connected_type' => 'player_vote',
-            'connected_meta' => array(
+        $connected = get_posts(array(
+            'connected_type'   => 'player_vote',
+            'connected_meta'   => array(
                 array(
-                    'key' => 'tournament_id',
+                    'key'   => 'tournament_id',
                     'value' => $this->tournament_id
                 )
             ),
-            'nopaging' => true,
+            'nopaging'         => true,
             'suppress_filters' => false
-        ) );
+        ));
 
         return [];
 
     }
 
-    public function get_vote(){
+    public function get_vote() {
 
-        $connected = get_posts( array(
-            'connected_type' => 'player_vote',
-            'connected_meta' => array(
+        $connected = get_posts(array(
+            'connected_type'   => 'player_vote',
+            'connected_meta'   => array(
                 array(
-                    'key' => 'tournament_id',
+                    'key'   => 'tournament_id',
                     'value' => $this->tournament_id
                 )
             ),
-            'nopaging' => true,
+            'nopaging'         => true,
             'suppress_filters' => false
-        ) );
+        ));
 
     }
 
-    public function has_voted(){
-
-
+    public function has_voted() {
 
 
     }
 
-    public static function is_polling(){
+    public static function is_polling() {
 
         global $post;
 
-        if(get_post_meta($post->ID, 'polling_enabled', true))
+        if (get_post_meta($post->ID, 'polling_enabled', true))
             return true;
 
         return false;
 
     }
 
-    public function action_p2p_new_connection( $p2p_id ){
+    public function action_p2p_new_connection($p2p_id) {
 
-        if(!is_admin())
+        if (!is_admin())
             return;
 
-        $connection = p2p_get_connection( $p2p_id );
+        $connection = p2p_get_connection($p2p_id);
 
-        switch($connection->p2p_type){
+        switch ($connection->p2p_type) {
 
             case "player_vote" :
 
                 $tournament_id = matchCPT::get_match_tournament_id($connection->p2p_to);
 
-                p2p_add_meta( $p2p_id, 'tournament_id', $tournament_id );
+                p2p_add_meta($p2p_id, 'tournament_id', $tournament_id);
 
                 break;
 
@@ -329,7 +332,7 @@ class userPolling {
 
     }
 
-    public static function p2p_display_tournament($connection, $direction){
+    public static function p2p_display_tournament($connection, $direction) {
 
         return get_the_title(p2p_get_meta($direction->name[1], 'tournament_id', true));
 
