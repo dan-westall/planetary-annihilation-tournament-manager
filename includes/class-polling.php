@@ -189,8 +189,13 @@ class userPolling {
 
         do_action('match_vote_made', $current_user->ID, $_POST['vote_on'], self::get_vote_type($vote_on));
 
-        if ($result) {
+        if ( is_wp_error( $result ) ) {
 
+            echo json_encode(array('result' => false, 'message' => $result->get_error_message()));
+
+            die();
+
+        } else {
             echo json_encode(array('result' => true, 'message' => 'Vote has been placed.'));
 
             die();
