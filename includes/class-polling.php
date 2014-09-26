@@ -33,10 +33,9 @@ class userPolling {
 
         $plugin = new self();
 
-        add_action('p2p_init', [ $plugin, 'register_p2p_connections']);
+        add_action( 'p2p_init', [ $plugin, 'register_p2p_connections']);
 
-        add_action('wp_ajax_tournament_vote', [ $plugin, 'tournament_vote']);
-        add_action('wp_ajax_match_vote', [ $plugin, 'match_vote']);
+        add_action( 'wp_ajax_vote', [ $plugin, 'vote']);
 
         add_action( 'p2p_created_connection', [ $plugin, 'action_p2p_new_connection' ] );
 
@@ -164,19 +163,31 @@ class userPolling {
 
     }
 
+
     /**
      *
      */
-    public static function tournament_vote() {
+    public static function vote() {
 
         check_ajax_referer('security-' . date('dmy'), 'security');
 
+        global $current_user; get_currentuserinfo();
 
-        $result = p2p_type('player_vote')->connect($_POST['current_user_id'], $_POST['player_id'], array(
+        $tournament_id = $_POST['tournament_id'];
+        $vote_on       = $_POST['vote_on'];
+        $team_id       = $_POST['team_id'];
+
+        $vote_type = self::get_vote_type($vote_on);
+
+
+        $result = p2p_type('player_vote')->connect($current_user->ID, $vote_on, array(
             'date'          => current_time('mysql'),
-            'tournament_id' => $_POST['tournament_id'],
-            'vote'          => 'tournament_win'
+            'tournament_id' => $tournament_id,
+            'team'          => $team_id,
+            'vote'          => $vote_type
         ));
+
+        do_action('match_vote_made', $current_user->ID, $_POST['vote_on'], self::get_vote_type($vote_on));
 
         if ($result) {
 
@@ -187,58 +198,26 @@ class userPolling {
         }
     }
 
-    /**
-     *
-     */
-    public static function match_vote() {
+    public static function get_vote_type($object_id){
 
-        check_ajax_referer('security-' . date('dmy'), 'security');
+        $keys = array_keys(self::$vote_type);
 
-        $match_id = $_POST['match_id'];
+        switch(get_post_type($object_id)){
 
-        switch (get_match_format($_POST['match_id'])) {
+            case matchCPT::$post_type :
 
-            case "format-vs" :
-            case "format-ffs" :
-
-                //matchCPT::get_player get_match_players_by_card
-
-                $result = p2p_type('player_vote')->connect($_POST['current_user_id'], $_POST['player_id'], array(
-                    'date'          => current_time('mysql'),
-                    'tournament_id' => $_POST['tournament_id'],
-                    'match_id'      => $match_id,
-                    'vote'          => 'match_win'
-                ));
-
-                do_action('match_vote_made', $_POST['player_id'], $match_id);
+                return $keys[1];
 
                 break;
 
-            case "format-vs-team" :
-            case "format-vs-team-clan" :
+            case playerCPT::$post_type :
 
-                $team = $_POST['team'];
-
-                $result = p2p_type('player_vote')->connect($_POST['current_user_id'], $player, array(
-                    'date'          => current_time('mysql'),
-                    'tournament_id' => $_POST['tournament_id'],
-                    'match_id'      => $match_id,
-                    'vote'          => 'match_win'
-                ));
-
-                do_action('match_team_vote_made', $team, $match_id);
+                return $keys[0];
 
                 break;
 
         }
 
-        if ($result) {
-
-            echo json_encode(array('result' => true, 'message' => 'Vote has been placed.'));
-
-            die();
-
-        }
     }
 
     /**

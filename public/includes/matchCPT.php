@@ -376,6 +376,8 @@ class matchCPT {
 
     }
 
+
+    //todo i hate this function it works somehow need to rewrite.
     public static function match_up($attr){
 
         extract(shortcode_atts(array(
@@ -384,7 +386,8 @@ class matchCPT {
             'match_id' => ''
         ), $attr));
 
-        $players = p2p_type('match_players')->get_connected($match_id);
+        $players       = p2p_type('match_players')->get_connected($match_id);
+        $tournament_id = self::get_match_tournament_id($match_id);
 
         $match_cards = '';
 
@@ -407,7 +410,7 @@ class matchCPT {
         $vote_button = '';
 
         if(is_user_logged_in()){
-            $vote_button = '<a href="javascript:void(0);" class="large-vote-button team-%s" data-team-id="%s">Vote For %s</a>';
+            $vote_button = '<a href="javascript:void(0);" class="large-vote-button team-%1$s" data-team-id="%1$s" data-vote-on="%3$s" data-tournament-id="%4$s">Vote For %2$s</a>';
         }
 
 
@@ -517,7 +520,7 @@ class matchCPT {
 
                             }
 
-                            $vote_button_string = sprintf($vote_button, $key, $key, $team_label);
+                            $vote_button_string = sprintf($vote_button, $key, $team_label, $match_id, $tournament_id);
 
                             $match_cards .= $vs.  '<div class="col-lg-5"><h3 class="text-center">Team '.$team_label.'</h3>'.$team.$vote_button_string.'</div>' ;
                         } else {
@@ -531,7 +534,7 @@ class matchCPT {
                             }
 
 
-                            $vote_button_string = sprintf($vote_button, $key, $key, $team_label);
+                            $vote_button_string = sprintf($vote_button, $key, $team_label, $match_id, $tournament_id);
 
                             $match_cards .=  '<div class="col-lg-5"><h3 class="text-center">Team '.$team_label.'</h3>'.$team.$vote_button_string.'</div>' ;
                         }
