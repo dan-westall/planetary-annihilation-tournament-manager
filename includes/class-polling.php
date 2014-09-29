@@ -175,11 +175,6 @@ class userPolling {
                 break;
         }
 
-
-
-
-
-
         //setsub
         $result['subscription'] =  sprintf('t%s-live', $tournament_id);
 
@@ -303,16 +298,20 @@ class userPolling {
 
         global $wpdb;
 
-        $args = [
-            'connected_type'   => 'player_vote',
-            'connected_items'  => $this->object_id,
-            'nopaging'         => true,
-            'suppress_filters' => false
-        ];
+        $query = $wpdb->prepare(
+            "
+                SELECT
+                    (SELECT meta_value FROM $wpdb->p2pmeta WHERE p2p_id = p2p.p2p_id AND meta_key = 'team') AS team,
+                    count(p2p_to) AS votes
+                      FROM $wpdb->p2p as p2p WHERE p2p_type = 'player_vote' AND p2p_to = %s GROUP BY team
+                ",
+            $this->object_id
+        );
 
-        $connected = get_posts($args);
+        $votes = $wpdb->get_results( $query );
 
-        return [];
+        return $votes;
+
 
     }
 
