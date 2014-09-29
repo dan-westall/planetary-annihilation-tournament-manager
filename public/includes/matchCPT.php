@@ -611,13 +611,17 @@ class matchCPT {
 
             foreach ($players->posts as $player) {
 
-                //delete_transient('player_user_avatar_' .$player->ID. '_src');
 
-                if ( false === ( $avatar_src = get_transient( 'player_user_avatar_' .$player->ID. '_src'  ) ) ) {
+                $user_id = get_post_meta($player->ID, 'user_id', true);
 
-                    $avatar_src = get_wp_user_avatar_src($player->ID, 'medium-player-profile-thumbnail');
 
-                    set_transient( 'player_user_avatar_' .$player->ID. '_src', $avatar_src, ( HOUR_IN_SECONDS / 1 ) );
+                delete_transient('player_user_avatar_' .$user_id. '_src');
+
+                if ( false === ( $avatar_src = get_transient( 'player_user_avatar_' .$user_id. '_src'  ) ) ) {
+
+                    $avatar_src = get_wp_user_avatar_src($user_id, 'medium-player-profile-thumbnail');
+
+                    set_transient( 'player_user_avatar_' .$user_id. '_src', $avatar_src, ( HOUR_IN_SECONDS / 1 ) );
 
                 }
 
