@@ -17,6 +17,9 @@ class userPolling {
      * @var
      */
     private $tournament_id;
+
+    private $object_id;
+
     /**
      * @var
      */
@@ -33,11 +36,13 @@ class userPolling {
 
         $plugin = new self();
 
-        add_action('p2p_init', [$plugin, 'register_p2p_connections']);
+        add_action('p2p_init', [ $plugin, 'register_p2p_connections']);
 
-        add_action('wp_ajax_vote', [$plugin, 'vote']);
+        add_action('wp_ajax_vote', [ $plugin, 'vote']);
 
-        add_action('p2p_created_connection', [$plugin, 'action_p2p_new_connection']);
+        add_action('p2p_created_connection', [ $plugin, 'action_p2p_new_connection']);
+
+        add_action( 'match_vote_made', [ $plugin, 'realtime_polling_result'], 10, 3);
 
     }
 
@@ -47,6 +52,22 @@ class userPolling {
     function __construct() {
 
 
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getObjectId() {
+        return $this->object_id;
+    }
+
+    /**
+     * @param mixed $object_id
+     */
+    public function setObjectId($object_id) {
+        $this->object_id = $object_id;
+
+        return $this;
     }
 
     /**
@@ -129,6 +150,49 @@ class userPolling {
         return $this;
     }
 
+    public function realtime_polling_result( $current_user_id, $object_id, $vote_type ){
+
+        $tournament_id = 0;
+
+        switch(get_post_type($object_id)){
+
+            case tournamentCPT::$post_type :
+
+                $tournament_id = $object_id;
+
+                break;
+
+            case matchCPT::$post_type :
+
+                $tournament_id = matchCPT::get_match_tournament_id($object_id);
+
+                $votes = new userPolling();
+
+                $object_votes = $votes->setObjectId($object_id)->get_votes();
+
+                $result['polling'][$object_id] = $object_votes;
+
+                break;
+        }
+
+
+
+
+
+
+        //setsub
+        $result['subscription'] =  sprintf('t%s-live', $tournament_id);
+
+        //send to realtime
+        $context = new ZMQContext();
+        $socket = $context->getSocket(ZMQ::SOCKET_PUSH, 'my pusher');
+        $socket->connect("tcp://localhost:5555");
+
+        $socket->send(json_encode($result));
+
+
+    }
+
     /**
      *
      */
@@ -199,7 +263,7 @@ class userPolling {
 
         } else {
 
-            do_action('match_vote_made', $current_user->ID, $_POST['vote_on'], self::get_vote_type($vote_on));
+            do_action('match_vote_made', $current_user->ID, $_POST['vote_on'], $vote_type);
 
             echo json_encode(array('result' => true, 'message' => 'Vote has been placed.'));
 
@@ -230,67 +294,25 @@ class userPolling {
 
     }
 
-    /**
-     * @return array
-     */
-    function get_match_votes() {
-
-        global $wpdb;
-
-        $connected = get_posts(array(
-            'connected_type'   => 'player_vote',
-            'connected_meta'   => array(
-                array(
-                    'key'   => 'match_id',
-                    'value' => $this->match_id
-                )
-            ),
-            'nopaging'         => true,
-            'suppress_filters' => false
-        ));
-
-
-        return [];
-
-    }
 
     /**
      * @param $match_id
      * @return array
      */
-    public function get_tournament_votes() {
+    public function get_votes() {
 
         global $wpdb;
 
-        $connected = get_posts(array(
+        $args = [
             'connected_type'   => 'player_vote',
-            'connected_meta'   => array(
-                array(
-                    'key'   => 'tournament_id',
-                    'value' => $this->tournament_id
-                )
-            ),
+            'connected_items'  => $this->object_id,
             'nopaging'         => true,
             'suppress_filters' => false
-        ));
+        ];
+
+        $connected = get_posts($args);
 
         return [];
-
-    }
-
-    public function get_vote() {
-
-        $connected = get_posts(array(
-            'connected_type'   => 'player_vote',
-            'connected_meta'   => array(
-                array(
-                    'key'   => 'tournament_id',
-                    'value' => $this->tournament_id
-                )
-            ),
-            'nopaging'         => true,
-            'suppress_filters' => false
-        ));
 
     }
 
@@ -350,7 +372,7 @@ class userPolling {
 
 $votes = new userPolling();
 
-$votes->setMatchId(0)->get_match_votes();
+//$votes->setMatchId(0)->get_match_votes();
 //$votes->setMatchId(0)->get_match_votes();
 
 
