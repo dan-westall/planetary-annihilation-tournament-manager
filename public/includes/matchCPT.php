@@ -382,7 +382,7 @@ class matchCPT {
 
         extract(shortcode_atts(array(
             'date' => '',
-            'size' => '',
+            'small' => '',
             'match_id' => ''
         ), $attr));
 
@@ -394,7 +394,7 @@ class matchCPT {
         $match_format = matchCPT::match_format($match_id);
 
         $player_card = '
-                    <div class="player-match-card %5$s">
+                    <div class="player-match-card large %5$s">
                         <div class="player-match-card-inner row text">
                             <div class="player-avatar col-lg-4">
                                 <a href="%2$s">%1$s</a>
@@ -406,6 +406,23 @@ class matchCPT {
                             <div class="match-result col-lg-1">Winner</div>
                         </div>
                     </div>';
+
+
+        if($attr['small']){
+            $player_card = '
+                    <div class="player-match-card small %5$s">
+                        <div class="player-match-card-inner row text">
+                            <div class="player-avatar col-lg-2">
+                                <a href="%2$s">%1$s</a>
+                            </div>
+                            <div class="player-details col-lg-9">
+                                <h4 class="player-name"><a href="%2$s">%3$s</a></h4>
+                                %4$s
+                            </div>
+                            <div class="match-result col-lg-1">Winner</div>
+                        </div>
+                    </div>';
+        }
 
         $vote_button = '';
 
@@ -614,6 +631,7 @@ class matchCPT {
             $_post['meta']['twitch']         = get_post_meta($post['ID'], 'twitch', true);
             $_post['meta']['match_round']    = get_post_meta($post['ID'], 'match_round', true);
             $_post['meta']['team_filter']    = get_post_meta($post['ID'], 'team_filter', true);
+            $_post['meta']['format']         = self::match_format($post['ID']);
 
         }
 
