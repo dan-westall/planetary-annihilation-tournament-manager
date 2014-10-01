@@ -178,12 +178,14 @@ class userPolling {
         //setsub
         $result['subscription'] =  sprintf('t%s-live', $tournament_id);
 
-        //send to realtime
-        $context = new ZMQContext();
-        $socket = $context->getSocket(ZMQ::SOCKET_PUSH, 'my pusher');
-        $socket->connect("tcp://localhost:5555");
+        if (class_exists('ZMQContext')) {
+            //send to realtime
+            $context = new ZMQContext();
+            $socket  = $context->getSocket(ZMQ::SOCKET_PUSH, 'my pusher');
+            $socket->connect("tcp://localhost:5555");
 
-        $socket->send(json_encode($result));
+            $socket->send(json_encode($result));
+        }
 
 
     }
