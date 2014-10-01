@@ -749,12 +749,16 @@ class matchCPT {
         //setsub
         $match['subscription'] = 't'.$match['meta']['tournament']['wp_id'];
 
-        //send to realtime
-        $context = new ZMQContext();
-        $socket = $context->getSocket(ZMQ::SOCKET_PUSH, 'my pusher');
-        $socket->connect("tcp://localhost:5555");
+        if (class_exists('ZMQContext')) {
 
-        $socket->send(json_encode($match));
+            //send to realtime
+            $context = new ZMQContext();
+            $socket  = $context->getSocket(ZMQ::SOCKET_PUSH, 'my pusher');
+            $socket->connect("tcp://localhost:5555");
+
+            $socket->send(json_encode($match));
+
+        }
 
 
     }
