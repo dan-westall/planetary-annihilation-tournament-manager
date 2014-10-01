@@ -147,7 +147,7 @@ function pltm_add_match( $data ){
 
             $p2p_id = p2p_type('match_players')->get_p2p_id($match_id, $player['wp_player_id']);
 
-            p2p_update_meta($p2p_id, 'winner', 0);
+            //p2p_update_meta($p2p_id, 'winner', 0);
 
             do_action('match_loser_declared', $match_id, $player['wp_player_id']);
         }
