@@ -296,10 +296,12 @@ class matchCPT {
 
             foreach ($players->posts as $player) {
 
+                $winner = p2p_get_meta($player->p2p_id, 'winner', true);
+
                 $match_players[] = array(
                     'player_name'        => $player->post_title,
                     'pa_stats_player_id' => get_post_meta($player->ID, 'pastats_player_id', true),
-                    'winner'             => p2p_get_meta($player->p2p_id, 'winner', true),
+                    'winner'             => ( $winner != '' ? $winner : 0 ),
                     'team'               => p2p_get_meta($player->p2p_id, 'team', true)
                 );
 
