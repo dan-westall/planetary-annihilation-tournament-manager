@@ -44,6 +44,27 @@ class matchCPT {
 
         add_action( 'parse_query',   array( $this, 'match_api_filter'));
 
+        add_filter( 'p2p_connection_type_args' ,   array( $this, 'test_args'), 10, 2);
+
+    }
+
+    public static function test_args($args, $sides){
+
+        //
+
+        if((get_post_type($_GET['post']) == matchCPT::$post_type || get_post_type($_REQUEST['post_ID']) == matchCPT::$post_type || get_post_type($_POST['from']) == matchCPT::$post_type) && $args['name'] == 'player_vote'){
+
+            $args['fields']['team'] = [
+                'title' => 'Team',
+                'type' => 'select',
+                'values' => range(0, 10)
+            ];
+
+        }
+
+
+        return $args;
+
     }
 
     function register_cpt_match(){
@@ -347,40 +368,33 @@ class matchCPT {
 
     public static function get_match_tournament_id($match_id){
 
-        $tournament_id = tournamentCPT::get_tournament_id_by(get_post_meta($match_id, 'challonge_tournament_id', true));
+        global $wpdb;
 
-        //Cheap way if fail fail back to p2p
-        if(!$tournament_id){
-
-            $tournament = p2p_type( 'tournament_matches' )->set_direction( 'to' )->get_connected( $match_id );
-
-            if(isset($tournament->posts[0]->ID)){
-
-                $tournament_id = $tournament->posts[0]->ID;
-
-            }
-
-        }
+        $tournament_id = $wpdb->get_var( $wpdb->prepare( "SELECT p2p.p2p_from AS tournament_id FROM wp_p2p AS p2p WHERE p2p_to = %s AND p2p_type = 'tournament_matches'", $match_id));
 
         return $tournament_id;
+
     }
 
+
+    //todo i hate this function it works somehow need to rewrite.
     public static function match_up($attr){
 
         extract(shortcode_atts(array(
             'date' => '',
-            'size' => '',
+            'small' => '',
             'match_id' => ''
         ), $attr));
 
-        $players = p2p_type('match_players')->get_connected($match_id);
+        $players       = p2p_type('match_players')->get_connected($match_id);
+        $tournament_id = self::get_match_tournament_id($match_id);
 
         $match_cards = '';
 
         $match_format = matchCPT::match_format($match_id);
 
         $player_card = '
-                    <div class="player-match-card %5$s">
+                    <div class="player-match-card large %5$s">
                         <div class="player-match-card-inner row text">
                             <div class="player-avatar col-lg-4">
                                 <a href="%2$s">%1$s</a>
@@ -393,6 +407,28 @@ class matchCPT {
                         </div>
                     </div>';
 
+
+        if($attr['small']){
+            $player_card = '
+                    <div class="player-match-card small %5$s">
+                        <div class="player-match-card-inner row text">
+                            <div class="player-avatar col-lg-2">
+                                <a href="%2$s">%1$s</a>
+                            </div>
+                            <div class="player-details col-lg-9">
+                                <h4 class="player-name"><a href="%2$s">%3$s</a></h4>
+                                %4$s
+                            </div>
+                            <div class="match-result col-lg-1">Winner</div>
+                        </div>
+                    </div>';
+        }
+
+        $vote_button = '';
+
+        if(is_user_logged_in()){
+            $vote_button = '<a href="javascript:void(0);" class="large-vote-button team-%1$s" data-team-id="%1$s" data-vote-on="%3$s" data-tournament-id="%4$s">Vote For %2$s</a>';
+        }
 
 
         foreach($players->posts as $player){
@@ -495,24 +531,29 @@ class matchCPT {
 
                             //todo remove nasty!!
                             if($match_format == "format-vs-team-clan"){
-                                if(false !== $key = array_search($team, $clans)){
-                                    $team_label = $key;
+                                if(false !== $clan_label = array_search($team, $clans)){
+                                    $team_label = $clan_label;
                                 }
 
                             }
 
-                            $match_cards .= $vs.  '<div class="col-lg-5"><h3 class="text-center">Team '.$team_label.'</h3>'.$team.'</div>' ;
+                            $vote_button_string = sprintf($vote_button, $key, $team_label, $match_id, $tournament_id);
+
+                            $match_cards .= $vs.  '<div class="col-lg-5"><h3 class="text-center">Team '.$team_label.'</h3>'.$team.$vote_button_string.'</div>' ;
                         } else {
 
                             //todo remove nasty!!
                             if($match_format == "format-vs-team-clan"){
-                                if(false !== $key = array_search($team, $clans)){
-                                    $team_label = $key;
+                                if(false !== $clan_label = array_search($team, $clans)){
+                                    $team_label = $clan_label;
                                 }
 
                             }
 
-                            $match_cards .=  '<div class="col-lg-5"><h3 class="text-center">Team '.$team_label.'</h3>'.$team.'</div>' ;
+
+                            $vote_button_string = sprintf($vote_button, $key, $team_label, $match_id, $tournament_id);
+
+                            $match_cards .=  '<div class="col-lg-5"><h3 class="text-center">Team '.$team_label.'</h3>'.$team.$vote_button_string.'</div>' ;
                         }
 
                         $team_count ++;
@@ -570,9 +611,24 @@ class matchCPT {
 
             foreach ($players->posts as $player) {
 
+
+                $user_id = get_post_meta($player->ID, 'user_id', true);
+
+
+                delete_transient('player_user_avatar_' .$user_id. '_src');
+
+                if ( false === ( $avatar_src = get_transient( 'player_user_avatar_' .$user_id. '_src'  ) ) ) {
+
+                    $avatar_src = get_wp_user_avatar_src($user_id, 'medium-player-profile-thumbnail');
+
+                    set_transient( 'player_user_avatar_' .$user_id. '_src', $avatar_src, ( HOUR_IN_SECONDS / 1 ) );
+
+                }
+
                 $match_players[] = array(
                     'wp_player_id'       => $player->ID,
                     'player_name'        => $player->post_title,
+                    'player_avatar'      => $avatar_src,
                     'pa_stats_player_id' => get_post_meta($player->ID, 'pastats_player_id', true),
                     'winner'             => p2p_get_meta($player->p2p_id, 'winner', true),
                     'team'               => p2p_get_meta($player->p2p_id, 'team', true),
@@ -590,6 +646,7 @@ class matchCPT {
             $_post['meta']['twitch']         = get_post_meta($post['ID'], 'twitch', true);
             $_post['meta']['match_round']    = get_post_meta($post['ID'], 'match_round', true);
             $_post['meta']['team_filter']    = get_post_meta($post['ID'], 'team_filter', true);
+            $_post['meta']['format']         = self::match_format($post['ID']);
 
         }
 
@@ -692,12 +749,16 @@ class matchCPT {
         //setsub
         $match['subscription'] = 't'.$match['meta']['tournament']['wp_id'];
 
-        //send to realtime
-        $context = new ZMQContext();
-        $socket = $context->getSocket(ZMQ::SOCKET_PUSH, 'my pusher');
-        $socket->connect("tcp://localhost:5555");
+        if (class_exists('ZMQContext')) {
 
-        $socket->send(json_encode($match));
+            //send to realtime
+            $context = new ZMQContext();
+            $socket  = $context->getSocket(ZMQ::SOCKET_PUSH, 'my pusher');
+            $socket->connect("tcp://localhost:5555");
+
+            $socket->send(json_encode($match));
+
+        }
 
 
     }
@@ -824,34 +885,6 @@ class matchCPT {
 
     }
 
-    public static function get_clan_team_from_match($match_id){
-
-        global $wpdb;
-
-        $clan_teams = [];
-
-        $query = $wpdb->prepare(
-            "
-                SELECT
-                    p2p_from as match_id,
-                    p2p_to as player_id,
-                    (SELECT meta_value FROM wp_p2pmeta WHERE p2p_id = p2p.p2p_id AND meta_key = 'team') AS team,
-                    (SELECT meta_value FROM wp_postmeta WHERE post_id = p2p.p2p_to AND meta_key = 'clan') as clan
-                      FROM wp_p2p as p2p WHERE p2p_type = 'match_players' AND p2p_from = %s
-                ",
-            $match_id
-        );
-
-        $match_teams = $wpdb->get_results( $query );
-
-        foreach($match_teams as $team){
-            $clan_teams[$team->clan] = $team->team;
-        }
-
-        return $clan_teams;
-
-    }
-
 
     public static function match_api_filter($wp_query){
 
@@ -916,6 +949,76 @@ class matchCPT {
         $clan = $wpdb->get_var($query);
 
         return $clan;
+
+    }
+
+    public static function get_match_players($match_id){
+
+        global $wpdb;
+
+        $query = $wpdb->prepare(
+            "
+                SELECT
+                    p2p_from as match_id,
+                    p2p_to as player_id,
+                    (SELECT meta_value FROM wp_p2pmeta WHERE p2p_id = p2p.p2p_id AND meta_key = 'team') AS team,
+                    (SELECT meta_value FROM wp_postmeta WHERE post_id = p2p.p2p_to AND meta_key = 'clan') as clan
+                      FROM wp_p2p as p2p WHERE p2p_type = 'match_players' AND p2p_from = %s
+                ",
+            $match_id
+        );
+
+        $match_teams = $wpdb->get_results( $query );
+
+        return $match_teams;
+
+    }
+
+    public static function get_clan_team_from_match($match_id){
+
+        global $wpdb;
+
+        $clan_teams = [];
+
+        $match_teams = self::get_match_players($match_id);
+
+        foreach($match_teams as $team){
+            $clan_teams[$team->clan] = $team->team;
+        }
+
+        return $clan_teams;
+
+    }
+
+    public static function get_match_players_by($by = 'team', $match_id, $args = []) {
+
+        switch ($by) {
+
+            case "team" :
+
+                $team = array_filter(self::get_match_players($match_id), function ($player) {
+                        if ($player->team == $args['team']) {
+                            return $player;
+                        };
+                    });
+
+                break;
+
+        }
+
+        return $team;
+
+    }
+
+    public static function get_player_match_team($match_id, $player_id) {
+
+        $team = array_filter(self::get_match_players($match_id), function ($player) {
+                if ($player->player_id == $player_id) {
+                    return $player;
+                };
+            });
+
+        return $team[0]->team;
 
     }
 

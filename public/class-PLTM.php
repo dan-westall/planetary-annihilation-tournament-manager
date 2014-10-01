@@ -50,6 +50,7 @@ class Planetary_Annihilation_Tournament_Manager {
     public static $tournament_endpoints = array('signup', 'rules', 'matches', 'players', 'countdown', 'brackets', 'brackets-full');
 
     public static $match_endpoints = array('roster');
+    public static $planet_servers = 'https://raw.githubusercontent.com/pamods/mods-conundrum/master/cShareSystems_serverList/serverlist.json';
 
 	/**
 	 * Instance of this class.
@@ -93,6 +94,8 @@ class Planetary_Annihilation_Tournament_Manager {
 
         //new userWager();
 
+        userPolling::register();
+
         remove_action( 'wp_head', 'wp_generator');
         remove_action( 'wp_head', 'wp_shortlink_wp_head' );
         remove_action( 'wp_head', 'adjacent_posts_rel_link_wp_head' );
@@ -110,6 +113,8 @@ class Planetary_Annihilation_Tournament_Manager {
         add_filter( 'acf/load_field/name=signup_form', array( $this, 'filter_form_listing') );
         add_filter( 'acf/load_field/name=standard_tournament_signup_form', array( $this, 'filter_form_listing') );
         add_filter( 'acf/load_field/name=country', array( $this, 'filter_form_country') );
+        add_filter( 'acf/load_field/name=planet', array( $this, 'filter_planet') );
+        add_filter( 'acf/load_field/name=planet_server', array( $this, 'filter_planet_server') );
 
         //add_filter( 'json_prepare_post',  array( $this, 'clean_json_api' ), 100, 3 );
 
@@ -172,6 +177,48 @@ class Planetary_Annihilation_Tournament_Manager {
         }
 
         $field['choices'] = $form_listing;
+
+        return $field;
+
+    }
+
+    public function filter_planet($field){
+
+        global $post;
+
+        //?minPlanets=1&maxPlanets=16&start=0&limit=100&request_time=1&sort_field=system_id&sort_direction=desc&name=&creator=
+
+        foreach($forms as $form){
+
+            $form_listing[$form->id] = $form->title;
+
+        }
+
+        $field['choices'] = $form_listing;
+
+        return $field;
+
+    }
+
+    public function filter_planet_server($field){
+
+        if ( false === ( $planet_servers = get_transient( 'planet_servers' ) ) ) {
+
+            $servers = wp_remote_get(self::$planet_servers);
+
+            $planet_servers = json_decode($servers['body']);
+
+            set_transient( 'planet_servers', $planet_servers, 6 * HOUR_IN_SECONDS  );
+        }
+
+
+        foreach($planet_servers->servers as $server){
+
+            $server_listing[$server->search_url] = $server->name;
+
+        }
+
+        $field['choices'] = $server_listing;
 
         return $field;
 

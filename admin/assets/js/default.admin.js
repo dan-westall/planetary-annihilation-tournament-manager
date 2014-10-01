@@ -75,6 +75,21 @@
 
         });
 
-	});
+
+        $('body').on('change', '#acf-planets table tr td:nth-child(2) select', function(e){
+            $.ajax({
+                url: $(this).val() +'?minPlanets=1&maxPlanets=16&start=0&limit=100&request_time=1&sort_field=system_id&sort_direction=desc&name=&creator=&callback=?',
+                cache: false,
+                crossOrigin: true,
+                dataType:'jsonp',
+                success: function (results) {
+                    //console.log(results)
+                }
+            })
+
+        })
+
+
+    });
 
 }(jQuery));

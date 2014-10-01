@@ -1,6 +1,5 @@
 <?php
 
-
 if(function_exists("register_field_group"))
 {
     register_field_group(array (
@@ -1046,6 +1045,67 @@ if(function_exists("register_field_group"))
                 ),
                 'default_value' => '',
                 'allow_null' => 1,
+                'multiple' => 0,
+            ),
+            array (
+                'key' => 'field_5419cff3c2eef',
+                'label' => 'Planets',
+                'name' => '',
+                'type' => 'tab',
+            ),
+            array (
+                'key' => 'field_5419d002c2ef0',
+                'label' => 'Planets',
+                'name' => 'planets',
+                'type' => 'repeater',
+                'sub_fields' => array (
+                    array (
+                        'key' => 'field_5419d09ddec28',
+                        'label' => 'Planet Server',
+                        'name' => 'planet_server',
+                        'type' => 'select',
+                        'column_width' => '',
+                        'choices' => array (
+                            'http://1-dot-winged-will-482.appspot.com/search' => 'Default Server',
+                            'http://1-dot-exodus-esports.appspot.com/search' => 'Exodus eSports',
+                            'http://1-dot-exodus-league.appspot.com/search' => 'Exodus Clan Wars',
+                            'http://1-dot-pa-esports.appspot.com/search' => 'PACE',
+                            'http://1-dot-realm-sharing.appspot.com/search' => 'The Realm',
+                            'http://1-dot-promethean-clan.appspot.com/search' => 'Promethean',
+                            'http://1-dot-team-burning.appspot.com/search' => 'Team Burning',
+                            'http://1-dot-community-tourney.appspot.com/search' => 'Cheddar Cup',
+                        ),
+                        'default_value' => '',
+                        'allow_null' => 0,
+                        'multiple' => 0,
+                    ),
+                    array (
+                        'key' => 'field_5419d010c2ef1',
+                        'label' => 'Planet',
+                        'name' => 'planet',
+                        'type' => 'select',
+                        'instructions' => 'Only when planet server is selected will you be able to select a planet.',
+                        'column_width' => '',
+                        'choices' => NULL,
+                        'default_value' => '',
+                        'allow_null' => 0,
+                        'multiple' => 0,
+                    ),
+                ),
+                'row_min' => '',
+                'row_limit' => '',
+                'layout' => 'table',
+                'button_label' => 'Add Row',
+            ),
+            array (
+                'key' => 'field_5419d05adec27',
+                'label' => '',
+                'name' => '',
+                'type' => 'select',
+                'choices' => array (
+                ),
+                'default_value' => '',
+                'allow_null' => 0,
                 'multiple' => 0,
             ),
         ),
