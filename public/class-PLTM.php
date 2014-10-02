@@ -116,14 +116,13 @@ class Planetary_Annihilation_Tournament_Manager {
         add_filter( 'acf/load_field/name=planet', array( $this, 'filter_planet') );
         add_filter( 'acf/load_field/name=planet_server', array( $this, 'filter_planet_server') );
 
-        //add_filter( 'json_prepare_post',  array( $this, 'clean_json_api' ), 100, 3 );
-
-
-
 
 	}
 
     public function register_tournament_endpoints(){
+
+
+        add_filter( 'json_prepare_user',  array( $this, 'clean_json_api' ), 20, 3 );
 
         foreach(array_merge(self::$tournament_endpoints, self::$match_endpoints) as $endpoint){
             add_rewrite_endpoint($endpoint, EP_PERMALINK);
@@ -247,15 +246,9 @@ class Planetary_Annihilation_Tournament_Manager {
 
     public function clean_json_api($_post, $post, $context){
 
-//        $remove_fields = array('author', 'parent', 'format', 'slug', 'guid', 'excerpt', 'menu_order', 'ping_status', 'sticky', 'content', 'meta');
-//
-//        //dont need author
-//        foreach($remove_fields as $field){
-//            unset($_post[$field]);
-//        }
 
 
-        return $_post;
+        return [];
 
     }
 
