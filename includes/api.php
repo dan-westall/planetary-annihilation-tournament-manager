@@ -221,9 +221,23 @@ class PLTM_API_Endpoint{
 
         } elseif(isset($wp->query_vars['__site-status'])){
             if(is_tournament_in_progress()){
-                $this->send_response('tournament_in_progress');
+
+                $post_id       = get_option('page_on_front');
+                $tournament_id = get_post_meta($post_id, 'tournament', true);
+
+                $response['site_status'] = ['tournament_in_progress' => true, 'front_page' => false, 'tournament_name' => get_the_title($tournament_id)];
+
+                header('content-type: application/json; charset=utf-8');
+                echo json_encode($response)."\n";
+                exit;
+
             } else {
-                $this->send_response('tournament_not_in_progress');
+
+                $response['site_status'] = ['tournament_in_progress' => false];
+
+                header('content-type: application/json; charset=utf-8');
+                echo json_encode($response)."\n";
+                exit;
             }
         }
     }
