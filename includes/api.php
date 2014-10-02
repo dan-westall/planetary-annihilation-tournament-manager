@@ -225,7 +225,7 @@ class PLTM_API_Endpoint{
                 $post_id       = get_option('page_on_front');
                 $tournament_id = get_post_meta($post_id, 'tournament', true);
 
-                $response['site_status'] = ['tournament_in_progress' => true, 'front_page' => false, 'tournament_name' => get_the_title($tournament_id)];
+                $response['site_status'] = ['tournament_in_progress' => true, 'front_page' => true, 'tournament_name' => get_the_title($tournament_id)];
 
                 header('content-type: application/json; charset=utf-8');
                 echo json_encode($response)."\n";
