@@ -34,6 +34,9 @@ class matchCPT {
         add_action( 'match_updated', array( $this, 'realtime_update_match_listing'), 10, 2);
         add_action( 'save_post',  array( $this, 'realtime_update_match_listing'), 10, 1 );
 
+
+        add_action( 'save_post',  array( $this, 'match_time'), 10, 1 );
+
         //moved outside to our own api endpoint
 //        add_action('wp_ajax_pltm_get_match_results',  array( $this, 'get_match_json') );
 //        add_action('wp_ajax_nopriv_pltm_get_match_results',  array( $this, 'get_match_json') );
@@ -296,10 +299,12 @@ class matchCPT {
 
             foreach ($players->posts as $player) {
 
+                $winner = p2p_get_meta($player->p2p_id, 'winner', true);
+
                 $match_players[] = array(
                     'player_name'        => $player->post_title,
                     'pa_stats_player_id' => get_post_meta($player->ID, 'pastats_player_id', true),
-                    'winner'             => p2p_get_meta($player->p2p_id, 'winner', true),
+                    'winner'             => ( $winner != '' ? $winner : 0 ),
                     'team'               => p2p_get_meta($player->p2p_id, 'team', true)
                 );
 
@@ -615,7 +620,7 @@ class matchCPT {
                 $user_id = get_post_meta($player->ID, 'user_id', true);
 
 
-                delete_transient('player_user_avatar_' .$user_id. '_src');
+                //delete_transient('player_user_avatar_' .$user_id. '_src');
 
                 if ( false === ( $avatar_src = get_transient( 'player_user_avatar_' .$user_id. '_src'  ) ) ) {
 
@@ -765,30 +770,38 @@ class matchCPT {
 
     public static function match_format($match_id = 0){
 
-        $match = get_post($match_id);
-        $teams = [];
-        $clans = [];
-        $players    = p2p_type('match_players')->get_connected($match->ID);
+        //todo move to wpdb for better performance
+        if ( false === ( $match_format = get_transient( 'match_format_' .$match_id  ) ) ) {
 
-        foreach ($players->posts as $player) {
+            $match = get_post($match_id);
+            $teams = [];
+            $clans = [];
+            $players    = p2p_type('match_players')->get_connected($match->ID);
 
-            $teams[p2p_get_meta($player->p2p_id, 'team', true)] ++;
+            foreach ($players->posts as $player) {
 
-            if($clan = get_post_meta($player->ID, 'clan', true)){
-                $clans[$clan] = true;
+                $teams[p2p_get_meta($player->p2p_id, 'team', true)] ++;
+
+                if($clan = get_post_meta($player->ID, 'clan', true)){
+                    $clans[$clan] = true;
+                }
             }
+
+            if(count($players->posts) == 2){
+                $match_format =  'format-vs';
+            } else if(count($teams) == count($players->posts)){
+                $match_format =  'format-ffs';
+            } else if(count($teams) < count($players->posts) && count($teams) == count($clans)) {
+                $match_format =  'format-vs-team-clan';
+            } else if(count($teams) < count($players->posts)){
+                $match_format = 'format-vs-team';
+            }
+
+            set_transient( 'match_format_' .$match_id, $match_format, ( HOUR_IN_SECONDS / 2 ) );
+
         }
 
-
-        if(count($players->posts) == 2){
-            return 'format-vs';
-        } else if(count($teams) == count($players->posts)){
-            return 'format-ffs';
-        } else if(count($teams) < count($players->posts) && count($teams) == count($clans)) {
-            return 'format-vs-team-clan';
-        } else if(count($teams) < count($players->posts)){
-            return 'format-vs-team';
-        }
+        return $match_format;
 
     }
 
@@ -1019,6 +1032,10 @@ class matchCPT {
             });
 
         return $team[0]->team;
+
+    }
+
+    public static function match_time(){
 
     }
 

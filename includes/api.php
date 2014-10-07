@@ -19,6 +19,7 @@ class PLTM_API_Endpoint{
     public function add_query_vars($vars){
         $vars[] = '__api';
         $vars[] = '__signature';
+        $vars[] = '__site-status';
         $vars[] = 'tournament';
         $vars[] = 'tournaments';
         $vars[] = 'return';
@@ -40,6 +41,10 @@ class PLTM_API_Endpoint{
      *	@return void
      */
     public function add_endpoint(){
+
+
+        add_rewrite_rule('^site-status/?([^/]*)?/?','index.php?__site-status=1','top');
+
         //add_rewrite_rule('^api/tournament-matches/?([0-9]+)?/?','index.php?__api=1&tournament-matches=$matches[1]','top');
 
         //add_rewrite_rule('^signature/tournament/?([^/]*)?/?([^/]*)?/?','index.php?__api=1&tournament=$matches[1]&return=$matches[2]','top');
@@ -51,7 +56,8 @@ class PLTM_API_Endpoint{
 
         add_rewrite_rule('^api/match/?([0-9]+)?/?([^/]*)?/?','index.php?__api=1&match_id=$matches[1]&id_type=$matches[2]','top');
         add_rewrite_rule('^api/playercid/?([0-9]+)?/?','index.php?__api=1&playercid=$matches[1]','top');
-        add_rewrite_rule('^api/player/?([0-9]+)?/?','index.php?__api=1&player=$matches[1]','top');
+
+
 
 
 
@@ -75,7 +81,7 @@ class PLTM_API_Endpoint{
      */
     public function sniff_requests(){
         global $wp;
-        if(isset($wp->query_vars['__api']) || isset($wp->query_vars['__signature'])){
+        if(isset($wp->query_vars['__api']) || isset($wp->query_vars['__signature']) || isset($wp->query_vars['__site-status'])){
             $this->handle_request();
             exit;
         }
@@ -213,6 +219,26 @@ class PLTM_API_Endpoint{
             imagepng($sig_image);
             imagedestroy($sig_image);
 
+        } elseif(isset($wp->query_vars['__site-status'])){
+            if(is_tournament_in_progress()){
+
+                $post_id       = get_option('page_on_front');
+                $tournament_id = get_post_meta($post_id, 'tournament', true);
+
+                $response['site_status'] = ['tournament_in_progress' => true, 'front_page' => true, 'tournament_name' => get_the_title($tournament_id)];
+
+                header('content-type: application/json; charset=utf-8');
+                echo json_encode($response)."\n";
+                exit;
+
+            } else {
+
+                $response['site_status'] = ['tournament_in_progress' => false];
+
+                header('content-type: application/json; charset=utf-8');
+                echo json_encode($response)."\n";
+                exit;
+            }
         }
     }
 
