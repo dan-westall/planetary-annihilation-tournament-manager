@@ -18,7 +18,7 @@ class Pusher implements WampServerInterface {
     /**
      * @param string JSON'ified string we'll receive from ZeroMQ
      */
-    public function onBlogEntry($entry) {
+    public function onRealtimeEvent($entry) {
         $entryData = json_decode($entry, true);
 
         // If the lookup topic object isn't set there is no one to publish to

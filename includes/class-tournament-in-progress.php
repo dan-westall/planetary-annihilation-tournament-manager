@@ -6,8 +6,9 @@ class tournament_in_progress {
 
         $plugin = new self();
 
+        add_action( 'save_post',  [ $plugin, 'realtime_update_live_page'], 10, 1 );
 
-        add_action( 'save_post',  array( $this, 'realtime_update_live_page'), 10, 1 );
+        add_filter( 'realtime_subscription', [ $plugin, 'get_live_state' ], 10, 2 );
 
 
     }
@@ -34,6 +35,14 @@ class tournament_in_progress {
         $socket->connect("tcp://localhost:5555");
 
         $socket->send(json_encode($result));
+
+
+
+    }
+
+    public function get_live_state($subscription_id){
+
+
 
 
 
