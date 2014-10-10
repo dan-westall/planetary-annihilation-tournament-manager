@@ -1478,6 +1478,7 @@ class tournamentCPT {
             $_post['meta']['total_matches'] = count($matches->posts);
             $_post['meta']['players']        = $match_players;
             $_post['meta']['tournament_date'] = get_post_meta($post['ID'], 'run_date', true);
+            $_post['meta']['tournament_starttime'] = get_post_meta($post['ID'], 'run_time', true);
             $_post['meta']['signup_open'] = is_tournament_signup_open($post['ID']);
 
         }
