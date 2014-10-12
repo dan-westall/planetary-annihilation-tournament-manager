@@ -250,11 +250,11 @@ class userPolling {
             'vote'          => $vote_type
         ];
 
-        if(!empty($team_id)){
+        if(!isset($team_id)){
             $meta['team'] = $team_id;
         }
 
-        if(get_post_type($vote_on) === matchCPT::$post_type && empty($team_id)){
+        if(get_post_type($vote_on) === matchCPT::$post_type && !isset($team_id)){
             
             echo json_encode(array('result' => false, 'message' => 'ERROR: To vote on match a team ID is needed'));
 
