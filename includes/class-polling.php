@@ -36,11 +36,12 @@ class userPolling {
 
         $plugin = new self();
 
-        add_action('p2p_init', [ $plugin, 'register_p2p_connections']);
+        add_action( 'p2p_init', [ $plugin, 'register_p2p_connections']);
 
-        add_action('wp_ajax_vote', [ $plugin, 'vote']);
+        add_action( 'wp_ajax_vote', [ $plugin, 'vote']);
+        add_action( 'wp_ajax_get_votes', [ $plugin, 'ajax_get_votes']);
 
-        add_action('p2p_created_connection', [ $plugin, 'action_p2p_new_connection']);
+        add_action( 'p2p_created_connection', [ $plugin, 'action_p2p_new_connection']);
 
         add_action( 'match_vote_made', [ $plugin, 'realtime_polling_result'], 10, 3);
 
@@ -314,6 +315,18 @@ class userPolling {
 
         return $votes;
 
+
+    }
+
+    public function ajax_get_votes() {
+
+        $votes = new userPolling();
+
+        $object_votes = $votes->setObjectId($_POST['match_id'])->get_votes();
+
+        echo json_encode($object_votes);
+
+        die();
 
     }
 
