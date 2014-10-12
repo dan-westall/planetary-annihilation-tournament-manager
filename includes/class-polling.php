@@ -250,7 +250,7 @@ class userPolling {
             'vote'          => $vote_type
         ];
 
-        if(!isset($team_id)){
+        if(isset($team_id)){
             $meta['team'] = $team_id;
         }
 
