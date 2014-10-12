@@ -13,6 +13,9 @@ class Pusher implements WampServerInterface {
     public function onSubscribe(ConnectionInterface $conn, $topic) {
 
         $this->subscribedTopics[$topic->getId()] = $topic;
+
+
+        //$topic->broadcast(apply_filters('realtime_subscription', [], $topic));
     }
 
     /**

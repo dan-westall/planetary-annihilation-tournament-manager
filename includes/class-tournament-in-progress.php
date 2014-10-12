@@ -40,10 +40,54 @@ class tournament_in_progress {
 
     }
 
-    public function get_live_state($subscription_id){
+    public function get_live_state($object, $subscription_id){
+
+        $object = [];
+
+        $live_page_id = self::get_live_page_id();
+
+        while( has_sub_field('stream', $live_page_id) ){
+
+            if( have_rows('large_content_type', $live_page_id) ) {
+
+                while (have_rows('large_content_type', $live_page_id)) {
+
+                    the_row();
+
+                    if (get_row_layout() == 'match'):
+
+                        $current_match_id   = get_sub_field( 'current_match' );
+                        $show_match_polling = get_sub_field( 'show_winner_poll' );
+
+                    elseif (get_row_layout() == 'poll'):
 
 
-//        get_live_page_id
+                    elseif (get_row_layout() == 'advert'):
+
+
+                    endif;
+
+                }
+
+            }  else {
+
+
+            }
+
+        }
+
+
+
+        $votes = new userPolling();
+
+        $object_votes = $votes->setObjectId($current_match_id)->get_votes();
+
+        $object['polling'] = $object_votes;
+        $object['subscription'] = $subscription_id;
+        $object['subscription'] = 'ddd';
+
+        return $object;
+
 
 
     }
