@@ -251,6 +251,14 @@ class userPolling {
             $meta['team'] = $team_id;
         }
 
+        if(get_post_type($vote_on) === matchCPT::$post_type && empty($team_id)){
+            
+            echo json_encode(array('result' => false, 'message' => 'ERROR: To vote on match a team ID is needed'));
+
+            die();
+        }
+
+
         $result = p2p_type('player_vote')->connect($current_user->ID, $vote_on, $meta);
 
         if (is_wp_error($result)) {
