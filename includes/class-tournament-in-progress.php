@@ -43,8 +43,19 @@ class tournament_in_progress {
     public function get_live_state($subscription_id){
 
 
+//        get_live_page_id
 
 
+    }
+
+    public static function get_live_page_id(){
+
+        $page_id = get_option('page_on_front');
+
+        if(get_post_meta($page_id, '_wp_page_template', true) == 'template-tournament-in-progress-2.php')
+            return $page_id;
+
+        return false;
 
     }
 

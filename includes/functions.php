@@ -22,6 +22,19 @@ function get_tournament_players($tournament_id, $status = array('active'), $args
 
 }
 
+function realtime_subscription_id($subscription_id){
+
+    $subscription_id = strtolower($subscription_id);
+
+    if($subscription_id{0} === 't'){
+
+        $tournamnet_id = '';
+
+    }
+
+
+}
+
 function get_tournament_matches($tournament_id){
     $matches = get_posts(array(
         'connected_type'   => 'tournament_matches',
