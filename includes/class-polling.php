@@ -45,6 +45,9 @@ class userPolling {
 
         add_action( 'match_vote_made', [ $plugin, 'realtime_polling_result'], 10, 3);
 
+        //add_action( 'save_post', [ $plugin, 'realtime_polling_result'], 10, 1 );
+
+
     }
 
     /**
