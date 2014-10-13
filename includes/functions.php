@@ -32,6 +32,16 @@ function realtime_subscription_id($subscription_id){
 
     }
 
+}
+
+function user_has_voted($object_id){
+
+    global $current_user; get_currentuserinfo();
+
+    $votes = new userPolling();
+
+    return $votes->setUserId($current_user->ID)->setObjectId($object_id)->has_voted();
+
 
 }
 
