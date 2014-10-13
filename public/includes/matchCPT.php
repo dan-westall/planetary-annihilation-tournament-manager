@@ -589,7 +589,7 @@ class matchCPT {
         return $data;
     }
 
-    public function extend_json_api($_post, $post, $context){
+    public static function extend_json_api($_post, $post, $context){
 
         if($post['post_type'] == 'match'){
 

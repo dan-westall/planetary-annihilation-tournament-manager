@@ -4,6 +4,9 @@ namespace MyApp;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\WampServerInterface;
 
+
+require_once __DIR__ .'/../../../includes/class-tournament-in-progress.php';
+
 class Pusher implements WampServerInterface {
     /**
      * A lookup of all the topics clients have subscribed to
@@ -13,10 +16,12 @@ class Pusher implements WampServerInterface {
     public function onSubscribe(ConnectionInterface $conn, $topic) {
 
         $this->subscribedTopics[$topic->getId()] = $topic;
+
         echo "New connection! ({$conn->resourceId})\n";
 
+        $live_state = \tournament_in_progress::get_live_state();
 
-        //$topic->broadcast(apply_filters('realtime_subscription', [], $topic));
+        $topic->broadcast($live_state);
     }
 
     /**

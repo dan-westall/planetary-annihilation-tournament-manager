@@ -1,15 +1,15 @@
 <?php
 
-/*
 
-require_once( $_SERVER['DOCUMENT_ROOT'] . '/wp-config.php' );
-require_once( $_SERVER['DOCUMENT_ROOT'] . '/wp-includes/wp-db.php' );
+require_once( __DIR__ . '/../../../../wp-load.php' );
+
+
 if (!$wpdb) {
     $wpdb = new wpdb( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST);
 } else {
     global $wpdb;
 }
- */
+
 
 class tournament_in_progress {
 
@@ -58,20 +58,25 @@ class tournament_in_progress {
 
     }
 
-    public function get_live_state($object, $subscription_id){
+    public static function get_live_state($object = 0, $subscription_id){
 
         $object = [];
 
         $live_page_id = self::get_live_page_id();
 
+        $current_match_id      = get_post_meta($live_page_id, 'current_match', true);
+        $current_tournament_id = get_post_meta($live_page_id, 'tournament', true);
 
+        $match = get_post($current_match_id, 'ARRAY_A');
 
         $votes = new userPolling();
 
         $object_votes = $votes->setObjectId($current_match_id)->get_votes();
 
-        $object['polling'] = $object_votes;
-        $object['subscription'] = $subscription_id;
+        $object['polling'][$current_match_id] = $object_votes;
+        $object['subscription']               = sprintf('t%s-live', $current_tournament_id);
+        $object['current_match']['id']        = $current_match_id;
+        $object['current_match']['object']    = matchCPT::extend_json_api($match, $match);
 
         return $object;
 
