@@ -13,6 +13,7 @@ class Pusher implements WampServerInterface {
     public function onSubscribe(ConnectionInterface $conn, $topic) {
 
         $this->subscribedTopics[$topic->getId()] = $topic;
+        echo "New connection! ({$conn->resourceId})\n";
 
 
         //$topic->broadcast(apply_filters('realtime_subscription', [], $topic));
@@ -30,6 +31,9 @@ class Pusher implements WampServerInterface {
         }
 
         $topic = $this->subscribedTopics[$entryData['subscription']];
+
+
+        echo "New update on{$topic}\n";
 
         // re-send the data to all the clients subscribed to that category
         $topic->broadcast($entryData);
