@@ -45,7 +45,7 @@ class userPolling {
 
         add_action( 'match_vote_made', [ $plugin, 'realtime_polling_result'], 10, 3);
 
-        //add_action( 'save_post', [ $plugin, 'realtime_polling_result'], 10, 1 );
+        add_action( 'save_post', [ $plugin, 'update_polling_result'], 10, 1 );
 
 
     }
@@ -385,6 +385,18 @@ class userPolling {
 
     }
 
+
+    public static function update_polling_result($post_id){
+
+        $live_page_id = tournament_in_progress::get_live_page_id();
+
+        if(get_post_meta($live_page_id, 'current_match', true) == $post_id){
+
+            self::realtime_polling_result(false, $post_id, false);
+
+        }
+
+    }
 }
 
 //aim

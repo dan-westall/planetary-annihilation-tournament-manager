@@ -13,6 +13,13 @@ class tournament_in_progress {
 
     }
 
+    /**
+     *
+     */
+    function __construct() {
+
+
+    }
 
     public static function realtime_update_live_page($post_id){
 
