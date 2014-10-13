@@ -343,6 +343,24 @@ class userPolling {
 
     public function has_voted() {
 
+        global $wpdb;
+
+        $query = $wpdb->prepare(
+            "
+                SELECT *
+                      FROM $wpdb->p2p as p2p WHERE p2p_type = 'player_vote' AND p2p_from = %s AND p2p_to = %s
+                ",
+            $this->user_id,
+            $this->object_id
+        );
+
+        $votes = $wpdb->get_results( $query );
+
+        if(empty($votes))
+            return false;
+
+        return true;
+
 
     }
 
@@ -398,19 +416,3 @@ class userPolling {
 
     }
 }
-
-//aim
-
-//$userVote = new userVote();
-
-///$userVote->get_player($player_id)->match_votes($match_id);
-///$userVote->get_player($player_id)->tournament_votes($tournament_id);
-///$userVote->get_match($match_id)->get_team();
-
-$votes = new userPolling();
-
-//$votes->setMatchId(0)->get_match_votes();
-//$votes->setMatchId(0)->get_match_votes();
-
-
-//$votes->setTournamentId()->setPlayerId()->get_vote();

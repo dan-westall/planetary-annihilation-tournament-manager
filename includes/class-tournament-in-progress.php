@@ -1,5 +1,16 @@
 <?php
 
+/*
+
+require_once( $_SERVER['DOCUMENT_ROOT'] . '/wp-config.php' );
+require_once( $_SERVER['DOCUMENT_ROOT'] . '/wp-includes/wp-db.php' );
+if (!$wpdb) {
+    $wpdb = new wpdb( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST);
+} else {
+    global $wpdb;
+}
+ */
+
 class tournament_in_progress {
 
     public static function register() {
@@ -53,36 +64,6 @@ class tournament_in_progress {
 
         $live_page_id = self::get_live_page_id();
 
-        while( has_sub_field('stream', $live_page_id) ){
-
-            if( have_rows('large_content_type', $live_page_id) ) {
-
-                while (have_rows('large_content_type', $live_page_id)) {
-
-                    the_row();
-
-                    if (get_row_layout() == 'match'):
-
-                        $current_match_id   = get_sub_field( 'current_match' );
-                        $show_match_polling = get_sub_field( 'show_winner_poll' );
-
-                    elseif (get_row_layout() == 'poll'):
-
-
-                    elseif (get_row_layout() == 'advert'):
-
-
-                    endif;
-
-                }
-
-            }  else {
-
-
-            }
-
-        }
-
 
 
         $votes = new userPolling();
@@ -91,7 +72,6 @@ class tournament_in_progress {
 
         $object['polling'] = $object_votes;
         $object['subscription'] = $subscription_id;
-        $object['subscription'] = 'ddd';
 
         return $object;
 
