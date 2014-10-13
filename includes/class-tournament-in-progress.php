@@ -40,11 +40,11 @@ class tournament_in_progress {
         if(get_post_meta($post_id, '_wp_page_template', true) != 'template-tournament-in-progress-2.php')
             return false;
 
-        $tournament_id = get_post_meta($post_id, 'tournament', true );
+        if(!is_tournament_in_progress())
+            return false;
 
         //setsub
-        $result['subscription'] =  sprintf('t%s-live', $tournament_id);
-
+        $live_state = self::get_live_state();
 
 
         //send to realtime
@@ -52,7 +52,7 @@ class tournament_in_progress {
         $socket  = $context->getSocket(ZMQ::SOCKET_PUSH, 'my pusher');
         $socket->connect("tcp://localhost:5555");
 
-        $socket->send(json_encode($result));
+        $socket->send(json_encode($live_state));
 
 
 
@@ -79,8 +79,6 @@ class tournament_in_progress {
         $object['current_match']['object']    = matchCPT::extend_json_api($match, $match);
 
         return $object;
-
-
 
     }
 
