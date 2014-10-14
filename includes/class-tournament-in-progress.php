@@ -74,7 +74,7 @@ class tournament_in_progress {
         $object_votes = $votes->setObjectId($current_match_id)->get_votes();
 
         $object['polling'][$current_match_id] = $object_votes;
-        $object['subscription']               = sprintf('t%s-live', $current_tournament_id);
+        $object['subscription']               = 'live';
         $object['current_match']['id']        = $current_match_id;
         $object['current_match']['object']    = matchCPT::extend_json_api($match, $match, 'websocket');
 

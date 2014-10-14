@@ -182,7 +182,7 @@ class userPolling {
         }
 
         //setsub
-        $result['subscription'] =  sprintf('t%s-live', $tournament_id);
+        $result['subscription'] =  'live';
 
         if (class_exists('ZMQContext')) {
             //send to realtime
