@@ -65,6 +65,10 @@ class tournament_in_progress {
         $live_page_id = self::get_live_page_id();
 
         $current_match_id      = get_post_meta($live_page_id, 'current_match', true);
+
+        if(empty($current_match_id))
+            return ['result' => false, 'match ID not set on live page'];
+
         $current_tournament_id = get_post_meta($live_page_id, 'tournament', true);
 
         $match = get_post($current_match_id, 'ARRAY_A');
