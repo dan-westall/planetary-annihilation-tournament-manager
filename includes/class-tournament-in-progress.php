@@ -58,7 +58,7 @@ class tournament_in_progress {
 
     }
 
-    public static function get_live_state($object = 0, $subscription_id){
+    public static function get_live_state(){
 
         $object = [];
 
@@ -76,7 +76,7 @@ class tournament_in_progress {
         $object['polling'][$current_match_id] = $object_votes;
         $object['subscription']               = sprintf('t%s-live', $current_tournament_id);
         $object['current_match']['id']        = $current_match_id;
-        $object['current_match']['object']    = matchCPT::extend_json_api($match, $match);
+        $object['current_match']['object']    = matchCPT::extend_json_api($match, $match, 'websocket');
 
         return $object;
 
