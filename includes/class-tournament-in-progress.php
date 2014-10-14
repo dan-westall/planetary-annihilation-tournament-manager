@@ -58,7 +58,7 @@ class tournament_in_progress {
 
     }
 
-    public static function get_live_state(){
+    public static function get_live_state() {
 
         $object = [];
 
@@ -77,6 +77,21 @@ class tournament_in_progress {
         $object['subscription']               = sprintf('t%s-live', $current_tournament_id);
         $object['current_match']['id']        = $current_match_id;
         $object['current_match']['object']    = matchCPT::extend_json_api($match, $match, 'websocket');
+
+        if (have_rows('small_content_type', $live_page_id)) {
+
+            while (have_rows('small_content_type', $live_page_id)) { the_row();
+
+                if (get_row_layout() == 'guest_analyst') {
+
+                    $object['small_content']['type']   = 'guest_analyst';
+                    $object['small_content']['object'] = get_sub_field('select_analyst');
+
+                }
+
+            }
+
+        }
 
         return $object;
 

@@ -17,11 +17,21 @@ class Pusher implements WampServerInterface {
 
         $this->subscribedTopics[$topic->getId()] = $topic;
 
-        echo "New connection! ({$conn->resourceId})\n";
+        echo "New connection! ({$topic})\n";
 
-        $live_state = \tournament_in_progress::get_live_state();
+        switch($topic){
 
-        $topic->broadcast($live_state);
+            case "live" :
+
+                $live_state = \tournament_in_progress::get_live_state();
+
+                $topic->broadcast($live_state);
+
+                break;
+
+        }
+
+
     }
 
     /**
