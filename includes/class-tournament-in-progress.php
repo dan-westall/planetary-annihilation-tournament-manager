@@ -66,6 +66,9 @@ class tournament_in_progress {
 
         $current_match_id      = get_post_meta($live_page_id, 'current_match', true);
 
+        if(!is_tournament_in_progress())
+            return ['result' => false, 'Tournament live page is not front page.'];
+
         if(empty($current_match_id))
             return ['result' => false, 'match ID not set on live page'];
 
@@ -88,8 +91,10 @@ class tournament_in_progress {
 
                 if (get_row_layout() == 'guest_analyst') {
 
+                    $analyst = get_sub_field('analyst');
+
                     $object['small_content']['type']   = 'guest_analyst';
-                    $object['small_content']['object'] = get_sub_field('select_analyst');
+                    $object['small_content']['object'] = [ 'display_name' => $analyst['display_name'], 'avatar' => $analyst['user_avatar']];
 
                 }
 
