@@ -36,13 +36,19 @@ class userPolling {
 
         $plugin = new self();
 
-        add_action('p2p_init', [ $plugin, 'register_p2p_connections']);
+        add_action( 'p2p_init', [ $plugin, 'register_p2p_connections']);
 
-        add_action('wp_ajax_vote', [ $plugin, 'vote']);
+        add_action( 'wp_ajax_vote', [ $plugin, 'vote']);
 
-        add_action('p2p_created_connection', [ $plugin, 'action_p2p_new_connection']);
+        add_action( 'wp_ajax_get_votes', [ $plugin, 'ajax_get_votes']);
+        add_action( 'wp_ajax_nopriv_get_votes',  [ $plugin, 'ajax_get_votes' ] );
+
+        add_action( 'p2p_created_connection', [ $plugin, 'action_p2p_new_connection']);
 
         add_action( 'match_vote_made', [ $plugin, 'realtime_polling_result'], 10, 3);
+
+        add_action( 'save_post', [ $plugin, 'update_polling_result'], 10, 1 );
+
 
     }
 
@@ -176,7 +182,7 @@ class userPolling {
         }
 
         //setsub
-        $result['subscription'] =  sprintf('t%s-live', $tournament_id);
+        $result['subscription'] =  'live';
 
         if (class_exists('ZMQContext')) {
             //send to realtime
@@ -246,9 +252,17 @@ class userPolling {
             'vote'          => $vote_type
         ];
 
-        if(!empty($team_id)){
+        if(isset($team_id)){
             $meta['team'] = $team_id;
         }
+
+        if(get_post_type($vote_on) === matchCPT::$post_type && !isset($team_id)){
+            
+            echo json_encode(array('result' => false, 'message' => 'ERROR: To vote on match a team ID is needed'));
+
+            die();
+        }
+
 
         $result = p2p_type('player_vote')->connect($current_user->ID, $vote_on, $meta);
 
@@ -317,7 +331,37 @@ class userPolling {
 
     }
 
+    public function ajax_get_votes() {
+
+        $votes = new userPolling();
+
+        $object_votes = $votes->setObjectId($_POST['match_id'])->get_votes();
+
+        echo json_encode($object_votes);
+
+        die();
+
+    }
+
     public function has_voted() {
+
+        global $wpdb;
+
+        $query = $wpdb->prepare(
+            "
+                SELECT *
+                      FROM $wpdb->p2p as p2p WHERE p2p_type = 'player_vote' AND p2p_from = %s AND p2p_to = %s
+                ",
+            $this->user_id,
+            $this->object_id
+        );
+
+        $votes = $wpdb->get_results( $query );
+
+        if(empty($votes))
+            return false;
+
+        return true;
 
 
     }
@@ -361,20 +405,16 @@ class userPolling {
 
     }
 
+
+    public static function update_polling_result($post_id){
+
+        $live_page_id = tournament_in_progress::get_live_page_id();
+
+        if(get_post_meta($live_page_id, 'current_match', true) == $post_id){
+
+            self::realtime_polling_result(false, $post_id, false);
+
+        }
+
+    }
 }
-
-//aim
-
-//$userVote = new userVote();
-
-///$userVote->get_player($player_id)->match_votes($match_id);
-///$userVote->get_player($player_id)->tournament_votes($tournament_id);
-///$userVote->get_match($match_id)->get_team();
-
-$votes = new userPolling();
-
-//$votes->setMatchId(0)->get_match_votes();
-//$votes->setMatchId(0)->get_match_votes();
-
-
-//$votes->setTournamentId()->setPlayerId()->get_vote();

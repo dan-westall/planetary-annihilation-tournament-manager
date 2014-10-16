@@ -95,6 +95,7 @@ class Planetary_Annihilation_Tournament_Manager {
         //new userWager();
 
         userPolling::register();
+        tournament_in_progress::register();
 
         remove_action( 'wp_head', 'wp_generator');
         remove_action( 'wp_head', 'wp_shortlink_wp_head' );

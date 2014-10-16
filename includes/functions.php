@@ -22,6 +22,29 @@ function get_tournament_players($tournament_id, $status = array('active'), $args
 
 }
 
+function realtime_subscription_id($subscription_id){
+
+    $subscription_id = strtolower($subscription_id);
+
+    if($subscription_id{0} === 't'){
+
+        $tournamnet_id = '';
+
+    }
+
+}
+
+function user_has_voted($object_id){
+
+    global $current_user; get_currentuserinfo();
+
+    $votes = new userPolling();
+
+    return $votes->setUserId($current_user->ID)->setObjectId($object_id)->has_voted();
+
+
+}
+
 function get_tournament_matches($tournament_id){
     $matches = get_posts(array(
         'connected_type'   => 'tournament_matches',

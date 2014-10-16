@@ -589,7 +589,7 @@ class matchCPT {
         return $data;
     }
 
-    public function extend_json_api($_post, $post, $context){
+    public static function extend_json_api($_post, $post, $context){
 
         if($post['post_type'] == 'match'){
 
@@ -652,6 +652,9 @@ class matchCPT {
             $_post['meta']['match_round']    = get_post_meta($post['ID'], 'match_round', true);
             $_post['meta']['team_filter']    = get_post_meta($post['ID'], 'team_filter', true);
             $_post['meta']['format']         = self::match_format($post['ID']);
+            $_post['meta']['teams']          = self::get_clan_team_from_match($post['ID'], true);
+
+
 
         }
 
@@ -987,7 +990,7 @@ class matchCPT {
 
     }
 
-    public static function get_clan_team_from_match($match_id){
+    public static function get_clan_team_from_match($match_id, $swtich = false){
 
         global $wpdb;
 
@@ -996,7 +999,13 @@ class matchCPT {
         $match_teams = self::get_match_players($match_id);
 
         foreach($match_teams as $team){
-            $clan_teams[$team->clan] = $team->team;
+
+            if($swtich){
+                $clan_teams[$team->team] = $team->clan;
+            } else {
+                $clan_teams[$team->clan] = $team->team;
+
+            }
         }
 
         return $clan_teams;

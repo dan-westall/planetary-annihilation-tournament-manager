@@ -4,6 +4,9 @@ namespace MyApp;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\WampServerInterface;
 
+
+require_once __DIR__ .'/../../../includes/class-tournament-in-progress.php';
+
 class Pusher implements WampServerInterface {
     /**
      * A lookup of all the topics clients have subscribed to
@@ -13,12 +16,28 @@ class Pusher implements WampServerInterface {
     public function onSubscribe(ConnectionInterface $conn, $topic) {
 
         $this->subscribedTopics[$topic->getId()] = $topic;
+
+        echo "New connection! ({$topic})\n";
+
+        switch($topic){
+
+            case "live" :
+
+                $live_state = \tournament_in_progress::get_live_state();
+
+                $topic->broadcast($live_state);
+
+                break;
+
+        }
+
+
     }
 
     /**
      * @param string JSON'ified string we'll receive from ZeroMQ
      */
-    public function onBlogEntry($entry) {
+    public function onRealtimeEvent($entry) {
         $entryData = json_decode($entry, true);
 
         // If the lookup topic object isn't set there is no one to publish to
@@ -27,6 +46,9 @@ class Pusher implements WampServerInterface {
         }
 
         $topic = $this->subscribedTopics[$entryData['subscription']];
+
+
+        echo "New update on{$topic}\n";
 
         // re-send the data to all the clients subscribed to that category
         $topic->broadcast($entryData);
