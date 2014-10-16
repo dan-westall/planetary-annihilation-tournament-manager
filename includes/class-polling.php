@@ -205,7 +205,6 @@ class userPolling {
             'name'      => 'player_vote',
             'from'      => 'user',
             'to'        => [matchCPT::$post_type, playerCPT::$post_type],
-            'duplicate_connections' => true,
             'admin_box' => array(
                 'show'    => 'to',
                 'context' => 'advanced'
