@@ -4,10 +4,6 @@ define( 'PLTM_PLUGIN_DIR' , dirname(__FILE__) );
 define( 'PLTM_PLUGIN_URI' , plugin_dir_url(__FILE__) );
 
 
-if($_SERVER['SERVER_NAME'] == 'exodusesports.com' || $_SERVER['SERVER_NAME'] ==  'dev.exodusesports.com'){
-    require_once ( PLTM_PLUGIN_DIR.'/includes/acf.fields.php' );
-}
-
 require_once( PLTM_PLUGIN_DIR.'/includes/functions.php');
 
 require_once( PLTM_PLUGIN_DIR.'/includes/xmlrpc_function.php');
