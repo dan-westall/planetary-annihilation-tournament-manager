@@ -558,7 +558,7 @@ class matchCPT {
 
                             $vote_button_string = sprintf($vote_button, $key, $team_label, $match_id, $tournament_id);
 
-                            $match_cards .=  '<div class="col-lg-5"><h3 class="text-center">Team '.$team_label.'</h3>'.$team.$vote_button_string.'</div>' ;
+                            $match_cards .=  '<div class="col-lg-5 team-container"><h3 class="text-center">Team '.$team_label.'</h3>'.$team.$vote_button_string.'</div>' ;
                         }
 
                         $team_count ++;
