@@ -431,8 +431,8 @@ class matchCPT {
 
         $vote_button = '';
 
-        if(is_user_logged_in()){
-            $vote_button = '<a href="javascript:void(0);" class="large-vote-button team-%1$s" data-team-id="%1$s" data-vote-on="%3$s" data-tournament-id="%4$s">Vote For %2$s</a>';
+        if(is_user_logged_in() && $polling == true){
+            //$vote_button = '<a href="javascript:void(0);" class="large-vote-button team-%1$s" data-team-id="%1$s" data-vote-on="%3$s" data-tournament-id="%4$s">Vote For %2$s</a>';
         }
 
 
