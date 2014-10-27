@@ -31,7 +31,9 @@ class statistic {
 
         global $wpdb;
 
-        $query = $wpdb->prepare("SELECT p2p_from FROM $wpdb->p2p WHERE p2p_to = %d AND p2p_type = 'match_players' ORDER BY p2p_id", $this->players[0]);
+        //$query = $wpdb->prepare("SELECT p2p_from FROM $wpdb->p2p WHERE p2p_to = %d AND p2p_type = 'match_players' ORDER BY p2p_id", $this->players[0]);
+        //only matches with start stop time
+        $query = $wpdb->prepare("SELECT p2p_from FROM $wpdb->p2p AS p2p WHERE p2p_to = %d AND p2p_type = 'match_players' AND (SELECT meta_value FROM $wpdb->postmeta WHERE post_id = p2p.p2p_from AND meta_key = 'pa_stats_start') != '' AND (SELECT meta_value FROM $wpdb->postmeta WHERE post_id = p2p.p2p_from AND meta_key = 'pa_stats_stop') != '' ORDER BY p2p_id", $this->players[0]);
 
         $player_matches = $wpdb->get_col($query);
 
