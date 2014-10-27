@@ -26,7 +26,7 @@ class playerCPT {
 
         add_action( 'update_post_meta', array( $this, 'link_player_to_user'), 10, 4 );
 
-        add_action('wp_ajax_player_missing_pa_stats_id', array($this,'player_missing_pa_stats_id'));
+        add_action( 'wp_ajax_player_missing_pa_stats_id', array($this,'player_missing_pa_stats_id'));
 
         add_action( 'profile_update', array( $this, 'delete_user_caches'), 10, 2 );
 
@@ -39,7 +39,7 @@ class playerCPT {
 
         add_action( 'template_redirect',  array( $this, 'pastats_player_id_to_profile' ), 100, 3 );
 
-
+        add_action( 'pre_get_posts', array( $this, 'archive_pagination_limit' ), 10, 1);
         //add_action( 'posts_fields', array( $this, 'extend_player_object'), 10, 100 );
 
     }
@@ -65,7 +65,7 @@ class playerCPT {
             'labels'              => $playerLabel,
             'description'         => 'Tournament Players',
             'public'              => true,
-            'has_archive'         => false,
+            'has_archive'         => true,
             'show_ui'             => true,
             'menu_position'       => 10,
             'menu_icon'           => 'dashicons-id',
@@ -622,7 +622,9 @@ class playerCPT {
 
             } else {
 
-                wp_redirect(home_url());
+
+
+                wp_redirect('http://pastats.com/player?player='.$_GET['pastats_player_id']);
 
                 exit;
 
@@ -645,5 +647,19 @@ class playerCPT {
         }
 
         return $fields;
+    }
+
+    public static function archive_pagination_limit($wp_query){
+
+        if ($wp_query->is_main_query() && $wp_query->is_archive()){
+            if($wp_query->query_vars['post_type'] == playerCPT::$post_type){
+                $wp_query->set('posts_per_page', 45);
+                $wp_query->set('orderby', 'title');
+                $wp_query->set('order', 'ASC');
+            }
+        }
+
+        return $wp_query;
+
     }
 }
