@@ -12,6 +12,7 @@ require_once( PLTM_PLUGIN_DIR.'/includes/class_statistics.php');
 require_once( PLTM_PLUGIN_DIR.'/includes/class-polling.php');
 require_once( PLTM_PLUGIN_DIR.'/includes/class-tournament-in-progress.php');
 require_once( PLTM_PLUGIN_DIR.'/includes/class_gform_filters.php');
+require_once( PLTM_PLUGIN_DIR.'/includes/class-acf-rules.php');
 
 
 //3rd party library

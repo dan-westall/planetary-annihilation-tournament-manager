@@ -18,9 +18,9 @@ class acfCustomRules {
         add_filter('acf/location/rule_types', [$plugin, 'acf_location_rules_types']);
 
         add_filter('acf/location/rule_operators', [$plugin, 'acf_location_rules_operators']);
-        add_filter('acf/location/rule_values/user', [$plugin, 'acf_location_rules_values_user']);
+        add_filter('acf/location/rule_values/fixture', [$plugin, 'acf_location_fixture_values']);
 
-        add_filter('acf/location/rule_match/user', [$plugin, 'acf_location_rules_match_user'], 10, 3);
+        add_filter('acf/location/rule_match/fixture', [$plugin, 'acf_location_rules_match_fixture'], 10, 3);
 
     }
 
@@ -47,26 +47,26 @@ class acfCustomRules {
         return $choices;
     }
 
-    function acf_location_rules_values_user($choices) {
-        $users = get_users();
+    function acf_location_fixture_values($choices) {
 
-        if ($users) {
-            foreach ($users as $user) {
-                $choices[$user->data->ID] = $user->data->display_name;
-            }
-        }
+        $choices['true'] = 'True';
+        $choices['false'] = 'False';
 
         return $choices;
     }
 
-    function acf_location_rules_match_user($match, $rule, $options) {
-        $current_user  = wp_get_current_user();
-        $selected_user = (int)$rule['value'];
+    function acf_location_rules_match_fixture($match, $rule, $options) {
+
+        global $post;
+
+
+        //convert
+        $is_fixture = $rule['value'] === 'true'? true: false;
 
         if ($rule['operator'] == "==") {
-            $match = ($current_user->ID == $selected_user);
+            $match = (empty($post->post_parent) != $is_fixture);
         } elseif ($rule['operator'] == "!=") {
-            $match = ($current_user->ID != $selected_user);
+            $match = (empty($post->post_parent) == $is_fixture);
         }
 
         return $match;
