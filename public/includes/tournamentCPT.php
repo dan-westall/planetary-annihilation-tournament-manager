@@ -6,7 +6,7 @@ class tournamentCPT {
 
     public static $tournament_status = array('Signup', 'In Progress', 'Cancelled', 'Finished', 'Preparation');
 
-    public static $tournament_format = array('standard' => 'Standard', 'clanwars' => 'Clan Wars', 'kotp' => 'King of the planet', 'teamtournament' => 'Team Tournament');
+    public static $tournament_format = array('standard' => 'Standard', 'clanwars' => 'League (Clan Wars)', 'kotp' => 'King of the planet', 'teamtournament' => 'Team Tournament');
 
     public static $tournament_player_status = array( 'Active', 'Reserve', 'No Show', 'Banned', 'Disqualify');
 
@@ -53,6 +53,9 @@ class tournamentCPT {
         add_action( 'parse_query',   array( $this, 'tournament_api_filter'));
 
 
+        add_action( 'p2p_tournament_matches_args',   array( $this, 'p2p_tournament_match_fields'));
+
+
     }
 
     function register_cpt_tournament(){
@@ -78,6 +81,8 @@ class tournamentCPT {
                 'has_archive'         => true,
                 'exclude_from_search' => true,
                 'show_ui'             => true,
+                'show_in_json'        => true,
+                'hierarchical'        => false,
                 'menu_position'       => 10,
                 'menu_icon'           => 'dashicons-networking',
                 'capability_type'     => array('tournament','tournaments'),
@@ -263,15 +268,35 @@ class tournamentCPT {
         ) );
 
 
-        p2p_register_connection_type( array(
-            'name' => 'tournament_matches',
-            'from' => self::$post_type,
-            'to' => matchCPT::$post_type,
-            'admin_box' => array(
-                'show' => 'any',
-                'context' => 'side'
-            )
-        ) );
+
+
+
+
+        $tournament_matches_args = [
+            'name'      => 'tournament_matches',
+            'from'      => self::$post_type,
+            'to'        => matchCPT::$post_type,
+            'admin_box' => [
+                'show'    => 'any',
+                'context' => 'advanced'
+            ],
+
+        ];
+
+
+        if(get_tournament_type($_GET['post']) == 'clanwars' || get_tournament_type($_REQUEST['post_ID']) == 'clanwars'){
+
+            $tournament_matches_args = array_merge_recursive($tournament_matches_args, [ 'fields' => [
+                    'match_fixture' => [
+                        'title' => 'Fixture',
+                        'type' => 'select',
+                        'values' => self::tournament_fixtures()
+                    ]
+            ]]);
+
+        }
+
+        p2p_register_connection_type($tournament_matches_args );
 
     }
 
@@ -1531,6 +1556,35 @@ class tournamentCPT {
 
         return $wp_query;
 
+    }
+
+    public static function get_tournament_winners($tournament_id){
+
+
+
+    }
+
+    public static function tournament_fixtures(){
+
+        global $post;
+
+        $fixtures = [];
+        $tournament_id = ( isset($_GET['post']) ? $_GET['post'] : $_POST['post_ID'] );
+
+        if( have_rows('fixtures', $tournament_id) ) {
+
+            // loop through the rows of data
+            while (have_rows('fixtures', $tournament_id)) { the_row();
+
+                // display a sub field value
+                $name = get_sub_field('name', $tournament_id);
+                $fixtures[str_replace(' ', '-', $name)] = $name;
+
+            }
+
+        }
+
+        return $fixtures;
     }
 
 }
