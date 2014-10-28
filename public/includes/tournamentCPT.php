@@ -1577,8 +1577,10 @@ class tournamentCPT {
             while (have_rows('fixtures', $tournament_id)) { the_row();
 
                 // display a sub field value
-                $name = get_sub_field('name', $tournament_id);
-                $fixtures[str_replace(' ', '-', $name)] = $name;
+                $name                 = get_sub_field('name', $tournament_id);
+                $date_time            = get_sub_field('time_and_date', $tournament_id);
+
+                $fixtures[strtotime($date_time)] = $name;
 
             }
 

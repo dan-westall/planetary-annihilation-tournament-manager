@@ -687,28 +687,32 @@ class matchCPT {
 
         if($query->query_vars['orderby'] == 'tournament_date'){
 
+            if(in_array(matchCPT::$post_type, $query->query_vars['post_type']) && empty($query->query_vars['fields'])){
 
+                //if fixture date
+                if(true){
 
-            switch($query->query_vars['post_type'][0]){
+                    $statment_fields .= ",
+                    IF(
+                        (SELECT meta_value FROM $wpdb->p2p LEFT JOIN $wpdb->postmeta ON post_id = p2p_from WHERE p2p_to = wp_posts.ID AND meta_key = 'tournament_format' LIMIT 1) = 'clanwars',
+                        DATE_FORMAT(str_to_date((SELECT meta_value FROM $wpdb->p2p LEFT JOIN $wpdb->p2pmeta ON $wpdb->p2p.p2p_id = $wpdb->p2pmeta.p2p_id WHERE p2p_to = wp_posts.ID AND $wpdb->p2p.p2p_type = 'tournament_matches' AND $wpdb->p2pmeta.meta_key = 'match_fixture' LIMIT 1), '%c/%e/%y %h:%i %p'),'%Y-%m-%d %H:%i:00') ,
+                        DATE_FORMAT(str_to_date( CONCAT( (SELECT meta_value FROM $wpdb->p2p LEFT JOIN $wpdb->postmeta ON post_id = p2p_from WHERE p2p_to = wp_posts.ID AND meta_key = 'run_date' LIMIT 1), '', (SELECT meta_value FROM $wpdb->p2p LEFT JOIN $wpdb->postmeta ON post_id = p2p_from WHERE p2p_to = wp_posts.ID AND meta_key = 'run_time' LIMIT 1) ), '%Y%m%d %H:%i'),'%Y-%m-%d %H:%i:00')
+                    ) AS tournament_date";
 
-                case "match" :
+                    $test = $statment_fields;
 
-                    $statment_query[]  = $wpdb->prepare("(SELECT meta_value FROM $wpdb->p2p LEFT JOIN wp_postmeta ON post_id = p2p_from WHERE p2p_to = wp_posts.ID AND meta_key = 'run_date') AS tournament_date", '', '');
+                } else {
 
-                    break;
+                    $statment_fields .= $wpdb->prepare("(SELECT meta_value FROM $wpdb->p2p LEFT JOIN wp_postmeta ON post_id = p2p_from WHERE p2p_to = wp_posts.ID AND meta_key = 'run_date') AS tournament_date", '', '');
 
-                //todo move this out
-                case "tournament" :
+                }
 
-                    $statment_query[]  = $wpdb->prepare("(SELECT meta_value FROM $wpdb->postmeta WHERE post_id = wp_posts.ID AND meta_key = 'run_date') AS tournament_date", '', '');
-                    $statment_query[]  = $wpdb->prepare("(SELECT meta_value FROM $wpdb->postmeta WHERE post_id = wp_posts.ID AND meta_key = 'run_time') AS tournament_time", '', '');
+            } elseif(in_array(tournamentCPT::$post_type, $query->query_vars['post_type'])){
 
-                    break;
+                $statment_fields .= $wpdb->prepare(", (SELECT meta_value FROM $wpdb->postmeta WHERE post_id = wp_posts.ID AND meta_key = 'run_date') AS tournament_date, (SELECT meta_value FROM $wpdb->postmeta WHERE post_id = wp_posts.ID AND meta_key = 'run_time') AS tournament_time", '', '');
 
             }
 
-
-            $statment_fields .= ', '.implode(', ', $statment_query);
         }
 
         return $statment_fields;
@@ -718,19 +722,16 @@ class matchCPT {
 
         if($query->query_vars['orderby'] == 'tournament_date'){
 
-            if($query->query_vars['post_type'][0] == tournamentCPT::$post_type){
+            if(in_array(tournamentCPT::$post_type, $query->query_vars['post_type'])){
 
                 $orderby_statement = "tournament_date DESC, tournament_time DESC, ".$orderby_statement;
-            } else {
 
+            } elseif(in_array(matchCPT::$post_type, $query->query_vars['post_type']) && empty($query->query_vars['fields'])) {
 
                 $orderby_statement = "tournament_date DESC, ".$orderby_statement;
             }
 
         }
-
-
-
 
         return $orderby_statement;
     }
@@ -904,39 +905,39 @@ class matchCPT {
 
     public static function match_api_filter($wp_query){
 
-        if(isset($wp_query->query_vars['match_players']) && in_array('player', $wp_query->query_vars['post_type'])){
-
-            $match_id = $wp_query->query_vars['match_players'];
-
-            $wp_query->set('connected_type', 'match_players');
-            $wp_query->set('connected_items', $match_id);
-            $wp_query->set('nopaging', true);
-            $wp_query->set('suppress_filters', false);
-
-            if(isset($wp_query->query_vars['clan'])){
-                $clan = $wp_query->query_vars['clan'];
-                $wp_query->set('meta_query', [[ 'key' => 'clan', 'value' => $clan]]);
-            }
-        }
-
-        if(isset($wp_query->query_vars['match_statuss']) && in_array(self::$post_type, $wp_query->query_vars['post_type'])){
-
-            $match_status = $wp_query->query_vars['match_statuss'];
-
-            switch($match_status) {
-                case "played" :
-
-                    $wp_query->set('meta_query', [
-                        'relation' => 'OR',
-                        [ 'key' => 'schedule_date', 'value' => date('Ymd') , 'type' => 'date', 'compare' => '<'],
-                        [ 'key' => 'schedule_date', 'value' => ''],
-                        [ 'key' => 'schedule_date', 'value' => '', 'compare' => 'NOT EXISTS']
-                    ]);
-
-                    break;
-            }
-
-        }
+//        if(isset($wp_query->query_vars['match_players']) && in_array('player', $wp_query->query_vars['post_type'])){
+//
+//            $match_id = $wp_query->query_vars['match_players'];
+//
+//            $wp_query->set('connected_type', 'match_players');
+//            $wp_query->set('connected_items', $match_id);
+//            $wp_query->set('nopaging', true);
+//            $wp_query->set('suppress_filters', false);
+//
+//            if(isset($wp_query->query_vars['clan'])){
+//                $clan = $wp_query->query_vars['clan'];
+//                $wp_query->set('meta_query', [[ 'key' => 'clan', 'value' => $clan]]);
+//            }
+//        }
+//
+//        if(isset($wp_query->query_vars['match_statuss']) && in_array(self::$post_type, $wp_query->query_vars['post_type'])){
+//
+//            $match_status = $wp_query->query_vars['match_statuss'];
+//
+//            switch($match_status) {
+//                case "played" :
+//
+//                    $wp_query->set('meta_query', [
+//                        'relation' => 'OR',
+//                        [ 'key' => 'schedule_date', 'value' => date('Ymd') , 'type' => 'date', 'compare' => '<'],
+//                        [ 'key' => 'schedule_date', 'value' => ''],
+//                        [ 'key' => 'schedule_date', 'value' => '', 'compare' => 'NOT EXISTS']
+//                    ]);
+//
+//                    break;
+//            }
+//
+//        }
 
 
         return $wp_query;
