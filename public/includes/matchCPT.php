@@ -689,27 +689,16 @@ class matchCPT {
 
             if(in_array(matchCPT::$post_type, $query->query_vars['post_type']) && empty($query->query_vars['fields'])){
 
-                //if fixture date
-                if(true){
-
-                    $statment_fields .= ",
-                    IF(
-                        (SELECT meta_value FROM $wpdb->p2p LEFT JOIN $wpdb->postmeta ON post_id = p2p_from WHERE p2p_to = wp_posts.ID AND meta_key = 'tournament_format' LIMIT 1) = 'clanwars',
-                        DATE_FORMAT(str_to_date((SELECT meta_value FROM $wpdb->p2p LEFT JOIN $wpdb->p2pmeta ON $wpdb->p2p.p2p_id = $wpdb->p2pmeta.p2p_id WHERE p2p_to = wp_posts.ID AND $wpdb->p2p.p2p_type = 'tournament_matches' AND $wpdb->p2pmeta.meta_key = 'match_fixture' LIMIT 1), '%c/%e/%y %h:%i %p'),'%Y-%m-%d %H:%i:00') ,
-                        DATE_FORMAT(str_to_date( CONCAT( (SELECT meta_value FROM $wpdb->p2p LEFT JOIN $wpdb->postmeta ON post_id = p2p_from WHERE p2p_to = wp_posts.ID AND meta_key = 'run_date' LIMIT 1), '', (SELECT meta_value FROM $wpdb->p2p LEFT JOIN $wpdb->postmeta ON post_id = p2p_from WHERE p2p_to = wp_posts.ID AND meta_key = 'run_time' LIMIT 1) ), '%Y%m%d %H:%i'),'%Y-%m-%d %H:%i:00')
-                    ) AS tournament_date";
-
-                    $test = $statment_fields;
-
-                } else {
-
-                    $statment_fields .= $wpdb->prepare("(SELECT meta_value FROM $wpdb->p2p LEFT JOIN wp_postmeta ON post_id = p2p_from WHERE p2p_to = wp_posts.ID AND meta_key = 'run_date') AS tournament_date", '', '');
-
-                }
+                $statment_fields .= ",
+                IF(
+                    (SELECT meta_value FROM $wpdb->p2p LEFT JOIN $wpdb->postmeta ON post_id = p2p_from WHERE p2p_to = wp_posts.ID AND meta_key = 'tournament_format' LIMIT 1) = 'clanwars',
+                    DATE_FORMAT(str_to_date((SELECT meta_value FROM $wpdb->p2p LEFT JOIN $wpdb->p2pmeta ON $wpdb->p2p.p2p_id = $wpdb->p2pmeta.p2p_id WHERE p2p_to = wp_posts.ID AND $wpdb->p2p.p2p_type = 'tournament_matches' AND $wpdb->p2pmeta.meta_key = 'match_fixture' LIMIT 1), '%c/%e/%y %h:%i %p'),'%Y-%m-%d %H:%i:00') ,
+                    DATE_FORMAT(str_to_date( CONCAT( (SELECT meta_value FROM $wpdb->p2p LEFT JOIN $wpdb->postmeta ON post_id = p2p_from WHERE p2p_to = wp_posts.ID AND meta_key = 'run_date' LIMIT 1), '', (SELECT meta_value FROM $wpdb->p2p LEFT JOIN $wpdb->postmeta ON post_id = p2p_from WHERE p2p_to = wp_posts.ID AND meta_key = 'run_time' LIMIT 1) ), '%Y%m%d %H:%i'),'%Y-%m-%d %H:%i:00')
+                ) AS tournament_date";
 
             } elseif(in_array(tournamentCPT::$post_type, $query->query_vars['post_type'])){
 
-                $statment_fields .= $wpdb->prepare(", (SELECT meta_value FROM $wpdb->postmeta WHERE post_id = wp_posts.ID AND meta_key = 'run_date') AS tournament_date, (SELECT meta_value FROM $wpdb->postmeta WHERE post_id = wp_posts.ID AND meta_key = 'run_time') AS tournament_time", '', '');
+                $statment_fields .= ", (SELECT meta_value FROM $wpdb->postmeta WHERE post_id = wp_posts.ID AND meta_key = 'run_date') AS tournament_date, (SELECT meta_value FROM $wpdb->postmeta WHERE post_id = wp_posts.ID AND meta_key = 'run_time') AS tournament_time";
 
             }
 
