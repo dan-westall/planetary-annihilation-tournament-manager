@@ -692,8 +692,8 @@ class matchCPT {
                 $statment_fields .= ",
                 IF(
                     (SELECT meta_value FROM $wpdb->p2p LEFT JOIN $wpdb->postmeta ON post_id = p2p_from WHERE p2p_to = wp_posts.ID AND meta_key = 'tournament_format' LIMIT 1) = 'clanwars',
-                    DATE_FORMAT(str_to_date((SELECT meta_value FROM $wpdb->p2p LEFT JOIN $wpdb->p2pmeta ON $wpdb->p2p.p2p_id = $wpdb->p2pmeta.p2p_id WHERE p2p_to = wp_posts.ID AND $wpdb->p2p.p2p_type = 'tournament_matches' AND $wpdb->p2pmeta.meta_key = 'match_fixture' LIMIT 1), '%c/%e/%y %h:%i %p'),'%Y-%m-%d %H:%i:00') ,
-                    DATE_FORMAT(str_to_date( CONCAT( (SELECT meta_value FROM $wpdb->p2p LEFT JOIN $wpdb->postmeta ON post_id = p2p_from WHERE p2p_to = wp_posts.ID AND meta_key = 'run_date' LIMIT 1), '', (SELECT meta_value FROM $wpdb->p2p LEFT JOIN $wpdb->postmeta ON post_id = p2p_from WHERE p2p_to = wp_posts.ID AND meta_key = 'run_time' LIMIT 1) ), '%Y%m%d %H:%i'),'%Y-%m-%d %H:%i:00')
+                    DATE_FORMAT( FROM_UNIXTIME( (SELECT meta_value FROM $wpdb->p2p LEFT JOIN $wpdb->p2pmeta ON $wpdb->p2p.p2p_id = $wpdb->p2pmeta.p2p_id WHERE p2p_to = wp_posts.ID AND $wpdb->p2p.p2p_type = 'tournament_matches' AND $wpdb->p2pmeta.meta_key = 'match_fixture' LIMIT 1) ), '%Y-%m-%d %H:%i:00'),
+                    DATE_FORMAT( STR_TO_DATE( CONCAT( (SELECT meta_value FROM $wpdb->p2p LEFT JOIN $wpdb->postmeta ON post_id = p2p_from WHERE p2p_to = wp_posts.ID AND meta_key = 'run_date' LIMIT 1), '', (SELECT meta_value FROM $wpdb->p2p LEFT JOIN $wpdb->postmeta ON post_id = p2p_from WHERE p2p_to = wp_posts.ID AND meta_key = 'run_time' LIMIT 1) ), '%Y%m%d %H:%i'),'%Y-%m-%d %H:%i:00')
                 ) AS tournament_date";
 
             } elseif(in_array(tournamentCPT::$post_type, $query->query_vars['post_type'])){
