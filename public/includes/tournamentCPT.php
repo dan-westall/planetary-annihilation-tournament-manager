@@ -1498,12 +1498,31 @@ class tournamentCPT {
 
             }
 
+            $date = get_post_meta($post['ID'], 'run_date', true);
+            $time = get_post_meta($post['ID'], 'run_time', true);
+
+            $currentTime = DateTime::createFromFormat( 'U', $timestamp );
+
+            $date = new DateTime($date);
+
+//            $date->setTimestamp(strtotime($date));
+
+            $timeArray = explode(':', $time);
+
+            $date->setTime($timeArray[0], $timeArray[1]);
+
+//            $date->format('Y-m-d H:i:s');
+
             $_post['status'] = self::$tournament_status[get_post_meta($post['ID'], 'tournament_status', true)];
             $_post['meta']['total_players'] = count($match_players);
             $_post['meta']['total_matches'] = count($matches->posts);
             $_post['meta']['players']        = $match_players;
             $_post['meta']['tournament_date'] = get_post_meta($post['ID'], 'run_date', true);
             $_post['meta']['tournament_starttime'] = get_post_meta($post['ID'], 'run_time', true);
+            $_post['meta']['tournament_datetime'] = $date->getTimestamp();
+
+
+
             $_post['meta']['signup_open'] = is_tournament_signup_open($post['ID']);
 
 
