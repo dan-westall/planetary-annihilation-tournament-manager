@@ -1506,6 +1506,24 @@ class tournamentCPT {
             $_post['meta']['tournament_starttime'] = get_post_meta($post['ID'], 'run_time', true);
             $_post['meta']['signup_open'] = is_tournament_signup_open($post['ID']);
 
+
+            if( have_rows('fixtures', $post['ID']) ) {
+
+                // loop through the rows of data
+                while (have_rows('fixtures', $post['ID'])) { the_row();
+
+                    // display a sub field value
+                    $name      = get_sub_field('name', $post['ID']);
+                    $date_time = get_sub_field('time_and_date', $post['ID']);
+
+                    $fixtures[] = ['date' => strtotime($date_time), 'name' => $name];
+
+                }
+
+                $_post['meta']['fixtures'] = $fixtures;
+            }
+
+
         }
 
         return $_post;
