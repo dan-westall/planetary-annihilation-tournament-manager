@@ -408,7 +408,7 @@ class matchCPT {
                                 <h4 class="player-name"><a href="%2$s">%3$s</a></h4>
                                 %4$s
                             </div>
-                            <div class="match-result col-lg-1">Winner</div>
+                            <div class="match-result __winner col-lg-1">Winner</div>
                         </div>
                     </div>';
 
@@ -424,7 +424,7 @@ class matchCPT {
                                 <h4 class="player-name"><a href="%2$s">%3$s</a></h4>
                                 %4$s
                             </div>
-                            <div class="match-result col-lg-1">Winner</div>
+                            <div class="match-result __winner col-lg-1"></div>
                         </div>
                     </div>';
         }
