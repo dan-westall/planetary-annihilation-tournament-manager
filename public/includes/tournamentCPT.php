@@ -46,6 +46,7 @@ class tournamentCPT {
 
         add_filter( 'acf/load_field/name=challonge_tournament_link', array( $this, 'filter_challonge_tournament_listing') );
         add_filter( 'acf/load_field/name=tournament_status', array( $this, 'filter_tournament_status') );
+        add_filter( 'acf/load_field/name=fixture_status', array( $this, 'filter_tournament_status') );
         add_filter( 'acf/load_field/name=tournament_format', array( $this, 'filter_tournament_format') );
 
         add_filter( 'json_prepare_post',  array( $this, 'tournament_json_extend' ), 50, 3 );
@@ -1498,6 +1499,8 @@ class tournamentCPT {
 
             }
 
+
+
             $date = get_post_meta($post['ID'], 'run_date', true);
             $time = get_post_meta($post['ID'], 'run_time', true);
 
@@ -1528,14 +1531,28 @@ class tournamentCPT {
 
             if( have_rows('fixtures', $post['ID']) ) {
 
+                $fixture_match_count = [];
+
+                foreach($matches->posts as $match){
+
+                    $fixture_match_count[p2p_get_meta($match->p2p_id, 'match_fixture', true)] ++;
+
+                }
+
                 // loop through the rows of data
                 while (have_rows('fixtures', $post['ID'])) { the_row();
 
                     // display a sub field value
-                    $name      = get_sub_field('name', $post['ID']);
-                    $date_time = get_sub_field('time_and_date', $post['ID']);
+                    $name           = get_sub_field('name', $post['ID']);
+                    $date_time      = get_sub_field('time_and_date', $post['ID']);
+                    $fixture_status = get_sub_field('fixture_status', $post['ID']);
 
-                    $fixtures[] = ['date' => strtotime($date_time), 'name' => $name];
+                    $fixtures[] = [
+                        'date' => strtotime($date_time),
+                        'name' => $name,
+                        'status' => self::$tournament_status[$fixture_status],
+                        'matches' => $fixture_match_count[strtotime($date_time)]
+                    ];
 
                 }
 
