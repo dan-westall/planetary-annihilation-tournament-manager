@@ -8,7 +8,7 @@ class tournamentCPT {
 
     public static $tournament_format = array('standard' => 'Standard', 'clanwars' => 'League (Clan Wars)', 'kotp' => 'King of the planet', 'teamtournament' => 'Team Tournament');
 
-    public static $tournament_player_status = array( 'Active', 'Reserve', 'No Show', 'Banned', 'Disqualify');
+    public static $tournament_player_status = array( 'Active', 'Reserve', 'No Show', 'Banned', 'Disqualify', 'Withdrawn');
 
     private $player_tournament_status = '';
 
@@ -1439,6 +1439,8 @@ class tournamentCPT {
         if ( wp_is_post_revision( $post_id ) )
             return;
 
+        //clear apc system cache!
+        apc_clear_cache();
 
         //todo is this being used?
         if ( matchCPT::$post_type == get_post_type($post_id) ) {
