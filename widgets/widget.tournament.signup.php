@@ -12,6 +12,8 @@ class tournament_signup extends WP_Widget {
     function widget($args, $instance) {
         extract( $args );
 
+        wp_enqueue_script('angularparts.tournament.withdraw');
+
         global $wp_query, $post;
 
         $title 		= apply_filters('widget_title', $instance['title']);
@@ -21,8 +23,7 @@ class tournament_signup extends WP_Widget {
 
             <?php// echo $before_widget; ?>
 
-                    <a href="<?php the_permalink(); ?>signup" class=' tournament-signup-button'><span>Signup to tournament</span></a>
-
+                    <a href="<?php the_permalink(); ?>signup" class='tournament-btn __signup tournament-signup-button'><span>Sign-up to tournament</span></a>
             <?php //echo $after_widget; ?>
 
         <?php endif; ?>

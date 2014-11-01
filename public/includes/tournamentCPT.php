@@ -285,7 +285,7 @@ class tournamentCPT {
         ];
 
 
-        if(get_tournament_type($_GET['post']) == 'clanwars' || get_tournament_type($_REQUEST['post_ID']) == 'clanwars'){
+        if(get_tournament_type($_GET['post']) == 'clanwars' || get_tournament_type($_REQUEST['post_ID']) == 'clanwars' || count(self::tournament_fixtures()) > 0){
 
             $tournament_matches_args = array_merge_recursive($tournament_matches_args, [ 'fields' => [
                     'match_fixture' => [
