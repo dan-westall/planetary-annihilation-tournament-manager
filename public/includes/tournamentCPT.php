@@ -1549,16 +1549,23 @@ class tournamentCPT {
                     $date_time      = get_sub_field('time_and_date', $post['ID']);
                     $fixture_status = get_sub_field('fixture_status', $post['ID']);
 
-                    $fixtures[] = [
-                        'date' => strtotime($date_time),
-                        'name' => $name,
-                        'status' => self::$tournament_status[$fixture_status],
-                        'matches' => $fixture_match_count[strtotime($date_time)]
-                    ];
+                    if(!empty($date_time)) {
+
+                        $fixtures[] = [
+                            'date'    => strtotime($date_time),
+                            'name'    => $name,
+                            'status'  => self::$tournament_status[$fixture_status],
+                            'matches' => $fixture_match_count[strtotime($date_time)]
+                        ];
+
+                    }
 
                 }
 
-                $_post['meta']['fixtures'] = $fixtures;
+                if(count($fixtures) > 0){
+                    $_post['meta']['fixtures'] = $fixtures;
+                }
+
             }
 
 
