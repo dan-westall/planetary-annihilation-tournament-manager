@@ -25,6 +25,7 @@ class tournamentCPT {
         add_action( 'p2p_created_connection', array( $this, 'action_p2p_new_connection' ) );
         add_action( 'p2p_delete_connections', array( $this, 'action_p2p_delete_connection' ) );
         add_filter( 'p2p_connectable_args', array( $this, 'filter_p2p_tournament_player_requirements' ) );
+        add_action( 'p2p_tournament_matches_args',   array( $this, 'p2p_tournament_match_fields'));
 
         add_action( 'gform_after_submission', array( $this, 'signup_tournament_player'), 10, 2);
         add_filter( 'gform_validation', array( $this, 'signup_form_validation'), 10, 4);
@@ -49,13 +50,13 @@ class tournamentCPT {
         add_filter( 'acf/load_field/name=fixture_status', array( $this, 'filter_tournament_status') );
         add_filter( 'acf/load_field/name=tournament_format', array( $this, 'filter_tournament_format') );
 
+        add_filter( 'page_js_args', array( $this, 'filter_page_js_vars'), 10, 2);
+
         add_filter( 'json_prepare_post',  array( $this, 'tournament_json_extend' ), 50, 3 );
 
         add_action( 'parse_query',   array( $this, 'tournament_api_filter'));
 
-
-        add_action( 'p2p_tournament_matches_args',   array( $this, 'p2p_tournament_match_fields'));
-
+        add_action( 'wp_ajax_tournament_withdraw',  array( $this, 'ajax_tournament_withdraw') );
 
     }
 
@@ -268,11 +269,6 @@ class tournamentCPT {
             )
         ) );
 
-
-
-
-
-
         $tournament_matches_args = [
             'name'      => 'tournament_matches',
             'from'      => self::$post_type,
@@ -283,7 +279,6 @@ class tournamentCPT {
             ],
 
         ];
-
 
         if(get_tournament_type($_GET['post']) == 'clanwars' || get_tournament_type($_REQUEST['post_ID']) == 'clanwars'){
 
@@ -595,7 +590,6 @@ class tournamentCPT {
         $user = $wpdb->get_row( $wpdb->prepare("SELECT user_email, ID AS user_id, (SELECT meta_value FROM wp_usermeta  WHERE user_id = user.ID AND meta_key = 'player_id') AS player_id  FROM $wpdb->users AS user WHERE user_email = %s", $values['email']['value']) );
 
 
-
         //existing player
         if (!empty($user)) {
 
@@ -629,7 +623,29 @@ class tournamentCPT {
 
                 wp_new_user_notification($user_id, $password);
 
-                $player_id = playerCPT::action_new_player_profile($user_id, $values);
+                //$player_id = playerCPT::action_new_player_profile($user_id, $values);
+
+                //create new player post
+                $new_player = array(
+                    'post_title'  => $values['ign']['value'],
+                    'post_status' => 'publish',
+                    'post_author' => $user_id,
+                    'post_type'   => playerCPT::$post_type
+                );
+
+                // Insert the post into the database
+                $player_id = wp_insert_post($new_player);
+
+                //fix!
+                if(get_post_type($player_id) != playerCPT::$post_type){
+                    wp_update_post( ['ID' => $player_id, 'post_type' => playerCPT::$post_type, 'post_author' => $user_id ] );
+                }
+
+                update_post_meta($player_id, 'player_email', $values['email']['value']);
+                update_post_meta($player_id, 'user_id', $user_id);
+
+                update_user_meta($user_id, 'player_id', $player_id);
+
 
             } else {
 
@@ -1641,6 +1657,52 @@ class tournamentCPT {
         }
 
         return $fixtures;
+
+    }
+
+    public static function ajax_tournament_withdraw(){
+
+        check_ajax_referer('security-' . date('dmy'), 'security');
+
+        $tournament_id = $_POST['tournament_id'];
+        $player_id     = $_POST['tournament_id'];
+
+        //todo make sure tournament signup are open
+
+        $p2p_id = p2p_type( 'tournament_players' )->get_p2p_id( $tournament_id, $player_id );
+
+        if ( $p2p_id ) {
+
+            p2p_update_meta($p2p_id, 'status', self::$tournament_player_status[4]);
+
+            if (!empty($_POST['reason'])) {
+                p2p_update_meta($p2p_id, 'note', $_POST['reason']);
+            }
+
+            do_action('tournament_player_withdrawn', $tournament_id, $player_id );
+
+            echo json_encode(array('result' => true, 'message' => 'You have been removed from the tournament.'));
+
+            die();
+
+        } else {
+
+            echo json_encode(array('result' => false, 'message' => 'Player not in tournament.'));
+
+            die();
+
+        }
+    }
+
+    public static function filter_page_js_vars($args, $post_id){
+
+        global $post, $current_user; get_currentuserinfo();
+
+        if(false !== ( $player_profile_id = playerCPT::get_user_player_profile_id($current_user->ID) )){
+            $args['player_profile_id'] = $player_profile_id;
+        }
+
+        return $args;
     }
 
 }
