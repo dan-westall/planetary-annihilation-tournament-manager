@@ -1457,7 +1457,9 @@ class tournamentCPT {
             return;
 
         //clear apc system cache!
-        apc_clear_cache();
+
+        if(function_exists('apc_clear_cache'))
+            apc_clear_cache();
 
         //todo is this being used?
         if ( matchCPT::$post_type == get_post_type($post_id) ) {
