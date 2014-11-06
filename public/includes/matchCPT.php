@@ -653,6 +653,7 @@ class matchCPT {
             $_post['meta']['team_filter']    = get_post_meta($post['ID'], 'team_filter', true);
             $_post['meta']['format']         = self::match_format($post['ID']);
             $_post['meta']['teams']          = self::get_clan_team_from_match($post['ID'], true);
+            $_post['url']                    = get_permalink($post['ID']);
 
 
 

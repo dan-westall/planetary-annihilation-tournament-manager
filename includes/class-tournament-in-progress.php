@@ -67,7 +67,7 @@ class tournament_in_progress {
         $current_match_id      = get_post_meta($live_page_id, 'current_match', true);
 
         if(!is_tournament_in_progress())
-            return ['result' => false, 'Tournament live page is not front page.'];
+            //return ['result' => false, 'Tournament live page is not front page.'];
 
         if(empty($current_match_id))
             return ['result' => false, 'match ID not set on live page'];
@@ -80,6 +80,7 @@ class tournament_in_progress {
 
         $object_votes = $votes->setObjectId($current_match_id)->get_votes();
 
+        $object['debug'] = ['live_page' => $live_page_id, 'current' => $current_match_id];
         $object['polling'][$current_match_id] = $object_votes;
         $object['subscription']               = 'live';
         $object['current_match']['id']        = $current_match_id;
