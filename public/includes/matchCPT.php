@@ -745,8 +745,8 @@ class matchCPT {
         //add detail
         $match = matchCPT::extend_json_api($new_match, $_match, 'realtime_match_listing');
 
-        //setsub
-        $match['subscription'] = 't'.$match['meta']['tournament']['wp_id'];
+        //'tournament-' + $scope.tournamentid + '-match'
+        $match['subscription'] = 'tournament-'.$match['meta']['tournament']['wp_id'].'-match';
 
         if (class_exists('ZMQContext')) {
 
