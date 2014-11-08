@@ -40,8 +40,8 @@ class userPolling {
 
         add_action( 'wp_ajax_vote', [ $plugin, 'vote']);
 
-//        add_action( 'wp_ajax_get_votes', [ $plugin, 'ajax_get_votes']);
-//        add_action( 'wp_ajax_nopriv_get_votes',  [ $plugin, 'ajax_get_votes' ] );
+        add_action( 'wp_ajax_get_votes', [ $plugin, 'ajax_get_votes']);
+        add_action( 'wp_ajax_nopriv_get_votes',  [ $plugin, 'ajax_get_votes' ] );
 
         add_action( 'p2p_created_connection', [ $plugin, 'action_p2p_new_connection']);
 
