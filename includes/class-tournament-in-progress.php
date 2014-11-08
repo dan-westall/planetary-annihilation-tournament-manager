@@ -66,7 +66,7 @@ class tournament_in_progress {
 
         $live_page_id = self::get_live_page_id();
 
-        $current_match_id = $wpdb->get_var( "SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = 'current_match' AND post_id = $live_page_id" );
+        $current_match_id = $wpdb->get_var( "SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = 'current_match' AND post_id = 417" );
 
         if(!is_tournament_in_progress())
             return ['result' => false, 'Tournament live page is not front page.'];
@@ -74,7 +74,7 @@ class tournament_in_progress {
         if(empty($current_match_id))
             return ['result' => false, 'match ID not set on live page'];
 
-        $current_tournament_id = $wpdb->get_var( "SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = 'tournament' AND post_id = $live_page_id" );
+        $current_tournament_id = $wpdb->get_var( "SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = 'tournament' AND post_id = 417" );
 
         $match = get_post($current_match_id, 'ARRAY_A');
 
