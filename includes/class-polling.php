@@ -240,7 +240,6 @@ class userPolling {
         global $current_user;
         get_currentuserinfo();
 
-        $tournament_id = $_POST['tournament_id'];
         $vote_on       = $_POST['vote_on'];
         $team_id       = $_POST['team_id'];
 
@@ -248,7 +247,7 @@ class userPolling {
 
         $meta = [
             'date'          => current_time('mysql'),
-            'tournament_id' => $tournament_id,
+            'tournament_id' => ( get_post_type($vote_on) == matchCPT::$post_type ? matchCPT::get_match_tournament_id($vote_on) : $vote_on ),
             'vote'          => $vote_type
         ];
 
