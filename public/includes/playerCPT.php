@@ -662,4 +662,5 @@ class playerCPT {
         return $wp_query;
 
     }
+
 }

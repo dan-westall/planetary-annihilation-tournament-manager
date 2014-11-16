@@ -12,22 +12,43 @@ class tournament_signup extends WP_Widget {
     function widget($args, $instance) {
         extract( $args );
 
-        wp_enqueue_script('angularparts.tournament.withdraw');
+        global $wp_query, $post, $current_user;
 
-        global $wp_query, $post;
+        get_currentuserinfo();
 
         $title 		= apply_filters('widget_title', $instance['title']);
         $message 	= $instance['message'];
+
         ?>
-        <?php if(!isset($wp_query->query_vars['signup']) && is_tournament_signup_open($post->ID)): ?>
+        <?php if(!isset($wp_query->query_vars['signup']) && is_tournament_signup_open($post->ID) && is_player_in_tournament($post->ID, $current_user->player_id) == false): ?>
 
-            <?php// echo $before_widget; ?>
+            <a href="<?php the_permalink(); ?>signup" class='tournament-btn __signup tournament-signup-button'><span>Sign-up to tournament</span></a>
 
-                    <a href="<?php the_permalink(); ?>signup" class='tournament-btn __signup tournament-signup-button'><span>Sign-up to tournament</span></a>
-            <?php //echo $after_widget; ?>
+        <?php elseif(is_player_in_tournament($post->ID, $current_user->player_id, tournamentCPT::$tournament_player_status[0]) == true && tournamentCPT::allow_withdraw($post->ID) == true):
+
+            wp_enqueue_script('angularparts.tournament.withdraw');
+
+            ?>
+
+            <div ng-controller="tournamentWithdraw as Withdraw">
+
+                <button id="tournament-withdraw" class='tournament-btn __withdraw' ng-click="Withdraw.promptConfirm();" ng-hide="Withdraw.hasWithdraw"><span>Withdraw</span></button>
+
+            </div>
+
+        <?php elseif(is_player_in_tournament($post->ID, $current_user->player_id, tournamentCPT::$tournament_player_status[5]) && is_tournament_signup_open($post->ID)):
+
+            wp_enqueue_script('angularparts.tournament.withdraw');
+
+            ?>
+
+            <div ng-controller="tournamentWithdraw as Withdraw">
+
+                <button id="tournament-withdraw" class='tournament-btn __signup' ng-click="Withdraw.reverse();" ng-hide="Withdraw.hasWithdraw"><span>Re-Enter</span></button>
+
+            </div>
 
         <?php endif; ?>
-
 
     <?php
     }
