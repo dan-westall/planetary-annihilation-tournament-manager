@@ -96,6 +96,7 @@ class Planetary_Annihilation_Tournament_Manager {
 
         userPolling::register();
         tournament_in_progress::register();
+//        award::register();
 //        acfCustomRules::register();
 
         remove_action( 'wp_head', 'wp_generator');

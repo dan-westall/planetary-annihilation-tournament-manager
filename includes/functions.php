@@ -120,12 +120,15 @@ function get_player_avatar($player_id, $size = 100){
 
 }
 
-function is_player_in_tournament($tournament_id, $player_id ){
+function is_player_in_tournament($tournament_id, $player_id, $status = ''){
 
     $p2p_id = p2p_type( 'tournament_players' )->get_p2p_id( $tournament_id, $player_id );
 
-    if ( $p2p_id )
+    if(p2p_get_meta($p2p_id, 'status', true) === $status){
         return true;
+    } elseif( empty($status) && $p2p_id ) {
+        return true;
+    }
 
     return false;
 

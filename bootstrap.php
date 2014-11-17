@@ -27,6 +27,7 @@ require_once( PLTM_PLUGIN_DIR.'/public/includes/tournamentCPT.php');
 require_once( PLTM_PLUGIN_DIR.'/public/includes/matchCPT.php');
 require_once( PLTM_PLUGIN_DIR.'/public/includes/notificationCPT.php');
 require_once( PLTM_PLUGIN_DIR.'/public/includes/class_shortcodes.php');
+//require_once( PLTM_PLUGIN_DIR.'/public/includes/awardCPT.php');
 
 // widgets
 require_once( PLTM_PLUGIN_DIR.'/widgets/widget.tournament.php');
