@@ -59,6 +59,8 @@ class tournamentCPT {
         add_action( 'wp_ajax_tournament_withdraw',  array( $this, 'ajax_tournament_withdraw') );
         add_action( 'wp_ajax_tournament_reenter',  array( $this, 'ajax_tournament_reenter') );
 
+        add_filter( 'tournament_prize_tiers', array( $this, 'get_tournament_prize_tiers') );
+
     }
 
     function register_cpt_tournament(){
@@ -252,6 +254,11 @@ class tournamentCPT {
             'note' => array(
                 'title' => 'Note',
                 'type'  => 'text',
+            ),
+            'result' => array(
+                'title' => 'Result',
+                'type' => 'select',
+                'values' => apply_filters('tournament_prize_tiers', ( isset($_GET['post']) ? $_GET['post'] : $_REQUEST['post_ID']) )
             )
         ]]);
 
@@ -1430,11 +1437,13 @@ class tournamentCPT {
 
         $statement_String = sprintf('SELECT %s %s %s WHERE %s GROUP BY p2p_to ORDER BY wins DESC %s', implode(', ', $fields), $from, implode(' ', $join), implode(' ', $where), $limit);
 
+
         $statement = $wpdb->prepare(
             $statement_String,
             $tournament_id
         );
 
+        echo $statement;
         //if user is admin remove cache and serve fresh results.
         if(DW_Helper::is_site_administrator()){
             delete_transient('tournament_result_' . $tournament_id);
@@ -1755,5 +1764,28 @@ class tournamentCPT {
             return true;
 
         return false;
+    }
+
+    public static function get_tournament_prize_tiers($tournament_id = 0){
+
+
+//        $result = [ 0 => 'Not Ranked' ];
+        $result = [];
+        $position = 1;
+
+        if(!empty($tournament_id)){
+            while ( have_rows('prize_tiers', $tournament_id) ) : the_row();
+
+            $result[$position] = get_sub_field('place');
+
+                $position ++;
+
+            endwhile;
+        } else {
+            return array_merge($result, range(1, 10) );
+        }
+
+        return $result;
+
     }
 }
