@@ -407,6 +407,9 @@ class userPolling {
 
     public static function update_polling_result($post_id){
 
+        if(!is_tournament_in_progress())
+            return false;
+
         $live_page_id = tournament_in_progress::get_live_page_id();
 
         if(get_post_meta($live_page_id, 'current_match', true) == $post_id){
