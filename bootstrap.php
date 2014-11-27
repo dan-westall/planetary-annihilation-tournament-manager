@@ -13,6 +13,7 @@ require_once( PLTM_PLUGIN_DIR.'/includes/class-polling.php');
 require_once( PLTM_PLUGIN_DIR.'/includes/class-tournament-in-progress.php');
 require_once( PLTM_PLUGIN_DIR.'/includes/class_gform_filters.php');
 require_once( PLTM_PLUGIN_DIR.'/includes/class-acf-rules.php');
+require_once( PLTM_PLUGIN_DIR.'/includes/class-awards.php');
 
 
 //3rd party library
@@ -27,7 +28,6 @@ require_once( PLTM_PLUGIN_DIR.'/public/includes/tournamentCPT.php');
 require_once( PLTM_PLUGIN_DIR.'/public/includes/matchCPT.php');
 require_once( PLTM_PLUGIN_DIR.'/public/includes/notificationCPT.php');
 require_once( PLTM_PLUGIN_DIR.'/public/includes/class_shortcodes.php');
-require_once( PLTM_PLUGIN_DIR.'/public/includes/awardCPT.php');
 require_once( PLTM_PLUGIN_DIR.'/public/includes/rulesCPT.php');
 
 // widgets
