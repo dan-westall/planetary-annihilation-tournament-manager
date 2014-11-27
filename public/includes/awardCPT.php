@@ -1,10 +1,8 @@
 <?php
 
-class award {
+class awardCPT {
 
     public static $post_type = 'award';
-
-    public static $award_types = [ 'video_highlight' => 'Video Highlight' ];
 
     /**
      *
@@ -13,10 +11,12 @@ class award {
 
         $plugin = new self();
 
-        add_action( 'init',  [ $plugin, 'register_cpt'] );
+        //add_action( 'init',  [ $plugin, 'register_cpt'] );
         add_action( 'p2p_init', [ $plugin, 'register_p2p_connections']);
 
         add_action( 'after_setup_theme', [ $plugin, 'role_permission'] );
+
+        add_filter( 'patm_p2p_args', [ $plugin, 'awards'], 10, 2);
 
     }
 
@@ -25,6 +25,51 @@ class award {
      */
     function __construct() {
 
+
+    }
+
+    public static function awards($args, $object_id){
+
+        $awards = [
+            'tournament_matches' => [
+                'fields' => [
+                    'award' => [
+                        'title'  => 'Award',
+                        'type'   => 'select',
+                        'values' => [
+                            'showcase' => 'Showcase Match',
+                            'match-of-tournament' => 'Match of the tournament',
+                            'best-team' => 'Best Team (Coming Soon)',
+
+                        ]
+                    ]
+                ]
+            ],
+            'tournament_players' => [
+                'fields' => [
+                    'awards' => [
+                        'title'  => 'Award',
+                        'type'   => 'select',
+                        'values' => [
+                            'player-of-tournament' => 'Player of tournament'
+                        ]
+                    ]
+                ]
+            ],
+            'match_players' => [
+                'fields' => [
+                    'awards' => [
+                        'title'  => 'Award',
+                        'type'   => 'select',
+                        'values' => [
+                            'player-of-match' => 'Player of match'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        return array_merge_recursive($args, $awards[$args['name']]);
 
     }
 
@@ -98,16 +143,8 @@ class award {
 
     private static function link_fields($post_type, $award_type){
 
-        $fields['video']['highlight'] = [
-            'time_slot' => [
-                    'title'  => 'Tournament',
-                    'type'   => 'text'
-                ],
 
-        ];
-
-
-        return $fields[$post_type][$award_type];
+        //return $fields[$post_type][$award_type];
     }
 
     /**
@@ -116,29 +153,31 @@ class award {
     public static function register_p2p_connections() {
 
 
-        $object_id = (isset($_REQUEST['post_ID']) ? $_REQUEST['post_ID'] : $_GET['post']);
-        $post_type = get_post_type($object_id);
+//        $object_id = (isset($_REQUEST['post_ID']) ? $_REQUEST['post_ID'] : $_GET['post']);
+//        $post_type = get_post_type($object_id);
 //
 //        p2p_register_connection_type([
 //            'name'      => 'award',
 //            'from'      => self::$post_type,
-//            'to'        => [ matchCPT::$post_type, playerCPT::$post_type ],
+//            'to'        => [ matchCPT::$post_type, playerCPT::$post_type, videoCPT::$post_type ],
 //            'admin_box' => [
 //                'show'    => 'to',
 //                'context' => 'advanced'
 //            ],
 //            'title'     => [
-//                'to' => __('Award - Vote', 'PLTM')
+//                'to' => __('Award', 'PLTM')
 //            ],
-//            'fields'    => self::link_fields($post_type, self::get_award_type($object_id))
+//            //'fields'    => self::awards($post_type, self::get_award_type($object_id))
 //        ]);
 
 
     }
 
-    public static function get_award_type($award_id){
+    public static function tournament_match_awards($args, $object_id){
 
-        return get_post_type($award_id, 'award_type', true);
+
+
+        return $args;
 
     }
 

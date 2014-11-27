@@ -192,7 +192,7 @@ class matchCPT {
 
     public function register_p2p_connections(){
 
-        p2p_register_connection_type( array(
+        p2p_register_connection_type( apply_filters('patm_p2p_args', array(
             'name' => 'match_players',
             'from' => self::$post_type,
             'to' => playerCPT::$post_type,
@@ -218,7 +218,7 @@ class matchCPT {
                 )
             ),
             'sortable' => 'any'
-        ) );
+        ), 0 ) );
 
 
     }

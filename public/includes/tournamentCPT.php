@@ -188,6 +188,10 @@ class tournamentCPT {
 
         global $post;
 
+        $object_id = (isset($_REQUEST['post_ID']) ? $_REQUEST['post_ID'] : $_GET['post']);
+        $post_type = get_post_type($object_id);
+
+
         p2p_register_connection_type( array(
             'name' => 'tournament_staff',
             'from' => self::$post_type,
@@ -251,18 +255,18 @@ class tournamentCPT {
         }
 
         $tournament_players_args = array_merge_recursive($tournament_players_args, ['fields' => [
-            'note' => array(
+            'note'   => array(
                 'title' => 'Note',
                 'type'  => 'text',
             ),
             'result' => array(
-                'title' => 'Result',
-                'type' => 'select',
-                'values' => apply_filters('tournament_prize_tiers', ( isset($_GET['post']) ? $_GET['post'] : $_REQUEST['post_ID']) )
+                'title'  => 'Result',
+                'type'   => 'select',
+                'values' => apply_filters('tournament_prize_tiers', (isset($_GET['post']) ? $_GET['post'] : $_REQUEST['post_ID']))
             )
         ]]);
 
-        p2p_register_connection_type( $tournament_players_args );
+        p2p_register_connection_type( apply_filters('patm_p2p_args', $tournament_players_args, $object_id ) );
 
         p2p_register_connection_type( array(
             'name' => 'tournament_excluded_players',
@@ -301,7 +305,7 @@ class tournamentCPT {
 
         }
 
-        p2p_register_connection_type($tournament_matches_args );
+        p2p_register_connection_type( apply_filters('patm_p2p_args', $tournament_matches_args, $object_id ) );
 
     }
 
