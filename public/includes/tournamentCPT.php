@@ -1443,7 +1443,7 @@ class tournamentCPT {
             $tournament_id
         );
 
-        echo $statement;
+        //echo $statement;
         //if user is admin remove cache and serve fresh results.
         if(DW_Helper::is_site_administrator()){
             delete_transient('tournament_result_' . $tournament_id);
