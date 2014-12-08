@@ -1102,7 +1102,9 @@ class tournamentCPT {
 
     public static function tournament_menu($post_id = 0){
 
-        global $wp_query;
+        global $wp_query,$current_user;
+
+        get_currentuserinfo();
 
         $html = '';
 
@@ -1129,7 +1131,7 @@ class tournamentCPT {
 
                 case "signup":
 
-                    if(self::is_tournament_signup_open($tournament->ID)){
+                    if(self::is_tournament_signup_open($tournament->ID) && is_player_in_tournament($tournament->ID, $current_user->player_id) == false){
 
                         $html .= sprintf('<li class="%4$s"><a href="%1$s/%2$s">%3$s</a></li>', get_permalink(), $tournament_endpoint, ucwords($tournament_endpoint), $classes);
 
