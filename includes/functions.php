@@ -80,7 +80,8 @@ function get_the_tournament_endpoint(){
 
             if($endpoint == Planetary_Annihilation_Tournament_Manager::$tournament_endpoints[0] && is_player_in_tournament($post->ID, $current_user->player_id) == true){
 
-                return tournamentCPT::$post_type;
+                //return tournamentCPT::$post_type;
+                return "$post->post_type-$endpoint";
             } else {
 
                 return "$post->post_type-$endpoint";
