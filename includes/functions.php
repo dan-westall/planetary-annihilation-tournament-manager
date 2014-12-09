@@ -76,7 +76,7 @@ function get_the_tournament_endpoint(){
 
     foreach(Planetary_Annihilation_Tournament_Manager::$tournament_endpoints as $endpoint){
 
-        if ($post->post_type == 'tournament' && isset( $wp_query->query_vars[$endpoint] )) {
+        if ($post->post_type == 'tournament' && isset( $wp_query->query_vars[$endpoint] ) ) {
 
             if($endpoint == Planetary_Annihilation_Tournament_Manager::$tournament_endpoints[0] && is_player_in_tournament($post->ID, $current_user->player_id) == true){
 
