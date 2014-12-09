@@ -6,7 +6,7 @@ class tournamentCPT {
 
     public static $tournament_status = array('Signup', 'In Progress', 'Cancelled', 'Finished', 'Preparation');
 
-    public static $tournament_format = array('standard' => 'Standard', 'clanwars' => 'League (Clan Wars)', 'kotp' => 'King of the planet', 'teamtournament' => 'Team Tournament');
+    public static $tournament_format = array('standard' => 'Standard', 'clanwars' => 'League (Clan Wars)', 'kotp' => 'King of the planet', 'teamtournament' => 'Team Tournament', 'teamarmies' => 'Team Armies');
 
     public static $tournament_player_status = array( 'Active', 'Reserve', 'No Show', 'Banned', 'Disqualify', 'Withdrawn');
 
@@ -249,6 +249,17 @@ class tournamentCPT {
                 'clan_contact' => array(
                     'title' => 'Clan Contact',
                     'type' => 'checkbox'
+                )
+            ]]);
+
+        }
+
+        if(get_tournament_type($_GET['post']) == 'teamarmies' || get_tournament_type($_REQUEST['post_ID']) == 'teamarmies'){
+
+            $tournament_players_args = array_merge_recursive($tournament_players_args, [ 'fields' => [
+                'team_name' => array(
+                    'title' => 'Team Name',
+                    'type' => 'text'
                 )
             ]]);
 
@@ -683,11 +694,17 @@ class tournamentCPT {
         if(!empty($values['clan_contact']['value']))
             $connection_meta['clan_contact'] = $values['clan_contact']['value'];
 
+        if(!empty($values['team_name']['value']))
+            $connection_meta['team_name'] = $values['team_name']['value'];
+
         //add player to current challonge tournament
         if($challonge_tournament_id){
-            $challonge_result = $this->challonge_add_player_to_tournament($challonge_tournament_id, $values['email']['value'], $values['ign']['value']);
 
-            $connection_meta = ['challonge_tournament_id' => $challonge_tournament_id, 'challonge_result' => $challonge_result];
+            $name = (get_tournament_type($tournament_id) == 'teamarmies' ? $values['team_name']['value'] : $values['ign']['value']);
+
+            $challonge_result = $this->challonge_add_player_to_tournament($challonge_tournament_id, $values['email']['value'], $name);
+            $connection_meta = array_merge($connection_meta, ['challonge_tournament_id' => $challonge_tournament_id, 'challonge_result' => $challonge_result]);
+            
         }
 
         $p2p_result = $this->action_add_player_to_tournament($player_id, $tournament_id, $connection_meta);
@@ -849,11 +866,12 @@ class tournamentCPT {
         return $result;
     }
 
+
     public function action_p2p_new_connection($p2p_id){
 
         $connection = p2p_get_connection( $p2p_id );
 
-        if ( 'tournament_players' == $connection->p2p_type && is_admin()) {
+        if ( 'tournament_players' == $connection->p2p_type && is_admin() && get_tournament_type($connection->p2p_from) != 'teamarmies') {
 
             $tournament_id = $connection->p2p_from;
 
@@ -884,6 +902,10 @@ class tournamentCPT {
 
         }
 
+        if(get_tournament_type($connection->p2p_from) == 'teamarmies'){
+            self::delete_tournament_caches($tournament_id);
+        }
+
 
 
     }
@@ -892,7 +914,7 @@ class tournamentCPT {
 
         $connection = p2p_get_connection( $p2p_id );
 
-        if ( 'tournament_players' == $connection->p2p_type && is_admin()) {
+        if ( 'tournament_players' == $connection->p2p_type && is_admin() && get_tournament_type($connection->p2p_from) != 'teamarmies') {
 
             //todo tournament remove reason and history will be to be done.
 
@@ -914,6 +936,11 @@ class tournamentCPT {
             self::delete_tournament_caches($tournament_id);
 
         }
+
+        if(get_tournament_type($connection->p2p_from) == 'teamarmies'){
+            self::delete_tournament_caches($tournament_id);
+        }
+
     }
 
     public function action_add_player_to_tournament($player_id, $tournament_id, $connection_meta = []){
@@ -1106,7 +1133,9 @@ class tournamentCPT {
 
     public static function tournament_menu($post_id = 0){
 
-        global $wp_query;
+        global $wp_query,$current_user;
+
+        get_currentuserinfo();
 
         $html = '';
 
@@ -1133,7 +1162,7 @@ class tournamentCPT {
 
                 case "signup":
 
-                    if(self::is_tournament_signup_open($tournament->ID)){
+                    if(self::is_tournament_signup_open($tournament->ID) && is_player_in_tournament($tournament->ID, $current_user->player_id) == false){
 
                         $html .= sprintf('<li class="%4$s"><a href="%1$s/%2$s">%3$s</a></li>', get_permalink(), $tournament_endpoint, ucwords($tournament_endpoint), $classes);
 
