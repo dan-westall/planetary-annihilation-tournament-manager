@@ -38,11 +38,13 @@ class tournament_in_progress {
         if (!class_exists('ZMQContext'))
             return false;
 
-        if(get_post_meta($post_id, '_wp_page_template', true) != 'template-tournament-in-progress-2.php')
-            return false;
-
         if(!is_tournament_in_progress())
             return false;
+
+        if(get_post_meta($post_id, '_wp_page_template', true) != 'template-tournament-in-progress-2.php' || get_field('current_match', tournament_in_progress::get_live_page_id()) != $post_id)
+            return false;
+
+
 
         //setsub
         $live_state = self::get_live_state();
@@ -54,7 +56,6 @@ class tournament_in_progress {
         $socket->connect("tcp://localhost:5555");
 
         $socket->send(json_encode($live_state));
-
 
 
     }
