@@ -18,6 +18,7 @@ class tournament_in_progress {
         $plugin = new self();
 
         add_action( 'save_post',  [ $plugin, 'realtime_update_live_page'], 10, 1 );
+        add_action( 'updated_live_page',  [ $plugin, 'realtime_update_live_page'], 10, 1 );
 
         add_filter( 'realtime_subscription', [ $plugin, 'get_live_state' ], 10, 2 );
 

@@ -121,6 +121,15 @@ function pltm_add_match( $data ){
         update_post_meta($match_id, 'twitch', $args["twitch"]);
     }
 
+    if(!empty($args["twitch_match"]) && is_tournament_in_progress()){
+
+        $live_page_id = tournament_in_progress::get_live_page_id();
+
+        update_field('current_match', $args["twitch_match"], $live_page_id);
+
+        do_action('updated_live_page', $live_page_id);
+    }
+
     if(is_array($args["pastatsmatches"][0])){
 
         update_post_meta($match_id, 'pa_stats_match_id', $args["pastatsmatches"][0]["gameId"]);
