@@ -125,7 +125,7 @@ function pltm_add_match( $data ){
 
         $live_page_id = tournament_in_progress::get_live_page_id();
 
-        update_field('current_match', $args["twitch_match"], $live_page_id);
+        update_field('current_match', $match_id, $live_page_id);
 
         do_action('updated_live_page', $live_page_id);
     }
