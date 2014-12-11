@@ -106,11 +106,10 @@ class notificationCPT {
         p2p_register_connection_type( array(
             'name' => 'notification_players',
             'from' => self::$post_type,
-            'to' => 'player',
+            'to' => 'user' ,
             'duplicate_connections' => true,
             'admin_box' => array(
-                'show' => 'to',
-                'context' => 'advanced'
+                'show' => false
             ),
             'fields' => array(
                 'tournament' => array(
@@ -157,7 +156,9 @@ class notificationCPT {
 
                     foreach($all_players as $player){
 
-                        $player_email = get_post_meta($player->ID, 'player_email', true);
+                        $user_id = get_post_meta($player->ID, 'user_id', true);
+                        $user    = get_userdata($user_id);
+
 
                         $find = array(
                             '<TOURNAMENT NAME>',
@@ -178,10 +179,10 @@ class notificationCPT {
 
                         $headers = array('Content-Type: text/html; charset=UTF-8', 'From: eXodus eSports <info@exodusesports.com>');
 
-                        $mail = wp_mail( $player_email, html_entity_decode($subject), $message, $headers );
+                        $mail = wp_mail( $user->user_email, html_entity_decode($subject), $message, $headers );
 
                         if($mail){
-                            $p2p_result = p2p_type('notification_players')->connect($notification->ID, $player->ID, array( 'date' =>  date("Y-m-d H:i:s"), 'tournament' => get_the_title($args['tournament_id']) ));
+                            $p2p_result = p2p_type('notification_players')->connect($notification->ID, $user_id, array( 'date' =>  date("Y-m-d H:i:s"), 'tournament' => get_the_title($args['tournament_id']) ));
                         }
 
                     }
@@ -206,7 +207,8 @@ class notificationCPT {
 
                             $message = $this->exodus_get_notification(array('location' => $key));
 
-                            $player_email = get_post_meta($args['player_id'], 'player_email', true);
+                            $user_id = get_post_meta($player->ID, 'user_id', true);
+                            $user    = get_userdata($user_id);
 
                             $find = array(
                                 '<TOURNAMENT NAME>',
@@ -229,10 +231,10 @@ class notificationCPT {
 
                             $headers = array('Content-Type: text/html; charset=UTF-8', 'From: eXodus eSports <info@exodusesports.com>');
 
-                            $mail = wp_mail( $player_email, html_entity_decode($subject), $message, $headers );
+                            $mail = wp_mail( $user->user_email, html_entity_decode($subject), $message, $headers );
 
                             if($mail){
-                                $p2p_result = p2p_type('tournament_players')->connect($notification_id, $args['player_id'], array( 'date' =>  date("Y-m-d H:i:s"), 'tournament' => get_the_title($args['tournament_id']) ));
+                                $p2p_result = p2p_type('tournament_players')->connect($notification_id, $user_id, array( 'date' =>  date("Y-m-d H:i:s"), 'tournament' => get_the_title($args['tournament_id']) ));
                             }
 
                             return $mail;
