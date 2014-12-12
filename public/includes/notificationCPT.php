@@ -163,6 +163,10 @@ class notificationCPT {
                         if(!$user_id)
                             continue;
 
+                        if (self::has_notification_been_sent($notification->ID, $args['tournament_id'], $user_id))
+                            continue;
+
+
                         $find = array(
                             '<TOURNAMENT NAME>',
                             '<TOURNAMENT URL>',
@@ -185,7 +189,7 @@ class notificationCPT {
                         $mail = wp_mail( $user_email, html_entity_decode($subject), $message, $headers );
 
                         if($mail){
-                            $p2p_result = p2p_type('notification_players')->connect($notification->ID, $user_id, array( 'date' =>  date("Y-m-d H:i:s"), 'tournament' => get_the_title($args['tournament_id']) ));
+                            $p2p_result = p2p_type('notification_players')->connect($notification->ID, $user_id, array( 'date' =>  date("Y-m-d H:i:s"), 'tournament' => get_the_title($args['tournament_id']), 'tournament_id' => $args['tournament_id'] ));
                         }
 
                     }
@@ -215,6 +219,9 @@ class notificationCPT {
                             $user_email = $user->user_email;
 
                             if(!$user_id)
+                                continue;
+
+                            if (self::has_notification_been_sent($notification->ID, $args['tournament_id'], $user_id))
                                 continue;
 
                             $find = array(
@@ -393,5 +400,14 @@ class notificationCPT {
        } else {
            echo '<br /><br /><a href="javascript:void(0);" class="button" data-tournament-id="'.$post->ID.'" data-security="'.wp_create_nonce( "send-players-tournament-wrap-up" ).'" id="send-players-tournament-wrap-up">Tournament Wrapup</a>';
        }
+    }
+
+    public function has_notification_been_sent($notification_id, $tournament_id, $user_id ){
+
+        global $wpdb;
+
+
+        return false;
+
     }
 }
