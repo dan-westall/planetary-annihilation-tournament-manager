@@ -212,12 +212,26 @@ class PLTM_API_Endpoint{
 
             }
 
-            $sig_image = imagecreatefrompng($image_url);
+            $filetype = wp_check_filetype($image_url);
 
-            header('Content-Type: image/png');
+            if($filetype['ext'] == 'png'){
+                $sig_image = imagecreatefrompng($image_url);
 
-            imagepng($sig_image);
-            imagedestroy($sig_image);
+                header('Content-Type: image/png');
+
+                imagepng($sig_image);
+                imagedestroy($sig_image);
+
+            } else if($filetype['ext'] == 'gif'){
+//                $sig_image = imagecreatefromgif($image_url);
+
+                header('Content-Type: image/gif');
+
+                readfile($image_url);
+
+            }
+
+
 
         } elseif(isset($wp->query_vars['__site-status'])){
             if(is_tournament_in_progress()){
