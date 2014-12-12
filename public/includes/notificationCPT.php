@@ -406,6 +406,28 @@ class notificationCPT {
 
         global $wpdb;
 
+        $query = $wpdb->prepare(
+            "
+                SELECT p2p_id,
+                (SELECT meta_value FROM $wpdb->p2pmeta WHERE meta_key = 'tournament' AND p2p_id = wp_p2p.p2p_id) AS tournament_name,
+                (SELECT meta_value FROM $wpdb->p2pmeta WHERE meta_key = 'tournament_id' AND p2p_id = wp_p2p.p2p_id) AS tournament_id
+                  FROM $wpdb->p2p WHERE p2p_from = %d and p2p_to = %d
+                ",
+            $notification_id,
+            $user_id
+        );
+
+        $notifications = $wpdb->get_results( $query );
+
+        foreach($notifications as $notification){
+
+            if($notification->tournament_name == get_the_title($tournament_id) || $notification->tournament_id == $tournament_id){
+
+                return true;
+            }
+
+        }
+
 
         return false;
 
