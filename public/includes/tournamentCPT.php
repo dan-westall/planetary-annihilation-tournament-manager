@@ -1542,7 +1542,7 @@ class tournamentCPT {
 
         if($post['post_type'] == 'tournament'){
 
-            $remove_fields = array('author', 'parent', 'format', 'slug', 'guid', 'excerpt', 'menu_order', 'ping_status', 'sticky', 'content', 'meta' => 'links');
+            $remove_fields = array('author', 'parent', 'format', 'slug', 'guid', 'menu_order', 'ping_status', 'sticky', 'content', 'meta' => 'links');
 
             $tournament_status = self::$tournament_status[get_post_meta($post['ID'], 'tournament_status', true)];
 
