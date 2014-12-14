@@ -1616,6 +1616,9 @@ class tournamentCPT {
             $_post['meta']['tournament_starttime'] = get_post_meta($post['ID'], 'run_time', true);
             $_post['meta']['tournament_datetime'] = $date->getTimestamp();
 
+            if(false !== ($challonge_id = get_post_meta($post['ID'], 'challonge_tournament_link', true)))
+                $_post['meta']['challonge_id'] = $challonge_id;
+
 
 
             $_post['meta']['tournament_prizes'] = self::get_tournament_prize_tiers($post['ID']);
