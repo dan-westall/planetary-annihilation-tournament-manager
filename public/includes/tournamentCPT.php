@@ -1542,24 +1542,52 @@ class tournamentCPT {
 
         if($post['post_type'] == 'tournament'){
 
-            $remove_fields = array('author', 'parent', 'format', 'slug', 'guid', 'excerpt', 'menu_order', 'ping_status', 'sticky');
+            $remove_fields = array('author', 'parent', 'format', 'slug', 'guid', 'excerpt', 'menu_order', 'ping_status', 'sticky', 'content', 'meta' => 'links');
+
+            $tournament_status = self::$tournament_status[get_post_meta($post['ID'], 'tournament_status', true)];
+
+            $tournament_result = [];
 
             //dont need author
-            foreach($remove_fields as $field){
-                unset($_post[$field]);
+            foreach($remove_fields as $key => $field){
+                if(is_string($key)){
+                    unset($_post[$key][$field]);
+                } else {
+                    unset($_post[$field]);
+                }
             }
 
             $matches = p2p_type('tournament_matches')->get_connected($post['ID'], array( 'posts_per_page' => -1));
-            $players    = p2p_type('tournament_players')->get_connected($post['ID'], array( 'posts_per_page' => -1 ));
+            $players = p2p_type('tournament_players')->get_connected($post['ID'], array( 'posts_per_page' => -1 ));
 
             foreach ($players->posts as $player) {
 
-                $match_players[] = array(
+                $result = [];
+
+                $player_details = array(
                     'wp_player_id'       => $player->ID,
                     'player_name'        => $player->post_title,
                     'pa_stats_player_id' => get_post_meta($player->ID, 'pastats_player_id', true),
                     'url'                => get_permalink($player->ID)
                 );
+
+                //tournament finished
+                if($tournament_status == self::$tournament_status[3]){
+
+                    $no_rank = null;
+
+                    $player_finish = p2p_get_meta($player->p2p_id, 'result', true);
+
+                    $result = [
+                        'finish' => ( $player_finish ? $player_finish : $no_rank )
+                    ];
+
+                    if(!empty($player_finish)){
+                        $tournament_result[$player_finish] = $player_details;
+                    }
+                }
+
+                $match_players[] = array_merge($player_details, $result);
 
             }
 
@@ -1580,13 +1608,17 @@ class tournamentCPT {
 
 //            $date->format('Y-m-d H:i:s');
 
-            $_post['status'] = self::$tournament_status[get_post_meta($post['ID'], 'tournament_status', true)];
+            $_post['status'] = $tournament_status;
             $_post['meta']['total_players'] = count($match_players);
             $_post['meta']['total_matches'] = count($matches->posts);
             $_post['meta']['players']        = $match_players;
             $_post['meta']['tournament_date'] = get_post_meta($post['ID'], 'run_date', true);
             $_post['meta']['tournament_starttime'] = get_post_meta($post['ID'], 'run_time', true);
             $_post['meta']['tournament_datetime'] = $date->getTimestamp();
+
+
+
+            $_post['meta']['tournament_prizes'] = self::get_tournament_prize_tiers($post['ID']);
 
 
 
@@ -1629,6 +1661,14 @@ class tournamentCPT {
                 }
 
             }
+
+            //tournament finished add winner and other information
+            if($tournament_status == self::$tournament_status[3]){
+                ksort($tournament_result);
+                $_post['meta']['result'] = $tournament_result;
+                $_post['meta']['awards'] = '';
+            }
+
 
 
         }
@@ -1793,6 +1833,10 @@ class tournamentCPT {
 
     public static function allow_withdraw($tournament_id){
 
+        //override, only allow tournaments in signup phase.
+        if(get_post_meta($tournament_id, 'tournament_status', true) != 0)
+            return false;
+
         if(get_post_meta($tournament_id, 'allow_withdraw', true))
             return true;
 
@@ -1809,7 +1853,7 @@ class tournamentCPT {
         if(!empty($tournament_id)){
             while ( have_rows('prize_tiers', $tournament_id) ) : the_row();
 
-            $result[$position] = get_sub_field('place');
+            $result[$position] = [ get_sub_field('place') => get_sub_field('prize')];
 
                 $position ++;
 
