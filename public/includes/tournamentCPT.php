@@ -1616,7 +1616,7 @@ class tournamentCPT {
             $_post['meta']['tournament_starttime'] = get_post_meta($post['ID'], 'run_time', true);
             $_post['meta']['tournament_datetime'] = $date->getTimestamp();
 
-            if(false !== ($challonge_id = get_post_meta($post['ID'], 'challonge_tournament_link', true)))
+            if(  ($challonge_id = get_post_meta($post['ID'], 'challonge_tournament_link', true)) > 0)
                 $_post['meta']['challonge_id'] = $challonge_id;
 
 
