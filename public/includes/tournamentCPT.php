@@ -6,7 +6,7 @@ class tournamentCPT {
 
     public static $tournament_status = array('Signup', 'In Progress', 'Cancelled', 'Finished', 'Preparation');
 
-    public static $tournament_format = array('standard' => 'Standard', 'clanwars' => 'League (Clan Wars)', 'kotp' => 'King of the planet', 'teamtournament' => 'Team Tournament', 'teamarmies' => 'Team Armies');
+    public static $tournament_format = array('standard' => 'Standard', 'clanwars' => 'League (Clan Wars)', 'kotp' => 'King of the planet', 'teamarmies' => 'Team Armies');
 
     public static $tournament_player_status = array( 'Active', 'Reserve', 'No Show', 'Banned', 'Disqualify', 'Withdrawn');
 
@@ -955,10 +955,10 @@ class tournamentCPT {
         //TODO not sure the challonge stuff should be in here
         //save the return to db as this has useful info in it
 
-        $connection_meta = array(
+        $connection_meta = array_merge($connection_meta, array(
             'date'                     => current_time('mysql'),
             'status'                   => $status
-        );
+        ));
 
         if(isset($connection_meta['challonge_result'])){
             update_post_meta($player_id, 'challonge_data', $connection_meta['challonge_result']);
@@ -1579,16 +1579,24 @@ class tournamentCPT {
 
                     $player_finish = p2p_get_meta($player->p2p_id, 'result', true);
 
-                    $result = [
-                        'finish' => ( $player_finish ? $player_finish : $no_rank )
-                    ];
-
                     if(!empty($player_finish)){
                         $tournament_result[$player_finish] = $player_details;
                     }
+
+                    $player_details = array_merge($player_details, [
+                        'finish' => ( $player_finish ? $player_finish : $no_rank )
+                    ]);
+
                 }
 
-                $match_players[] = array_merge($player_details, $result);
+                if(get_tournament_type($post['ID']) == 'teamarmies'){
+
+                    $player_details = array_merge($player_details, [
+                        'team_name' => p2p_get_meta($player->p2p_id, 'team_name', true)
+                    ]);
+                }
+
+                $match_players[] = $player_details;
 
             }
 
