@@ -55,6 +55,7 @@ class tournamentCPT {
         add_filter( 'json_prepare_post',  array( $this, 'tournament_json_extend' ), 50, 3 );
 
         add_action( 'parse_query',   array( $this, 'tournament_api_filter'));
+        add_action( 'pre_get_posts',   array( $this, 'pre_tournament_api_filter'));
 
         add_action( 'wp_ajax_tournament_withdraw',  array( $this, 'ajax_tournament_withdraw') );
         add_action( 'wp_ajax_tournament_reenter',  array( $this, 'ajax_tournament_reenter') );
@@ -1722,7 +1723,24 @@ class tournamentCPT {
             }
         }
 
+
         return $wp_query;
+
+    }
+
+    public static function pre_tournament_api_filter($wp_query){
+
+        if(isset($wp_query->query_vars['tournament_challonge']) && in_array(self::$post_type, $wp_query->query_vars['post_type'])){
+
+            if($wp_query->query_vars['tournament_challonge'] === "true"){
+                $wp_query->set('meta_query', [[ 'key' => 'challonge_tournament_link', 'value' => '0', 'compare' => '>']]);
+            } elseif($wp_query->query_vars['tournament_challonge'] === "false"){
+                //$wp_query->query['meta_query'] = [[ 'key' => 'challonge_tournament_link', 'value' => '0', 'compare' => '='] ];
+                $wp_query->set('meta_query', [[ 'key' => 'challonge_tournament_link', 'value' => '0', 'compare' => '='] ]);
+            }
+
+        }
+
 
     }
 
