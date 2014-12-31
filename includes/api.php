@@ -233,7 +233,7 @@ class PLTM_API_Endpoint{
             }
 
 
-
+        //exodus mod hook
         } elseif(isset($wp->query_vars['__site-status'])){
             if(is_tournament_in_progress()){
 

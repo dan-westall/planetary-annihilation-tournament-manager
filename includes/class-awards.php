@@ -34,7 +34,6 @@ class awards {
                             'showcase' => 'Showcase Match',
                             'match-of-tournament' => 'Match of the tournament',
                             'best-team' => 'Best Team (Coming Soon)',
-
                         ]
                     ]
                 ]
