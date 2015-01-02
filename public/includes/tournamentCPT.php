@@ -1569,7 +1569,8 @@ class tournamentCPT {
                     'wp_player_id'       => $player->ID,
                     'player_name'        => $player->post_title,
                     'pa_stats_player_id' => get_post_meta($player->ID, 'pastats_player_id', true),
-                    'url'                => get_permalink($player->ID)
+                    'url'                => get_permalink($player->ID),
+                    'status'             => p2p_get_meta($player->p2p_id, 'status', true)
                 );
 
                 //tournament finished
