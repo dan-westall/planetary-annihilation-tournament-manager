@@ -181,7 +181,7 @@ function pltm_player_attendance($data){
 
     if($p2p_id){
 
-        p2p_update_meta($p2p_id, 'status', tournamentCPT::$tournament_status[2]);
+        p2p_update_meta($p2p_id, 'status', tournamentCPT::$tournament_player_status[2]);
 
         return 'Player Marked as no show';
 
