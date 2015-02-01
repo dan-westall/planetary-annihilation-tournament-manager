@@ -4,6 +4,7 @@ add_filter( 'xmlrpc_methods', 'add_xml_rpc_methods' );
 
 function add_xml_rpc_methods( $methods ) {
     $methods['pltm.addMatch'] = 'pltm_add_match';
+    $methods['pltm.playerAttendance'] = 'pltm_player_attendance';
     //$methods['pltm.addMatch'] = 'pltm_add_match';
 
     return $methods;
@@ -166,5 +167,27 @@ function pltm_add_match( $data ){
     do_action('match_updated', $match_id, $args["wp_tournament_id"]);
 
     return get_permalink( $match_id );
+
+}
+
+function pltm_player_attendance($data){
+    global $wp_xmlrpc_server;
+    $args = json_decode($data,true);
+
+    $player_id     = $args['player_wp_id'];
+    $tournament_id = $args['tournament_id'];
+
+    $p2p_id = p2p_type('tournament_players')->get_p2p_id($tournament_id, $player_id);
+
+    if($p2p_id){
+
+        p2p_update_meta($p2p_id, 'status', tournamentCPT::$tournament_status[2]);
+
+        return 'Player Marked as no show';
+
+    }
+
+
+
 
 }
