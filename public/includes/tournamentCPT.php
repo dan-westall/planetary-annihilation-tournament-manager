@@ -52,7 +52,7 @@ class tournamentCPT {
 
         add_filter( 'page_js_args', array( $this, 'filter_page_js_vars'), 10, 2);
 
-        add_filter( 'json_prepare_post',  array( $this, 'tournament_json_extend' ), 50, 3 );
+        add_filter( 'json_prepare_post',  array( $this, 'tournament_json_extend_v2' ), 50, 3 );
 
         add_action( 'parse_query',   array( $this, 'tournament_api_filter'));
         add_action( 'pre_get_posts',   array( $this, 'pre_tournament_api_filter'));
@@ -735,7 +735,8 @@ class tournamentCPT {
         $tournament_status        = get_post_meta($tournament_id, 'tournament_status', true);
         $total_tournament_slots   = ($tournament_slots + $tournament_reserve_slots);
 
-        $current_player_total     = count(get_tournament_players($tournament_id, array(self::$tournament_player_status[0], self::$tournament_player_status[1])));
+
+        $current_player_total     = tournamentCPT::get_tournament_player_count($tournament_id, [self::$tournament_player_status[0], self::$tournament_player_status[1]]);
 
         if($tournament_closed == true){
 
@@ -1690,6 +1691,185 @@ class tournamentCPT {
 
     }
 
+    public function tournament_json_extend_v2($_post, $post, $context){
+
+        if($post['post_type'] == 'tournament'){
+
+            global $wpdb;
+
+            $remove_fields = array('author', 'parent', 'format', 'slug', 'guid', 'menu_order', 'ping_status', 'sticky', 'content', 'meta' => 'links');
+
+            $tournament_status = self::$tournament_status[get_post_meta($post['ID'], 'tournament_status', true)];
+
+            $tournament_result = [];
+            $tournament_id = $post['ID'];
+
+            //dont need author
+            foreach($remove_fields as $key => $field){
+                if(is_string($key)){
+                    unset($_post[$key][$field]);
+                } else {
+                    unset($_post[$field]);
+                }
+            }
+
+            //3962 clanwars
+
+            $player_query = $wpdb->prepare(
+                "
+                SELECT
+                p2p_id,
+                $wpdb->posts.ID,
+                $wpdb->posts.post_title,
+                (SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = 'pastats_player_id' AND $wpdb->postmeta.post_id = $wpdb->p2p.p2p_to) AS pastats_player_id,
+                (SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = 'pastats_player_id' AND $wpdb->postmeta.post_id = $wpdb->p2p.p2p_to) AS player_clan,
+                (SELECT meta_value FROM $wpdb->p2pmeta WHERE meta_key = 'status' AND p2p_id = $wpdb->p2p.p2p_id) AS player_tournament_status,
+                (SELECT meta_value FROM $wpdb->p2pmeta WHERE meta_key = 'result' AND p2p_id = $wpdb->p2p.p2p_id) AS player_finish,
+                (SELECT meta_value FROM $wpdb->p2pmeta WHERE meta_key = 'team_name' AND p2p_id = $wpdb->p2p.p2p_id) AS team_name
+                    FROM $wpdb->p2p
+                        LEFT JOIN $wpdb->posts ON p2p_to = $wpdb->posts.ID
+                            WHERE p2p_from = %s && p2p_type = 'tournament_players'
+                ",
+                $tournament_id
+            );
+
+            $players = $wpdb->get_results( $player_query );
+
+            $match_query = $wpdb->prepare(
+                "
+                SELECT
+                p2p_id,
+                $wpdb->posts.ID, 
+                $wpdb->posts.post_title, 
+                (SELECT meta_value FROM $wpdb->p2pmeta WHERE meta_key = 'match_fixture' AND p2p_id = $wpdb->p2p.p2p_id) AS match_fixture
+                    FROM $wpdb->p2p 
+                        LEFT JOIN $wpdb->posts ON p2p_to = $wpdb->posts.ID
+                            WHERE p2p_from = %s && p2p_type = 'tournament_matches'
+                ",
+                $tournament_id
+            );
+
+            $matches = $wpdb->get_results( $match_query );
+
+
+            foreach ($players as $player) {
+
+                $result = [];
+
+                $player_details = array(
+                    'wp_player_id'       => $player->ID,
+                    'player_name'        => $player->post_title,
+                    'pa_stats_player_id' => $player->pastats_player_id,
+                    'url'                => get_permalink($player->ID),
+                    'status'             => $player->player_tournament_status
+                );
+
+                //tournament finished
+                if($tournament_status == self::$tournament_status[3]){
+
+                    $no_rank = null;
+
+                    $player_finish = $player->player_finish;
+
+                    if(!empty($player_finish)){
+                        $tournament_result[$player_finish] = $player_details;
+                    }
+
+                    $player_details = array_merge($player_details, [
+                        'finish' => ( $player_finish ? $player_finish : $no_rank )
+                    ]);
+
+                }
+
+                if(get_tournament_type($post['ID']) == 'teamarmies'){
+
+                    $player_details = array_merge($player_details, [
+                        'team_name' => $player->team_name
+                    ]);
+                }
+
+                $match_players[] = $player_details;
+
+            }
+
+
+            $date = get_post_meta($post['ID'], 'run_date', true);
+            $time = get_post_meta($post['ID'], 'run_time', true);
+
+            $currentTime = DateTime::createFromFormat( 'U', $timestamp );
+
+            $date = new DateTime($date);
+
+//            $date->setTimestamp(strtotime($date));
+
+            $timeArray = explode(':', $time);
+
+            $date->setTime($timeArray[0], $timeArray[1]);
+
+//            $date->format('Y-m-d H:i:s');
+
+            $_post['status'] = $tournament_status;
+            $_post['meta']['total_players'] = count($match_players);
+            $_post['meta']['total_matches'] = count($matches);
+            $_post['meta']['players']        = $match_players;
+            $_post['meta']['tournament_date'] = get_post_meta($post['ID'], 'run_date', true);
+            $_post['meta']['tournament_starttime'] = get_post_meta($post['ID'], 'run_time', true);
+            $_post['meta']['tournament_datetime'] = $date->getTimestamp();
+
+            if(  ($challonge_id = get_post_meta($post['ID'], 'challonge_tournament_link', true)) > 0)
+                $_post['meta']['challonge_id'] = $challonge_id;
+
+
+            $_post['meta']['tournament_prizes'] = self::get_tournament_prize_tiers_v2($post['ID']);
+
+            $_post['meta']['signup_open'] = is_tournament_signup_open($post['ID']);
+
+            $tournament_fixtures = tournamentCPT::get_tournament_fixtures($tournament_id);
+
+            if( $tournament_fixtures ) {
+
+                $fixture_match_count = [];
+
+                foreach($matches as $match){
+
+                    $fixture_match_count[$match->match_fixture] ++;
+
+                }
+
+                // loop through the rows of data
+                foreach ($tournament_fixtures as $fixture) {
+
+                    if(!empty($date_time)) {
+
+                        $fixtures[] = [
+                            'date'    => $fixture->fixture_date,
+                            'name'    => $fixture->fixture_name,
+                            'status'  => self::$tournament_status[$fixture->fixture_status],
+                            'matches' => $fixture_match_count[strtotime($fixture->fixture_date)]
+                        ];
+
+                    }
+
+                }
+
+                if(count($fixtures) > 0){
+                    $_post['meta']['fixtures'] = $fixtures;
+                }
+
+            }
+
+            //tournament finished add winner and other information
+            if($tournament_status == self::$tournament_status[3]){
+                ksort($tournament_result);
+                $_post['meta']['result'] = $tournament_result;
+                $_post['meta']['awards'] = '';
+            }
+
+        }
+
+        return $_post;
+    }
+
     public static function p2p_display_clan($connection, $direction){
 
         global $wpdb;
@@ -1765,6 +1945,9 @@ class tournamentCPT {
 
         $fixtures = [];
         $tournament_id = ( isset($_GET['post']) ? $_GET['post'] : $_POST['post_ID'] );
+
+        if(!function_exists('have_Rows'))
+            return false;
 
         if( have_rows('fixtures', $tournament_id) ) {
 
@@ -1880,6 +2063,9 @@ class tournamentCPT {
         $result = [];
         $position = 1;
 
+        if(!function_exists('have_Rows'))
+            return false;
+
         if(!empty($tournament_id)){
             while ( have_rows('prize_tiers', $tournament_id) ) : the_row();
 
@@ -1893,6 +2079,91 @@ class tournamentCPT {
         }
 
         return $result;
+
+    }
+
+    public static function get_tournament_prize_tiers_v2($tournament_id){
+
+        global $wpdb;
+
+        $prize_query = $wpdb->prepare(
+            "
+                SELECT DISTINCT
+                SUBSTRING(meta_key,1,13) AS prize_group,
+                GROUP_CONCAT(CASE
+                    WHEN meta_key LIKE '%place' THEN meta_value
+                END) as place,
+                GROUP_CONCAT(CASE
+                    WHEN meta_key LIKE '%prize' THEN meta_value
+                END) as prize
+                    FROM $wpdb->postmeta
+                        WHERE post_id = 4199 AND meta_key LIKE 'prize_tiers_%'
+                          GROUP by prize_group
+                ",
+            $tournament_id
+        );
+
+        $prizes = $wpdb->get_results( $prize_query );
+
+        return $prizes;
+
+    }
+
+    public static function get_tournament_fixtures($tournament_id){
+
+        global $wpdb;
+
+        $fixture_query = $wpdb->prepare(
+            "
+                SELECT DISTINCT
+                SUBSTRING(meta_key,1,10) AS fixture_group,
+                GROUP_CONCAT(CASE
+                  WHEN meta_key LIKE '%status' THEN meta_value
+                END) as fixture_status,
+                CASE
+                  WHEN meta_key LIKE '%name' THEN meta_value
+                END as fixture_name,
+                GROUP_CONCAT(CASE
+                  WHEN meta_key LIKE '%date' THEN meta_value
+                END) as fixture_date
+                    FROM $wpdb->postmeta
+                      WHERE post_id = %s AND meta_key LIKE 'fixtures_%'
+                        GROUP by fixture_group
+                ",
+            $tournament_id
+        );
+
+        $fixtures = $wpdb->get_results( $fixture_query );
+
+        return $fixtures;
+
+    }
+
+    public static function get_tournament_player_count($tournament_id, $status = ''){
+
+        global $wpdb;
+
+        if(empty($status))
+            $status = tournamentCPT::$tournament_player_status;
+
+        $query = "SELECT
+                  COUNT($wpdb->posts.ID) as total_players
+                    FROM $wpdb->p2p
+                        LEFT JOIN $wpdb->posts ON p2p_to = $wpdb->posts.ID
+                            WHERE p2p_from = %s && p2p_type = 'tournament_players'
+                            AND (SELECT meta_value FROM $wpdb->p2pmeta WHERE $wpdb->p2pmeta.meta_key = 'status'
+                            AND $wpdb->p2pmeta.p2p_id = $wpdb->p2p.p2p_id) IN ('".implode("', '", $status)."')";
+
+        $player_count_query = $wpdb->prepare($query,
+            $tournament_id
+        );
+
+
+        $player_count = $wpdb->get_var( $player_count_query );
+
+        return $player_count;
+
+
 
     }
 }
