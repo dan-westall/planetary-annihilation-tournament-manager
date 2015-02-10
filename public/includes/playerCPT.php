@@ -116,7 +116,7 @@ class playerCPT {
 
     }
 
-    public static function action_new_player_profile($user_id, $values = []){
+    public static function new_player_profile($user_id, $values = []){
 
         //todo need a better signup form before we can do this automatically
 
@@ -124,16 +124,14 @@ class playerCPT {
             $user = get_user_by( 'id', $user_id );
         }
 
-        //create new player post
-        $new_player = array(
+
+        // Insert the post into the database
+        $player_id = wp_insert_post([
             'post_title'  => $values['ign']['value'],
             'post_status' => 'publish',
             'post_author' => $user_id,
             'post_type'   => playerCPT::$post_type
-        );
-
-        // Insert the post into the database
-        $player_id = wp_insert_post($new_player);
+        ]);
 
         //fix!
         if(get_post_type($player_id) != playerCPT::$post_type){
