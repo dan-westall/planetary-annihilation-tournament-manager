@@ -57,6 +57,7 @@ class tournamentCPT {
         add_action( 'parse_query',   array( $this, 'tournament_api_filter'));
         add_action( 'pre_get_posts',   array( $this, 'pre_tournament_api_filter'));
 
+        //moved to tournament signup class
         add_action( 'wp_ajax_tournament_withdraw',  array( $this, 'ajax_tournament_withdraw') );
         add_action( 'wp_ajax_tournament_reenter',  array( $this, 'ajax_tournament_reenter') );
 
@@ -1501,18 +1502,8 @@ class tournamentCPT {
         if ( wp_is_post_revision( $post_id ) )
             return;
 
-        //clear apc system cache!
-
         if(function_exists('apc_clear_cache'))
             apc_clear_cache();
-
-        //todo is this being used?
-        if ( matchCPT::$post_type == get_post_type($post_id) ) {
-
-            $tournament_id = matchCPT::get_match_tournament_id($post_id);
-
-            delete_transient( 'tournament_result_' . $tournament_id );
-        }
 
         if ( tournamentCPT::$post_type == get_post_type($post_id) ) {
             delete_transient( 'tournament_' .$post_id. '_players' );
