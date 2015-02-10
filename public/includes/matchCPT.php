@@ -36,6 +36,7 @@ class matchCPT {
 
 
         add_action( 'save_post',  array( $this, 'match_time'), 10, 1 );
+        add_action( 'save_post',  array( $this, 'delete_match_caches'), 10, 1 );
 
         //moved outside to our own api endpoint
 //        add_action('wp_ajax_pltm_get_match_results',  array( $this, 'get_match_json') );
@@ -1036,6 +1037,28 @@ class matchCPT {
     }
 
     public static function match_time(){
+
+    }
+
+    public function delete_match_caches($post_id){
+
+        if ( wp_is_post_revision( $post_id ) )
+            return;
+
+        //clear apc system cache!
+
+        if(function_exists('apc_clear_cache'))
+            apc_clear_cache();
+
+        //todo is this being used? should be moved to match class
+        if ( matchCPT::$post_type == get_post_type($post_id) ) {
+
+            $tournament_id = matchCPT::get_match_tournament_id($post_id);
+
+            delete_transient( 'tournament_result_' . $tournament_id );
+        }
+
+
 
     }
 
