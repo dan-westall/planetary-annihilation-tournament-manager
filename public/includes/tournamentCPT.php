@@ -613,6 +613,8 @@ class tournamentCPT {
 
         }
 
+
+        //what does this do?
         $user = $wpdb->get_row( $wpdb->prepare("SELECT user_email, ID AS user_id, (SELECT meta_value FROM wp_usermeta  WHERE user_id = user.ID AND meta_key = 'player_id') AS player_id  FROM $wpdb->users AS user WHERE user_email = %s", $values['email']['value']) );
 
 
@@ -728,6 +730,7 @@ class tournamentCPT {
 
     }
 
+    //moved to signup class
     public static function is_tournament_signup_open($tournament_id){
 
         $tournament_closed        = get_post_meta($tournament_id, 'signup_closed', true);
@@ -1365,6 +1368,7 @@ class tournamentCPT {
         }
     }
 
+    //old remove
     public static function tournament_return_format($tournament, $data = array(), $return = array('results' => true, 'prize' => true)){
 
         $to = new tournamentCPT();
@@ -1512,6 +1516,7 @@ class tournamentCPT {
 
     }
 
+    //moved to signup class
     public static function players_excluded_from_tournament($tournament_id){
 
         global $wpdb;
