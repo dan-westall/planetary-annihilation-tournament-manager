@@ -124,10 +124,12 @@ class playerCPT {
             $user = get_user_by( 'id', $user_id );
         }
 
+        //compatiblity for exsiting player signup system to new system.
+        $ign = ($values['ign']['value'] ? $values['ign']['value'] : $values['value']);
 
         // Insert the post into the database
         $player_id = wp_insert_post([
-            'post_title'  => $values['ign']['value'],
+            'post_title'  => $ign,
             'post_status' => 'publish',
             'post_author' => $user_id,
             'post_type'   => playerCPT::$post_type
@@ -142,6 +144,8 @@ class playerCPT {
         update_post_meta($player_id, 'user_id', $user_id);
 
         update_user_meta($user_id, 'player_id', $player_id);
+
+        do_action('new_player_profile');
 
         return $player_id;
 
