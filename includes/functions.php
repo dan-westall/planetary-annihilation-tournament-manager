@@ -96,6 +96,11 @@ function get_the_tournament_endpoint(){
 
 function is_tournament_signup_open($tournament_id){
 
+
+//    $tournament_signup = new tournamentSignup();
+//
+//    return $tournament_signup->is_tournament_signup_open($tournament_id);
+
     return tournamentCPT::is_tournament_signup_open($tournament_id);
 
 }
