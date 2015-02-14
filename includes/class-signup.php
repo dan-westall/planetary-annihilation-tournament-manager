@@ -8,6 +8,7 @@ class tournamentSignup {
     private $player_id;
     private $user_id;
     private $tournament_id;
+    private $join_id;
     private $tournament_team_name;
 
     /**
@@ -40,6 +41,55 @@ class tournamentSignup {
     /**
      * @return mixed
      */
+    public function getUserId() {
+        return $this->user_id;
+    }
+
+    /**
+     * @param mixed $user_id
+     */
+    public function setUserId($user_id) {
+        $this->user_id = $user_id;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getJoinId() {
+        return $this->join_id;
+    }
+
+    /**
+     * @param mixed $join_id
+     */
+    public function setJoinId($join_id) {
+        $this->join_id = $join_id;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getTournamentTeamName() {
+        return $this->tournament_team_name;
+    }
+
+    /**
+     * @param mixed $tournament_team_name
+     */
+    public function setTournamentTeamName($tournament_team_name) {
+        $this->tournament_team_name = $tournament_team_name;
+
+        return $this;
+    }
+
+
+    /**
+     * @return mixed
+     */
     public function getPlayerId() {
         return $this->player_id;
     }
@@ -67,50 +117,6 @@ class tournamentSignup {
         $this->tournament_id = $tournament_id;
 
         return $this;
-    }
-
-    public function new_signup(){
-
-    }
-
-    public function withdraw(){
-
-
-    }
-
-    public function set_team($player){
-
-        if(!is_user_logged_in() && isset($player->user_email)){
-
-            $validation_result['is_valid'] = false;
-            $validation_result['form']['cssClass'] = 'please-login-to-signup';
-
-        }
-
-    }
-
-    public function allow_signup($signup_values){
-
-        if(is_array(tournamentCPT::players_excluded_from_tournament($tournament_id))){
-
-            $error = new WP_Error;
-
-            if (in_array($signup_values['email'], tournamentCPT::players_excluded_from_tournament($tournament_id))){
-
-                $error->add('excluded_player', 'Very Sorry but you are excluded from this tournament, if you think this is in error please contact us via the contact form.');
-
-            }
-
-        }
-
-
-    }
-
-    public function signup_validation(){
-
-
-
-
     }
 
     public function is_existing_player($values){
@@ -209,11 +215,92 @@ class tournamentSignup {
 
     public function join_tournament(){
 
+        $tournament_id = $this->tournament_id;
+
+        $status                   = self::$tournament_player_status[0];
+        $tournament_slots         = get_post_meta($tournament_id, 'slots', true);
+        $tournament_reserve_slots = get_post_meta($tournament_id, 'reserve_slots', true);
+        $total_tournament_slots   = ($tournament_slots + $tournament_reserve_slots);
+
+        $tournament_player_status = tournamentCPT::$tournament_player_status;
+        $current_player_count     = tournamentCPT::get_tournament_player_count($tournament_id, [$tournament_player_status[0]]);
+
+
+
+        $connection_meta = array_merge($connection_meta, array(
+            'date'                     => current_time('mysql'),
+            'status'                   => $status
+        ));
+
+
+        //if therere are more players then slots reserve, any logic should have been done by this point
+        if($current_player_count >= $tournament_slots){
+
+            $status = $tournament_player_status[1];
+
+        }
+
+        $this->player_tournament_status = $status;
+
+
+        //player found add player to tornament
+        $p2p_result = p2p_type('tournament_players')->connect($tournament_id, $this->player_id, $connection_meta);
+
+        if(is_wp_error($p2p_result)){
+            throw new Exception('Sorry there was a error, we could not enter you into this tournament.');
+        } else {
+            $this->setJoinId($p2p_result);
+        }
+
+        tournamentCPT::delete_tournament_caches($tournament_id);
 
     }
 
     public function join_team(){
 
+
+
+    }
+
+    public function challonge_add_player_to_tournament($challonge_tournament_id, $email, $ign){
+
+        if(isset($connection_meta['challonge_result'])){
+            update_post_meta($player_id, 'challonge_data', $connection_meta['challonge_result']);
+
+            //easy search
+            update_post_meta($player_id, 'challonge_participant_id', $meta['challonge_result']->id);
+
+            $connection_meta = array_merge($connection_meta, [ 'challonge_tournament_id'  => $connection_meta['challonge_tournament_id'], 'challonge_participant_id' => $connection_meta['challonge_result']->id ] );
+
+        }
+
+        $c = new ChallongeAPI(Planetary_Annihilation_Tournament_Manager::fetch_challonge_API());
+
+        $c->verify_ssl = false;
+
+        $params = array(
+            'participant[name]'               => $ign
+        );
+
+        $participant = $c->createParticipant($challonge_tournament_id, $params);
+
+        $result = json_decode( json_encode( (array) $participant), false );
+
+        return $result;
+
+    }
+
+    public function challonge_remove_player_from_tournament($challonge_tournament_id, $challonge_participant_id){
+
+        $c = new ChallongeAPI(Planetary_Annihilation_Tournament_Manager::fetch_challonge_API());
+
+        $c->verify_ssl = false;
+
+        $participant = $c->deleteParticipant($challonge_tournament_id, $challonge_participant_id);
+
+        $result = json_decode( json_encode( (array) $participant), false );
+
+        return $result;
     }
 
     public static function player_signup(){
@@ -233,10 +320,12 @@ class tournamentSignup {
             if(!self::is_tournament_signup_open($tournament_id))
                 throw new Exception('Tournament sign ups closed.');
 
+            if(!is_user_logged_in() && $signup->is_existing_player($signup_data))
+                throw new Exception('Please login to sign up for this tournament');
 
+
+            //ok this is not an existing player we need to make an account!, call to playerCPT
             if(false === ( $player_id = $signup->is_existing_player($signup_data) )){
-
-                //ok this is not an existing player we need to make an account!, call to playerCPT
 
                 if(false === (  $user = get_user_by( 'email', $signup['email'] ) )){
                     $user =  $signup->new_user($signup_data);
@@ -265,6 +354,43 @@ class tournamentSignup {
 
 
             $signup->join_tournament()->join_team();
+
+//            if($values['clan']['value'])
+//                $connection_meta['clan'] = $values['clan']['value'];
+//
+//            if(!empty($values['clan_contact']['value']))
+//                $connection_meta['clan_contact'] = $values['clan_contact']['value'];
+//
+//            if(!empty($values['team_name']['value']))
+//                $connection_meta['team_name'] = $values['team_name']['value'];
+//
+//            //add player to current challonge tournament
+//            if($challonge_tournament_id){
+//
+//                $name = (get_tournament_type($tournament_id) == 'teamarmies' ? $values['team_name']['value'] : $values['ign']['value']);
+//
+//                $challonge_result = $this->challonge_add_player_to_tournament($challonge_tournament_id, $values['email']['value'], $name);
+//                $connection_meta = array_merge($connection_meta, ['challonge_tournament_id' => $challonge_tournament_id, 'challonge_result' => $challonge_result]);
+//
+//            }
+//
+//            $p2p_result = $this->action_add_player_to_tournament($player_id, $tournament_id, $connection_meta);
+//
+//            if ($p2p_result) {
+//
+//                //$this->player_tournament_status active or reserve
+//
+//                $action = "tournament_signup_$this->player_tournament_status";
+//
+//                do_action( $action, array( 'player_id' => $player_id, 'tournament_id' => $tournament_id ) );
+//
+//            }
+//
+//            //update details, clan tag ingame
+//
+//            if(!empty($values['clan']['value']))
+//                update_post_meta($player_id, 'clan', $values['clan']['value']);
+
 
 
 
