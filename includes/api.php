@@ -124,18 +124,12 @@ class PLTM_API_Endpoint{
 
             wp_reset_postdata();
 
-            header('content-type: application/json; charset=utf-8');
-
-            echo json_encode([
+            $this->send_response([
                 "color"          => "green",
                 "message"        => $html,
                 "notify"         => false,
                 "message_format" => "html"
             ]);
-
-
-
-            exit;
 
 
         }
