@@ -841,6 +841,7 @@ class tournamentCPT {
 
     }
 
+    //moved to signup class
     public function challonge_add_player_to_tournament($challonge_tournament_id, $email, $ign){
 
         $c = new ChallongeAPI(Planetary_Annihilation_Tournament_Manager::fetch_challonge_API());
@@ -859,6 +860,7 @@ class tournamentCPT {
 
     }
 
+    //moved to signup class
     public function challonge_remove_player_from_tournament($challonge_tournament_id, $challonge_participant_id){
 
         $c = new ChallongeAPI(Planetary_Annihilation_Tournament_Manager::fetch_challonge_API());
@@ -949,6 +951,7 @@ class tournamentCPT {
 
     }
 
+    //moved to signup class
     public function action_add_player_to_tournament($player_id, $tournament_id, $connection_meta = []){
 
         $status                   = self::$tournament_player_status[0];
@@ -1093,47 +1096,6 @@ class tournamentCPT {
 
         }
         return $messages;
-
-    }
-
-    //not in use
-    public function action_challonge_sync_check($post_id){
-
-        if ( wp_is_post_revision( $post_id ) )
-            return;
-
-        $post_meta = get_post_custom($post_id);
-
-        //check to make sure this tournament has been linked to a challonge one
-        if( array_key_exists('custom_tournament_id', $post_meta) == true || array_key_exists('custom_tournament_id', $post_meta) == true  ){
-
-            if(get_post_meta($post_id, 'challonge_tournament_link',true) == "Custom Tournament ID"){
-                $challonge_tournament_id = get_post_meta($post_id, 'custom_tournament_id',true);
-            } else {
-                $challonge_tournament_id = get_post_meta($post_id, 'challonge_tournament_link',true);
-            }
-
-            $c = new ChallongeAPI(Planetary_Annihilation_Tournament_Manager::fetch_challonge_API());
-
-            $args = array(
-                'connected_type' => 'tournament_players',
-                'connected_items' => $post_id
-            );
-
-            $players = get_posts( $args );
-
-            $wp_total_players = count($players);
-
-            $challonge_tournament_players = json_decode( json_encode( (array) $c->getParticipants($challonge_tournament_id) ), false );
-
-            //if wp players doesnt equal challonge players when sync!
-            if($wp_total_players != count($challonge_tournament_players->participant)){
-
-
-
-            }
-
-        }
 
     }
 
