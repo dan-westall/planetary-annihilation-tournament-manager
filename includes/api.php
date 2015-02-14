@@ -18,6 +18,7 @@ class PLTM_API_Endpoint{
      */
     public function add_query_vars($vars){
         $vars[] = '__api';
+        $vars[] = '__hipchat';
         $vars[] = '__signature';
         $vars[] = '__site-status';
         $vars[] = 'tournament';
@@ -44,6 +45,8 @@ class PLTM_API_Endpoint{
     public function add_endpoint(){
 
 
+
+
         add_rewrite_rule('^site-status/?([^/]*)?/?','index.php?__site-status=1','top');
 
         //add_rewrite_rule('^api/tournament-matches/?([0-9]+)?/?','index.php?__api=1&tournament-matches=$matches[1]','top');
@@ -59,7 +62,7 @@ class PLTM_API_Endpoint{
         add_rewrite_rule('^api/playercid/?([0-9]+)?/?','index.php?__api=1&playercid=$matches[1]','top');
 
 
-
+        add_rewrite_rule('^hipchat/tournaments/?([0-9]+)?/?','index.php?__hipchat=1&tournaments=$matches[1]','top');
 
 
         add_rewrite_tag('%tournaments%','([^&]+)');
@@ -82,7 +85,7 @@ class PLTM_API_Endpoint{
      */
     public function sniff_requests(){
         global $wp;
-        if(isset($wp->query_vars['__api']) || isset($wp->query_vars['__signature']) || isset($wp->query_vars['__site-status'])){
+        if(isset($wp->query_vars['__api']) || isset($wp->query_vars['__signature']) || isset($wp->query_vars['__site-status']) || isset($wp->query_vars['__hipchat'])){
             $this->handle_request();
             exit;
         }
@@ -95,6 +98,39 @@ class PLTM_API_Endpoint{
     protected function handle_request(){
 
         global $wp;
+
+        if(isset($wp->query_vars['__hipchat']) && isset($wp->query_vars['tournaments'])){
+
+
+
+            header('Content-Type: text/html');
+
+            $tournaments = new WP_Query( [
+                    'post_type' => tournamentCPT::$post_type,
+                    'posts_per_page' => 6,
+                    'meta_key' => 'run_date',
+                    'orderby' => 'run_date'
+                ]
+            );
+
+            echo '<table>';
+
+            while ( $tournaments->have_posts() ) : $tournaments->the_post();
+
+                $rundate = new DateTime( date("Y-m-d", strtotime(get_post_meta($tournaments->post->ID, 'run_date', true))), new DateTimeZone('UTC'));
+
+                printf('<tr><td>%s</td><td>%s</td><td>%s</td></tr>', $tournaments->post->post_title, $rundate->format('l jS F Y'), '');
+
+            endwhile;
+
+
+            echo '</table>';
+
+            wp_reset_postdata();
+
+            exit;
+
+        }
 
         if(isset($wp->query_vars['tournament'])){
 
