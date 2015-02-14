@@ -100,8 +100,6 @@ class PLTM_API_Endpoint{
         global $wp;
 
         if(isset($wp->query_vars['__hipchat']) && isset($wp->query_vars['tournaments'])){
-            
-            header('Content-Type: text/html');
 
             $tournaments = new WP_Query( [
                     'post_type' => tournamentCPT::$post_type,
@@ -111,22 +109,34 @@ class PLTM_API_Endpoint{
                 ]
             );
 
-            echo '<table>';
+            $html .= '<table>';
 
             while ( $tournaments->have_posts() ) : $tournaments->the_post();
 
                 $rundate = new DateTime( date("Y-m-d", strtotime(get_post_meta($tournaments->post->ID, 'run_date', true))), new DateTimeZone('UTC'));
 
-                printf('<tr><td>%s</td><td>%s</td><td>%s</td></tr>', $tournaments->post->post_title, $rundate->format('l jS F Y'), '');
+                $html .= sprintf('<tr><td>%s</td><td>%s</td><td>%s</td></tr>', $tournaments->post->post_title, $rundate->format('l jS F Y'), '');
 
             endwhile;
 
 
-            echo '</table>';
+            $html .= '</table>';
 
             wp_reset_postdata();
 
+            header('content-type: application/json; charset=utf-8');
+
+            echo json_encode([
+                "color"          => "green",
+                "message"        => $html,
+                "notify"         => false,
+                "message_format" => "html"
+            ]);
+
+
+
             exit;
+
 
         }
 
