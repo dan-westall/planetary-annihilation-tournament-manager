@@ -119,6 +119,31 @@ class tournamentSignup {
         return $this;
     }
 
+
+    public function join_team($team){
+
+        p2p_add_meta($this->getJoinId(), 'team_name', $team);
+
+    }
+
+    public function update_profile(){
+
+    }
+
+    public function set_clan($clan){
+
+        update_post_meta($this->getPlayerId(),'clan', $clan);
+
+        p2p_add_meta($this->getJoinId(), 'clan', $clan);
+
+    }
+
+    public function set_clan_contact(){
+
+        p2p_add_meta($this->getJoinId(), 'clan_contact', 1);
+
+    }
+
     public function is_existing_player($values){
 
         global $wpdb;
@@ -213,52 +238,53 @@ class tournamentSignup {
 
     }
 
-    public function join_tournament(){
+    public function join_tournament($player_id){
+
+        $this->setPlayerId($player_id);
 
         $tournament_id = $this->tournament_id;
 
-        $status                   = self::$tournament_player_status[0];
+        $tournament_player_status = tournamentCPT::$tournament_player_status;
         $tournament_slots         = get_post_meta($tournament_id, 'slots', true);
         $tournament_reserve_slots = get_post_meta($tournament_id, 'reserve_slots', true);
         $total_tournament_slots   = ($tournament_slots + $tournament_reserve_slots);
 
-        $tournament_player_status = tournamentCPT::$tournament_player_status;
-        $current_player_count     = tournamentCPT::get_tournament_player_count($tournament_id, [$tournament_player_status[0]]);
-
-
-
-        $connection_meta = array_merge($connection_meta, array(
-            'date'                     => current_time('mysql'),
-            'status'                   => $status
-        ));
-
-
-        //if therere are more players then slots reserve, any logic should have been done by this point
-        if($current_player_count >= $tournament_slots){
-
-            $status = $tournament_player_status[1];
-
-        }
-
-        $this->player_tournament_status = $status;
+        $current_player_count = tournamentCPT::get_tournament_player_count($tournament_id, [$tournament_player_status[0]]);
+        $status               = ($current_player_count >= $tournament_slots ? $tournament_player_status[1] : $tournament_player_status[0]);
 
 
         //player found add player to tornament
-        $p2p_result = p2p_type('tournament_players')->connect($tournament_id, $this->player_id, $connection_meta);
+        $p2p_result = p2p_type('tournament_players')->connect($tournament_id, $this->player_id, [
+            'date'   => current_time('mysql'),
+            'status' => $status
+        ]);
 
-        if(is_wp_error($p2p_result)){
+        if(is_wp_error($p2p_result))
             throw new Exception('Sorry there was a error, we could not enter you into this tournament.');
-        } else {
-            $this->setJoinId($p2p_result);
-        }
+
+
+        $this->setJoinId($p2p_result);
+
+        do_action( "tournament_signup_$status", [ 'player_id' => $this->player_id, 'tournament_id' => $tournament_id ] );
+        do_action( "tournament_signup", [ 'player_id' => $this->player_id, 'tournament_id' => $tournament_id ] );
 
         tournamentCPT::delete_tournament_caches($tournament_id);
 
     }
 
-    public function join_team(){
+    public function validate_signup(){
 
+        if(get_tournament_type($this->tournament_id) == 'teamarmies' && empty($_POST['team_name']))
+            throw new Exception('Team name is a required field.');
 
+        if(get_tournament_type($this->tournament_id) == 'clanwars' && empty($_POST['clan']))
+            throw new Exception('Clan name is a required field.');
+
+        if(empty($_POST['email']))
+            throw new Exception('Clan name is a required field.');
+
+        if(empty($_POST['ign']) || strlen($_POST['ign'] < 2))
+            throw new Exception('Clan name is a required field and must ne longer than 2');
 
     }
 
@@ -317,6 +343,8 @@ class tournamentSignup {
 
         try{
 
+            $signup->validate_signup();
+
             if(!self::is_tournament_signup_open($tournament_id))
                 throw new Exception('Tournament sign ups closed.');
 
@@ -353,16 +381,22 @@ class tournamentSignup {
                 throw new Exception('Sorry but you are excluded from this tournament.');
 
 
-            $signup->join_tournament()->join_team();
+            $signup->join_tournament($player_id);
 
-//            if($values['clan']['value'])
-//                $connection_meta['clan'] = $values['clan']['value'];
-//
-//            if(!empty($values['clan_contact']['value']))
-//                $connection_meta['clan_contact'] = $values['clan_contact']['value'];
-//
-//            if(!empty($values['team_name']['value']))
-//                $connection_meta['team_name'] = $values['team_name']['value'];
+
+            if(get_tournament_type($tournament_id) == 'teamarmies'){
+                $signup->join_team();
+            }
+
+
+            if(get_tournament_type($tournament_id) == 'clanwars'){
+
+            }
+
+
+//            $signup->join_tournament()->join_team()->update_proflie()->set_clan()->set_clan_contact();
+
+
 //
 //            //add player to current challonge tournament
 //            if($challonge_tournament_id){
@@ -376,15 +410,7 @@ class tournamentSignup {
 //
 //            $p2p_result = $this->action_add_player_to_tournament($player_id, $tournament_id, $connection_meta);
 //
-//            if ($p2p_result) {
 //
-//                //$this->player_tournament_status active or reserve
-//
-//                $action = "tournament_signup_$this->player_tournament_status";
-//
-//                do_action( $action, array( 'player_id' => $player_id, 'tournament_id' => $tournament_id ) );
-//
-//            }
 //
 //            //update details, clan tag ingame
 //
