@@ -10,25 +10,7 @@ class tournamentSignup {
     private $tournament_id;
     private $join_id;
     private $tournament_team_name;
-
-    /**
-     *
-     */
-    public static function register() {
-
-        $plugin = new self();
-
-        //add_action( 'p2p_init', [ $plugin, 'register_p2p_connections']);
-
-        add_action( 'wp_ajax_player_signup', [ $plugin, 'player_signup']);
-        add_action( 'wp_ajax_nopriv_player_signup',  [ $plugin, 'player_signup' ] );
-
-        //moved from tournament class
-        add_action( 'wp_ajax_tournament_withdraw',  [ $plugin, 'ajax_tournament_withdraw'] );
-        add_action( 'wp_ajax_tournament_reenter',  [ $plugin, 'ajax_tournament_reenter'] );
-
-    }
-
+    private $tournament_join_status;
 
     /**
      *
@@ -118,6 +100,43 @@ class tournamentSignup {
 
         return $this;
     }
+
+
+    /**
+     * @return mixed
+     */
+    public function getTournamentJoinStatus() {
+        return $this->tournament_join_status;
+    }
+
+    /**
+     * @param mixed $tournament_join_status
+     */
+    public function setTournamentJoinStatus($tournament_join_status) {
+        $this->tournament_join_status = $tournament_join_status;
+
+        return $this;
+    }
+
+    /**
+     *
+     */
+    public static function register() {
+
+        $plugin = new self();
+
+        //add_action( 'p2p_init', [ $plugin, 'register_p2p_connections']);
+
+        add_action( 'wp_ajax_player_signup', [ $plugin, 'player_signup']);
+        add_action( 'wp_ajax_nopriv_player_signup',  [ $plugin, 'player_signup' ] );
+
+        //moved from tournament class
+        add_action( 'wp_ajax_tournament_withdraw',  [ $plugin, 'ajax_tournament_withdraw'] );
+        add_action( 'wp_ajax_tournament_reenter',  [ $plugin, 'ajax_tournament_reenter'] );
+
+    }
+
+
 
 
     public function join_team($team){
@@ -252,11 +271,13 @@ class tournamentSignup {
         $current_player_count = tournamentCPT::get_tournament_player_count($tournament_id, [$tournament_player_status[0]]);
         $status               = ($current_player_count >= $tournament_slots ? $tournament_player_status[1] : $tournament_player_status[0]);
 
+        $this->setTournamentJoinStatus($status);
+
 
         //player found add player to tornament
         $p2p_result = p2p_type('tournament_players')->connect($tournament_id, $this->player_id, [
             'date'   => current_time('mysql'),
-            'status' => $status
+            'status' => $this->getTournamentJoinStatus()
         ]);
 
         if(is_wp_error($p2p_result))
@@ -266,19 +287,12 @@ class tournamentSignup {
         $this->setJoinId($p2p_result);
 
         do_action( "tournament_signup_$status", [ 'player_id' => $this->player_id, 'tournament_id' => $tournament_id ] );
-        do_action( "tournament_signup", [ 'player_id' => $this->player_id, 'tournament_id' => $tournament_id ] );
 
         tournamentCPT::delete_tournament_caches($tournament_id);
 
     }
 
-    public function validate_signup(){
-
-        if(get_tournament_type($this->tournament_id) == 'teamarmies' && empty($_POST['team_name']))
-            throw new Exception('Team name is a required field.');
-
-        if(get_tournament_type($this->tournament_id) == 'clanwars' && empty($_POST['clan']))
-            throw new Exception('Clan name is a required field.');
+    public function validate_signup_data(){
 
         if(empty($_POST['email']))
             throw new Exception('Clan name is a required field.');
@@ -286,9 +300,18 @@ class tournamentSignup {
         if(empty($_POST['ign']) || strlen($_POST['ign'] < 2))
             throw new Exception('Clan name is a required field and must ne longer than 2');
 
+        if(get_tournament_type($this->tournament_id) == 'teamarmies' && empty($_POST['team_name']))
+            throw new Exception('Team name is a required field.');
+
+        if(get_tournament_type($this->tournament_id) == 'clanwars' && empty($_POST['clan']))
+            throw new Exception('Clan name is a required field.');
+
     }
 
     public function challonge_add_player_to_tournament($challonge_tournament_id, $email, $ign){
+
+
+        $name = (get_tournament_type($tournament_id) == 'teamarmies' ? $values['team_name']['value'] : $values['ign']['value']);
 
         if(isset($connection_meta['challonge_result'])){
             update_post_meta($player_id, 'challonge_data', $connection_meta['challonge_result']);
@@ -329,6 +352,18 @@ class tournamentSignup {
         return $result;
     }
 
+    public function get_signup_message(){
+
+        //active
+        if($this->getTournamentJoinStatus() == tournamentCPT::$tournament_player_status[0])
+            return sprintf('Congratulations you have signuped to this tournament');
+
+        //active
+        if($this->getTournamentJoinStatus() == tournamentCPT::$tournament_player_status[1])
+            return sprintf('Unfortunately the tournament is full, but you\'ve been placed on the resevation list.');
+
+    }
+
     public static function player_signup(){
 
         check_ajax_referer('security-' . date('dmy'), 'security');
@@ -343,10 +378,10 @@ class tournamentSignup {
 
         try{
 
-            $signup->validate_signup();
+            $signup->validate_signup_data();
 
             if(!self::is_tournament_signup_open($tournament_id))
-                throw new Exception('Tournament sign ups closed.');
+                throw new Exception('Tournament sign ups are closed.');
 
             if(!is_user_logged_in() && $signup->is_existing_player($signup_data))
                 throw new Exception('Please login to sign up for this tournament');
@@ -384,40 +419,17 @@ class tournamentSignup {
             $signup->join_tournament($player_id);
 
 
-            if(get_tournament_type($tournament_id) == 'teamarmies'){
+            if(get_tournament_type($tournament_id) == 'teamarmies')
                 $signup->join_team();
-            }
-
 
             if(get_tournament_type($tournament_id) == 'clanwars'){
+                $signup->set_clan();
 
+                if(isset($signup_data['clan_contact']) && !empty($signup_data['clan_contact']))
+                    $signup->set_clan_contact();
             }
 
-
-//            $signup->join_tournament()->join_team()->update_proflie()->set_clan()->set_clan_contact();
-
-
-//
-//            //add player to current challonge tournament
-//            if($challonge_tournament_id){
-//
-//                $name = (get_tournament_type($tournament_id) == 'teamarmies' ? $values['team_name']['value'] : $values['ign']['value']);
-//
-//                $challonge_result = $this->challonge_add_player_to_tournament($challonge_tournament_id, $values['email']['value'], $name);
-//                $connection_meta = array_merge($connection_meta, ['challonge_tournament_id' => $challonge_tournament_id, 'challonge_result' => $challonge_result]);
-//
-//            }
-//
-//            $p2p_result = $this->action_add_player_to_tournament($player_id, $tournament_id, $connection_meta);
-//
-//
-//
-//            //update details, clan tag ingame
-//
-//            if(!empty($values['clan']['value']))
-//                update_post_meta($player_id, 'clan', $values['clan']['value']);
-
-
+            $signup->update_profile();
 
 
         } catch (Exception $e) {
@@ -427,6 +439,10 @@ class tournamentSignup {
             die();
 
         }
+
+        do_action( "tournament_signup", [ 'player_id' => $signup->getPlayerId(), 'tournament_id' => $signup->getTournamentId() ] );
+
+        wp_send_json_success(['message' => $signup->get_signup_message()]);
 
 
 
