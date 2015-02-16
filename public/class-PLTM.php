@@ -98,6 +98,7 @@ class Planetary_Annihilation_Tournament_Manager {
         tournament_in_progress::register();
         ruleCPT::register();
         awards::register();
+        tournamentSignup::register();
 //        acfCustomRules::register();
 
         remove_action( 'wp_head', 'wp_generator');

@@ -15,6 +15,7 @@ require_once( PLTM_PLUGIN_DIR.'/includes/class_gform_filters.php');
 require_once( PLTM_PLUGIN_DIR.'/includes/class-acf-rules.php');
 require_once( PLTM_PLUGIN_DIR.'/includes/class-awards.php');
 require_once( PLTM_PLUGIN_DIR.'/includes/class_shortcodes.php');
+require_once( PLTM_PLUGIN_DIR.'/includes/class-signup.php');
 
 
 //3rd party library

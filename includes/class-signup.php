@@ -127,18 +127,31 @@ class tournamentSignup {
 
         //add_action( 'p2p_init', [ $plugin, 'register_p2p_connections']);
 
-        add_action( 'wp_ajax_player_signup', [ $plugin, 'player_signup']);
+        add_action( 'wp_ajax_player_signup', [ $plugin, 'player_signup'] );
         add_action( 'wp_ajax_nopriv_player_signup',  [ $plugin, 'player_signup' ] );
 
         //moved from tournament class
         add_action( 'wp_ajax_tournament_withdraw',  [ $plugin, 'ajax_tournament_withdraw'] );
         add_action( 'wp_ajax_tournament_reenter',  [ $plugin, 'ajax_tournament_reenter'] );
 
-        add_shortcode( 'tournament_signup_form', 'tournament_signup_form' );
+        add_action( 'wp_enqueue_scripts',  [ $plugin, 'register_scripts'] );
+
+        add_shortcode( 'tournament_signup_form', [ $plugin,  'tournament_signup_form'] );
 
     }
 
+    public static function register_scripts(){
 
+        wp_register_script(
+            'signupForm',
+            PLTM_PLUGIN_URI. '/public/assets/js/patm.signup.min.js', //PLTM_PLUGIN_URI
+            ['defaults.main.min'],
+            '20120208',
+            true
+        );
+
+
+    }
 
 
     public function join_team($team){
@@ -382,7 +395,7 @@ class tournamentSignup {
 
             $signup->validate_signup_data();
 
-            if(!self::is_tournament_signup_open($tournament_id))
+            if(!$signup->is_tournament_signup_open($tournament_id))
                 throw new Exception('Tournament sign ups are closed.');
 
             if(!is_user_logged_in() && $signup->is_existing_player($signup_data))
@@ -542,94 +555,80 @@ class tournamentSignup {
             'tournament_id' => $post->ID
         ), $attr));
 
-            ?>
+        wp_enqueue_script('signupForm');
 
-            <script type="text/ng-template" id="signupform.html">
 
-                <form ng-controller="">
+        ?>
+
+        <script type="text/ng-template" id="signupform.html">
+
+            <form ng-controller="signupFormController as signupForm">
+
+                <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
+                    <label>In game Name</label>
+                    <input type="text" name="teamName" ng-teamName="signup.teamName" class="form-control" placeholder="Team name">
+                    <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
+                </div>
+
+                <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
+                    <label>Email Address</label>
+                    <input type="email" name="teamName" ng-teamName="signup.teamName" class="form-control" placeholder="Email Address">
+                    <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
+                </div>
+
+                <?php if(get_tournament_type($tournament_id) == 'teamarmies') : ?>
 
                     <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
-                        <label>In game Name</label>
+                        <label>Email</label>
+                        <input type="text" name="teamName" ng-teamName="signup.teamName" class="form-control" placeholder="Team name">
+                        <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
+                    </div>
+
+                <?php endif; ?>
+
+                <?php if(get_tournament_type($tournament_id) == 'clanwars') : ?>
+
+                    <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
+                        <label>Clan Name</label>
                         <input type="text" name="teamName" ng-teamName="signup.teamName" class="form-control" placeholder="Team name">
                         <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
                     </div>
 
                     <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
-                        <label>Email Address</label>
-                        <input type="email" name="teamName" ng-teamName="signup.teamName" class="form-control" placeholder="Email Address">
+                        <label>I am clan contact</label>
+                        <input type="text" name="teamName" ng-teamName="signup.teamName" class="form-control" placeholder="Team name">
+                        When dealing with clans its easier for everyone, if there is just one point of contact
                         <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
                     </div>
 
-                    <?php if(get_tournament_type($tournament_id) == 'teamarmies') : ?>
+                <?php endif; ?>
 
-                        <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
-                            <label>Email</label>
-                            <input type="text" name="teamName" ng-teamName="signup.teamName" class="form-control" placeholder="Team name">
-                            <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
-                        </div>
+                <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
+                    <label>Other Details</label>
+                    <textarea></textarea>
+                    <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
+                </div>
 
-                    <?php endif; ?>
-
-                    <?php if(get_tournament_type($tournament_id) == 'clanwars') : ?>
-
-                        <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
-                            <label>Clan Name</label>
-                            <input type="text" name="teamName" ng-teamName="signup.teamName" class="form-control" placeholder="Team name">
-                            <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
-                        </div>
-
-                        <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
-                            <label>I am clan contact</label>
-                            <input type="text" name="teamName" ng-teamName="signup.teamName" class="form-control" placeholder="Team name">
-                            When dealing with clans its easier for everyone, if there is just one point of contact
-                            <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
-                        </div>
-
-                    <?php endif; ?>
-
-                    <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
-                        <label>Other Details</label>
-                        <textarea></textarea>
-                        <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
-                    </div>
-
-                    <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
-                        <label>Future Communication</label>
-                        <input type="checkbox" name="" />
-                        I agree to receive emails from eXodus eSports regarding new products, services or upcoming events. Collected information will not be shared with any third party.
-                        <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
-                    </div>
+                <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
+                    <label>Future Communication</label>
+                    <input type="checkbox" name="" />
+                    I agree to receive emails from eXodus eSports regarding new products, services or upcoming events. Collected information will not be shared with any third party.
+                    <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
+                </div>
 
 
-                    <input type="submit" value="Sign up" />
+                <input type="submit" value="Join this tournament" class="custom-button" />
 
-                </form>
+            </form>
 
-            </script>
+        </script>
 
 
 
         <?php
 
-
-        return '<div ng-include=" \'templateId.html\' "></div>';
+        return '<div ng-include=" \'signupform.html\' "></div>';
         
     }
 
 }
-
-
-/*
- *
- *
- * //$signup = new tournamentSignup();
- *
- *
- *
- *
- *
- *
- *
- *
- *
- */

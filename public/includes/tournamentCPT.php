@@ -58,8 +58,8 @@ class tournamentCPT {
         add_action( 'pre_get_posts',   array( $this, 'pre_tournament_api_filter'));
 
         //moved to tournament signup class
-        add_action( 'wp_ajax_tournament_withdraw',  array( $this, 'ajax_tournament_withdraw') );
-        add_action( 'wp_ajax_tournament_reenter',  array( $this, 'ajax_tournament_reenter') );
+//        add_action( 'wp_ajax_tournament_withdraw',  array( $this, 'ajax_tournament_withdraw') );
+//        add_action( 'wp_ajax_tournament_reenter',  array( $this, 'ajax_tournament_reenter') );
 
         add_filter( 'tournament_prize_tiers', array( $this, 'get_tournament_prize_tiers') );
 
