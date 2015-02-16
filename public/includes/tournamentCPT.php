@@ -56,10 +56,7 @@ class tournamentCPT {
 
         add_action( 'parse_query',   array( $this, 'tournament_api_filter'));
         add_action( 'pre_get_posts',   array( $this, 'pre_tournament_api_filter'));
-
-        //moved to tournament signup class
-//        add_action( 'wp_ajax_tournament_withdraw',  array( $this, 'ajax_tournament_withdraw') );
-//        add_action( 'wp_ajax_tournament_reenter',  array( $this, 'ajax_tournament_reenter') );
+        
 
         add_filter( 'tournament_prize_tiers', array( $this, 'get_tournament_prize_tiers') );
 
@@ -1923,71 +1920,6 @@ class tournamentCPT {
         }
 
         return $fixtures;
-
-    }
-
-    public static function ajax_tournament_withdraw(){
-
-        check_ajax_referer('security-' . date('dmy'), 'security');
-
-        $tournament_id = $_POST['tournament_id'];
-        $player_id     = $_POST['player_id'];
-
-        //todo make sure tournament signup are open
-
-        $p2p_id = p2p_type( 'tournament_players' )->get_p2p_id( $tournament_id, $player_id );
-
-        if ( $p2p_id ) {
-
-            p2p_update_meta($p2p_id, 'status', self::$tournament_player_status[5]);
-
-            if (!empty($_POST['reason'])) {
-                p2p_update_meta($p2p_id, 'note', $_POST['reason']);
-            }
-
-            do_action('tournament_player_withdrawn', $tournament_id, $player_id );
-
-            echo json_encode(array('result' => true, 'message' => 'You have been removed from the tournament.'));
-
-            die();
-
-        } else {
-
-            echo json_encode(array('result' => false, 'message' => 'Player not in tournament.'));
-
-            die();
-
-        }
-    }
-
-    public static function ajax_tournament_reenter(){
-
-        check_ajax_referer('security-' . date('dmy'), 'security');
-
-        $tournament_id = $_POST['tournament_id'];
-        $player_id     = $_POST['player_id'];
-
-        //todo make sure tournament signup are open
-
-        $p2p_id = p2p_type( 'tournament_players' )->get_p2p_id( $tournament_id, $player_id );
-
-        if ( $p2p_id ) {
-
-            p2p_update_meta($p2p_id, 'status', self::$tournament_player_status[0]);
-
-            do_action('tournament_player_reentered', $tournament_id, $player_id );
-
-            echo json_encode(array('result' => true, 'message' => 'You have been re-entered into the tournament.'));
-
-            die();
-
-        } else {
-
-            echo json_encode(array('result' => false, 'message' => 'Player not in tournament.'));
-
-            die();
-
-        }
 
     }
 
