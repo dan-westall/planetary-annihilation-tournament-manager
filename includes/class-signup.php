@@ -134,6 +134,8 @@ class tournamentSignup {
         add_action( 'wp_ajax_tournament_withdraw',  [ $plugin, 'ajax_tournament_withdraw'] );
         add_action( 'wp_ajax_tournament_reenter',  [ $plugin, 'ajax_tournament_reenter'] );
 
+        add_shortcode( 'tournament_signup_form', 'tournament_signup_form' );
+
     }
 
 
@@ -415,9 +417,7 @@ class tournamentSignup {
             if($signup->is_excluded_player($player_id))
                 throw new Exception('Sorry but you are excluded from this tournament.');
 
-
             $signup->join_tournament($player_id);
-
 
             if(get_tournament_type($tournament_id) == 'teamarmies')
                 $signup->join_team();
@@ -531,6 +531,89 @@ class tournamentSignup {
 
         }
 
+    }
+
+    public static function tournament_signup_form($attr){
+
+        global $post;
+
+        extract(shortcode_atts(array(
+            'odd' => '',
+            'tournament_id' => $post->ID
+        ), $attr));
+
+            ?>
+
+            <script type="text/ng-template" id="signupform.html">
+
+                <form ng-controller="">
+
+                    <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
+                        <label>In game Name</label>
+                        <input type="text" name="teamName" ng-teamName="signup.teamName" class="form-control" placeholder="Team name">
+                        <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
+                    </div>
+
+                    <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
+                        <label>Email Address</label>
+                        <input type="email" name="teamName" ng-teamName="signup.teamName" class="form-control" placeholder="Email Address">
+                        <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
+                    </div>
+
+                    <?php if(get_tournament_type($tournament_id) == 'teamarmies') : ?>
+
+                        <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
+                            <label>Email</label>
+                            <input type="text" name="teamName" ng-teamName="signup.teamName" class="form-control" placeholder="Team name">
+                            <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
+                        </div>
+
+                    <?php endif; ?>
+
+                    <?php if(get_tournament_type($tournament_id) == 'clanwars') : ?>
+
+                        <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
+                            <label>Clan Name</label>
+                            <input type="text" name="teamName" ng-teamName="signup.teamName" class="form-control" placeholder="Team name">
+                            <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
+                        </div>
+
+                        <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
+                            <label>I am clan contact</label>
+                            <input type="text" name="teamName" ng-teamName="signup.teamName" class="form-control" placeholder="Team name">
+                            When dealing with clans its easier for everyone, if there is just one point of contact
+                            <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
+                        </div>
+
+                    <?php endif; ?>
+
+                    <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
+                        <label>Other Details</label>
+                        <textarea></textarea>
+                        <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
+                    </div>
+
+                    <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
+                        <label>Future Communication</label>
+                        <input type="checkbox" name="" />
+                        I agree to receive emails from eXodus eSports regarding new products, services or upcoming events. Collected information will not be shared with any third party.
+                        <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
+                    </div>
+
+
+                    <input type="submit" value="Sign up" />
+
+                </form>
+
+            </script>
+
+
+
+        <?php
+
+
+        return '<div ng-include=" \'templateId.html\' "></div>';
+        
     }
 
 }
