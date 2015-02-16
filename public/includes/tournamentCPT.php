@@ -24,7 +24,6 @@ class tournamentCPT {
         add_action( 'p2p_init', array( $this, 'register_p2p_connections' ) );
         add_action( 'p2p_created_connection', array( $this, 'action_p2p_new_connection' ) );
         add_action( 'p2p_delete_connections', array( $this, 'action_p2p_delete_connection' ) );
-        add_filter( 'p2p_connectable_args', array( $this, 'filter_p2p_tournament_player_requirements' ) );
         add_action( 'p2p_tournament_matches_args',   array( $this, 'p2p_tournament_match_fields'));
 
         add_action( 'gform_after_submission', array( $this, 'signup_tournament_player'), 10, 2);
@@ -56,7 +55,7 @@ class tournamentCPT {
 
         add_action( 'parse_query',   array( $this, 'tournament_api_filter'));
         add_action( 'pre_get_posts',   array( $this, 'pre_tournament_api_filter'));
-        
+
 
         add_filter( 'tournament_prize_tiers', array( $this, 'get_tournament_prize_tiers') );
 
@@ -790,28 +789,6 @@ class tournamentCPT {
         $field['choices'] = $form_listing;
 
         return $field;
-
-    }
-
-    public function filter_p2p_tournament_player_requirements($args){
-
-//        switch($_POST['p2p_type']){
-//
-//            case "tournament_players" :
-//
-//                //player profiles must have emails for challonge intergration
-//                $args['meta_query'] = array(
-//                    array(
-//                        'key' => 'player_email',
-//                        'compare' => 'EXISTS'
-//                    )
-//                );
-//
-//                break;
-//
-//        }
-
-        return $args;
 
     }
 
