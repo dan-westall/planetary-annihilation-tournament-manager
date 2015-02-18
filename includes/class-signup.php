@@ -548,7 +548,7 @@ class tournamentSignup {
 
     public static function tournament_signup_form($attr){
 
-        global $post;
+        global $post, $current_user;
 
         extract(shortcode_atts(array(
             'odd' => '',
@@ -557,30 +557,56 @@ class tournamentSignup {
 
         wp_enqueue_script('signupForm');
 
+        //prefills
+        $ign = $clan ='';
+
+        if(is_user_logged_in()){
+
+            get_currentuserinfo();
+
+            $user_player_profile = get_post( $current_user->player_id );
+
+            $ign   = $user_player_profile->post_title;
+            $email = $current_user->user_email;
+            $clan  = get_post_meta($user_player_profile->ID, 'clan', true);
+
+        }
+
+
 
         ?>
 
         <script type="text/ng-template" id="signupform.html">
 
-            <form ng-controller="signupFormController as signupForm">
+
+
+            <form ng-controller="signupFormController as signupForm" name="signupForm" ng-submit="signupForm.submit(signup.$valid, signupData)" novalidate>
+
+                <div ng-messages="signupForm.colorCode.$error" ng-if="signupForm.$submitted || signupForm.colorCode.$touched">
+                    <div ng-message="required">...</div>
+                    <div ng-message="minlength">...</div>
+                    <div ng-message="pattern">...</div>
+                </div>
 
                 <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
                     <label>In game Name</label>
-                    <input type="text" name="teamName" ng-teamName="signup.teamName" class="form-control" placeholder="Team name">
+                    <input type="text" name="teamName" ng-model="signupData.inGameName" class="form-control" placeholder="In game name" value="<?php echo $ign; ?>">
                     <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
+                    <div class="description">Please ensure this matches exactly, including the type of brackets used. You will be able to modify this later if it changes.</div>
                 </div>
 
                 <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
                     <label>Email Address</label>
-                    <input type="email" name="teamName" ng-teamName="signup.teamName" class="form-control" placeholder="Email Address">
+                    <input type="email" name="teamName" ng-model="signupData.email" class="form-control" placeholder="Email Address" value="<?php echo $email; ?>">
                     <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
+                    <div class="description">This e-mail address will be used solely by eXodus, it will not be passed to any third parties. Please ensure this is a monitored e-mail address as we will use it to communicate with you.</div>
                 </div>
 
                 <?php if(get_tournament_type($tournament_id) == 'teamarmies') : ?>
 
                     <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
-                        <label>Email</label>
-                        <input type="text" name="teamName" ng-teamName="signup.teamName" class="form-control" placeholder="Team name">
+                        <label>Team Name</label>
+                        <input type="text" name="teamName" ng-model="signupData.teamName" class="form-control" placeholder="Team name">
                         <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
                     </div>
 
@@ -590,13 +616,13 @@ class tournamentSignup {
 
                     <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
                         <label>Clan Name</label>
-                        <input type="text" name="teamName" ng-teamName="signup.teamName" class="form-control" placeholder="Team name">
+                        <input type="text" name="teamName" ng-model="signupData.teamName" class="form-control" placeholder="Clan name" value="<?php echo $clan; ?>">
                         <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
                     </div>
 
                     <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
-                        <label>I am clan contact</label>
-                        <input type="text" name="teamName" ng-teamName="signup.teamName" class="form-control" placeholder="Team name">
+                        <label>I am clan contact</label><br />
+                        <input type="text" name="teamName" ng-model="signupData.teamName" class="form-control" placeholder="Team name">
                         When dealing with clans its easier for everyone, if there is just one point of contact
                         <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
                     </div>
@@ -604,20 +630,28 @@ class tournamentSignup {
                 <?php endif; ?>
 
                 <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
-                    <label>Other Details</label>
-                    <textarea></textarea>
+                    <label>Is there anything else we need to know?</label>
+                    <textarea ng-model="signupData.otherDetails"></textarea>
                     <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
                 </div>
 
                 <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
-                    <label>Future Communication</label>
-                    <input type="checkbox" name="" />
-                    I agree to receive emails from eXodus eSports regarding new products, services or upcoming events. Collected information will not be shared with any third party.
+                    <label>Future Communication</label><br />
+                    <div class="custom-checkbox-style">
+                        <input type="checkbox" value="None" id="squaredOne" name="check"  ng-model="signupData.communication"/>
+                        <label for="squaredOne"></label>
+                    </div>
+                    <label for="squaredOne" class="description">I agree to receive emails from eXodus eSports regarding new products, services or upcoming events. Collected information will not be shared with any third party.</label>
+
                     <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
                 </div>
 
 
-                <input type="submit" value="Join this tournament" class="custom-button" />
+
+                <input type="submit" value="Join this tournament" class="tournament-btn __signup" />
+<br />
+
+                <pre>{{signupData | json}}</pre>
 
             </form>
 

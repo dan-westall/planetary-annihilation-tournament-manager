@@ -7,21 +7,17 @@ signupForm.constant('wordpressJS', js);
 signupForm.controller('signupFormController', [ '$scope', '$http', 'wordpressJS',
     function($scope, $http, wordpressJS) {
 
-        $scope.order = {};
-        $scope.packages = {};
-        $scope.services = {};
-        $scope.ordered = false;
+        $scope.signupData = {};
         $scope.message = '';
-        $scope.selected = '';
-
-
-        $scope.processSignup = function () {
+        $scope.submit = function () {
             $http({
                 method: 'POST',
                 url: wordpressJS.ajaxurl,
                 data: $.param({
-                    action: 'place_order',
-                    security: wordpressJS.security
+                    action: 'player_signup',
+                    security: wordpressJS.security,
+                    tournament_id: wordpressJS.post_id,
+                    user_id: wordpressJS.user_id
                 }),  // pass in data as strings
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
             })
@@ -41,3 +37,15 @@ signupForm.controller('signupFormController', [ '$scope', '$http', 'wordpressJS'
 
     }
 ]);
+signupForm.directive('input', function ($parse) {
+    return {
+        restrict: 'E',
+        require: '?ngModel',
+        link: function (scope, element, attrs) {
+            if (attrs.ngModel && attrs.value) {
+                $parse(attrs.ngModel).assign(scope, attrs.value);
+            }
+        }
+    };
+});
+
