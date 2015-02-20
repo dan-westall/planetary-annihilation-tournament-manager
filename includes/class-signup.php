@@ -408,7 +408,7 @@ class tournamentSignup {
             $t = $signup->validate_signup_data()->get_error_messages();
 
             if(count( $signup->validate_signup_data()->get_error_messages() ) )
-                wp_send_json_error(['message' => $signup->validate_signup_data()->get_error_messages() ]);
+                wp_send_json_error(['message' => $signup->validate_signup_data()->get_error_messages() , 'type' => 'validation']);
 
             if(!$signup->is_tournament_signup_open($tournament_id))
                 throw new Exception('Tournament sign ups are closed.');
@@ -469,8 +469,6 @@ class tournamentSignup {
         do_action( "tournament_signup", [ 'player_id' => $signup->getPlayerId(), 'tournament_id' => $signup->getTournamentId() ] );
 
         wp_send_json_success(['message' => $signup->get_signup_message()]);
-
-
 
     }
 
