@@ -196,27 +196,32 @@ class tournamentSignup {
             )
         );
 
+        if(isset($player->player_id))
+            return $player->player_id;
         //do name check
-        if(!isset($player->player_id)){
-
-            $player = $wpdb->get_row(
-                $wpdb->prepare(
-                    "
-                    SELECT
-                        user_email,
-                        post.ID,
-                        (SELECT meta_value FROM wp_postmeta  WHERE post_id = post.ID AND meta_key = 'user_id') AS user_id
-                          FROM wp_posts AS post
-                            LEFT JOIN wp_users AS user ON user.ID = (SELECT meta_value FROM wp_postmeta  WHERE post_id = post.ID AND meta_key = 'user_id')
-                              WHERE post_title = '%s'
-                                AND user_email != ''
-                    ",
-                    $values['ign']
-                )
-            );
 
 
-        }
+        $player = $wpdb->get_row(
+            $wpdb->prepare(
+                "
+                SELECT
+                    user_email,
+                    post.ID,
+                    (SELECT meta_value FROM wp_postmeta  WHERE post_id = post.ID AND meta_key = 'user_id') AS user_id
+                      FROM wp_posts AS post
+                        LEFT JOIN wp_users AS user ON user.ID = (SELECT meta_value FROM wp_postmeta  WHERE post_id = post.ID AND meta_key = 'user_id')
+                          WHERE post_title = '%s'
+                            AND user_email != ''
+                ",
+                $values['ign']
+            )
+        );
+
+        if(isset($player->player_id))
+            return $player->player_id;
+
+
+
 
         return false;
 
@@ -309,17 +314,24 @@ class tournamentSignup {
 
     public function validate_signup_data(){
 
-        if(empty($_POST['email']))
-            throw new Exception('Clan name is a required field.');
+        $error = new WP_Error();
 
-        if(empty($_POST['ign']) || strlen($_POST['ign'] < 2))
-            throw new Exception('Clan name is a required field and must ne longer than 2');
+        $er = empty($_POST['signup_data']['email']);
+        $er1 = array_key_exists('email', $_POST['signup_data']);
 
-        if(get_tournament_type($this->tournament_id) == 'teamarmies' && empty($_POST['team_name']))
-            throw new Exception('Team name is a required field.');
+        if(empty($_POST['signup_data']['email']) && !array_key_exists('email', $_POST['signup_data']))
+            $error->add('validation', 'Email is a required field.');
 
-        if(get_tournament_type($this->tournament_id) == 'clanwars' && empty($_POST['clan']))
-            throw new Exception('Clan name is a required field.');
+        if(empty($_POST['signup_data']['inGameName']) && !array_key_exists('inGameName', $_POST['signup_data']) &&  strlen($_POST['inGameName'] < 2))
+            $error->add('validation', 'In game name is a required field and must ne longer than 2');
+
+        if(get_tournament_type($this->tournament_id) == 'teamarmies' && !empty($_POST['signup_data']['teamName']) && !array_key_exists('teamName', $_POST['signup_data']))
+            $error->add('validation', 'Team name is a required field.');
+
+        if(get_tournament_type($this->tournament_id) == 'clanwars' && !empty($_POST['signup_data']['clan']) && !array_key_exists('clan', $_POST['signup_data']))
+            $error->add('validation', 'Clan name is a required field.');
+
+        return $error;
 
     }
 
@@ -393,7 +405,10 @@ class tournamentSignup {
 
         try{
 
-            $signup->validate_signup_data();
+            $t = $signup->validate_signup_data()->get_error_messages();
+
+            if(count( $signup->validate_signup_data()->get_error_messages() ) )
+                wp_send_json_error(['message' => $signup->validate_signup_data()->get_error_messages() ]);
 
             if(!$signup->is_tournament_signup_open($tournament_id))
                 throw new Exception('Tournament sign ups are closed.');
@@ -405,7 +420,7 @@ class tournamentSignup {
             //ok this is not an existing player we need to make an account!, call to playerCPT
             if(false === ( $player_id = $signup->is_existing_player($signup_data) )){
 
-                if(false === (  $user = get_user_by( 'email', $signup['email'] ) )){
+                if(false === (  $user = get_user_by( 'email', $signup_data['email'] ) )){
                     $user =  $signup->new_user($signup_data);
 
                     if (!is_object($user))
@@ -449,8 +464,6 @@ class tournamentSignup {
 
             wp_send_json_error(['message' => $e->getMessage()]);
 
-            die();
-
         }
 
         do_action( "tournament_signup", [ 'player_id' => $signup->getPlayerId(), 'tournament_id' => $signup->getTournamentId() ] );
@@ -467,7 +480,7 @@ class tournamentSignup {
         $password = wp_generate_password();
 
         $userdata = array(
-            'user_login' => $values['ign'],
+            'user_login' => $values['inGameName'],
             'user_email' => $values['email'],
             'user_pass'  => $password
         );
@@ -575,30 +588,34 @@ class tournamentSignup {
 
 
         ?>
+        <script type="text/ng-template" id="error-messages">
+            <div ng-message="required">You left the field blank</div>
+            <div ng-message="minlength">Your field is too short</div>
+            <div ng-message="maxlength">Your field is too long</div>
+            <div ng-message="email">Your email address invalid</div>
+        </script>
 
         <script type="text/ng-template" id="signupform.html">
 
+            <form ng-controller="signupFormController as signupForm" name="playerSignupForm" ng-submit="submitted = true; signupForm.submitSignup( signupData, playerSignupForm.$valid )" novalidate>
 
+                <div ng-show="message" class="message" ng-class="{ '__error': message.type == 'error', '__validation': message.type == 'validation' }">{{message}}</div>
 
-            <form ng-controller="signupFormController as signupForm" name="signupForm" ng-submit="signupForm.submit(signup.$valid, signupData)" novalidate>
-
-                <div ng-messages="signupForm.colorCode.$error" ng-if="signupForm.$submitted || signupForm.colorCode.$touched">
-                    <div ng-message="required">...</div>
-                    <div ng-message="minlength">...</div>
-                    <div ng-message="pattern">...</div>
-                </div>
-
-                <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
+                <div id="in-game-name" class="form-group" ng-class="{ 'has-error' : inGameName }">
                     <label>In game Name</label>
-                    <input type="text" name="teamName" ng-model="signupData.inGameName" class="form-control" placeholder="In game name" value="<?php echo $ign; ?>">
-                    <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
+                    <input type="text" name="inGameName" ng-model="signupData.inGameName" class="form-control" placeholder="In game name" value="<?php echo $ign; ?>" ng-minlength="2" required>
+                    <div class="ng-message" ng-class="{'__highlight': submitted == true}" ng-messages="playerSignupForm.inGameName.$error" ng-messages-include="error-messages" ng-if="submitted || playerSignupForm.inGameName.$touched">
+                        <div ng-message="required">You left your in game name blank.</div>
+                    </div>
                     <div class="description">Please ensure this matches exactly, including the type of brackets used. You will be able to modify this later if it changes.</div>
                 </div>
 
-                <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
+                <div id="email" class="form-group" ng-class="{ 'has-error' : email }">
                     <label>Email Address</label>
-                    <input type="email" name="teamName" ng-model="signupData.email" class="form-control" placeholder="Email Address" value="<?php echo $email; ?>">
-                    <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
+                    <input type="email" name="email" ng-model="signupData.email" class="form-control" placeholder="Email Address" value="<?php echo $email; ?>" required>
+                    <div class="ng-message" ng-class="{'__highlight': submitted == true}" ng-messages="playerSignupForm.email.$error" ng-messages-include="error-messages" ng-if="submitted || playerSignupForm.email.$touched">
+                        <div ng-message="required">You left your email blank.</div>
+                    </div>
                     <div class="description">This e-mail address will be used solely by eXodus, it will not be passed to any third parties. Please ensure this is a monitored e-mail address as we will use it to communicate with you.</div>
                 </div>
 
@@ -606,49 +623,46 @@ class tournamentSignup {
 
                     <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
                         <label>Team Name</label>
-                        <input type="text" name="teamName" ng-model="signupData.teamName" class="form-control" placeholder="Team name">
-                        <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
+                        <input type="text" name="teamName" ng-model="signupData.teamName" class="form-control" placeholder="Team name" required>
+                        <div class="ng-message" ng-class="{'__highlight': submitted == true}" ng-messages="playerSignupForm.teamName.$error" ng-messages-include="error-messages" ng-if="submitted || playerSignupForm.teamName.$touched"></div>
                     </div>
 
                 <?php endif; ?>
 
                 <?php if(get_tournament_type($tournament_id) == 'clanwars') : ?>
 
-                    <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
+                    <div id="clan-name" class="form-group" ng-class="{ 'has-error' : clanName }">
                         <label>Clan Name</label>
-                        <input type="text" name="teamName" ng-model="signupData.teamName" class="form-control" placeholder="Clan name" value="<?php echo $clan; ?>">
-                        <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
+                        <input type="text" name="teamName" ng-model="signupData.clanName" class="form-control" placeholder="Clan name" value="<?php echo $clan; ?>" required>
+                        <div class="ng-message" ng-class="{'__highlight': submitted == true}" ng-messages="playerSignupForm.clanName.$error" ng-messages-include="error-messages" ng-if="submitted || playerSignupForm.clanName.$touched"></div>
                     </div>
 
-                    <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
+                    <div id="clan-contact" class="form-group" ng-class="{ 'has-error' : clanContact }">
                         <label>I am clan contact</label><br />
-                        <input type="text" name="teamName" ng-model="signupData.teamName" class="form-control" placeholder="Team name">
-                        When dealing with clans its easier for everyone, if there is just one point of contact
-                        <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
+                        <div class="custom-checkbox-style">
+                            <input type="checkbox" value="None" id="clan-contact" name="clanContact"  ng-model="signupData.clanContact"/>
+                            <label for="clan-contact"></label>
+                        </div>
+                        <label for="communication" class="description">When dealing with clans its easier for everyone, if there is just one point of contact</label>
                     </div>
 
                 <?php endif; ?>
 
-                <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
+                <div id="team-name" class="form-group">
                     <label>Is there anything else we need to know?</label>
                     <textarea ng-model="signupData.otherDetails"></textarea>
-                    <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
                 </div>
 
-                <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
+                <div id="team-name" class="form-group">
                     <label>Future Communication</label><br />
                     <div class="custom-checkbox-style">
-                        <input type="checkbox" value="None" id="squaredOne" name="check"  ng-model="signupData.communication"/>
-                        <label for="squaredOne"></label>
+                        <input type="checkbox" value="None" id="communication" name="check"  ng-model="signupData.communication"/>
+                        <label for="communication"></label>
                     </div>
-                    <label for="squaredOne" class="description">I agree to receive emails from eXodus eSports regarding new products, services or upcoming events. Collected information will not be shared with any third party.</label>
-
-                    <span class="help-block" ng-show="errorEmail">{{ teamName }}</span>
+                    <label for="communication" class="description" ng-class="{ 'happy': signupData.communication }">I agree to receive emails from eXodus eSports regarding new products, services or upcoming events. Collected information will not be shared with any third party.<span></span></label>
                 </div>
 
-
-
-                <input type="submit" value="Join this tournament" class="tournament-btn __signup" />
+                <input type="submit" value="Join this tournament" class="tournament-btn __signup"/>
 <br />
 
                 <pre>{{signupData | json}}</pre>
@@ -656,8 +670,6 @@ class tournamentSignup {
             </form>
 
         </script>
-
-
 
         <?php
 
