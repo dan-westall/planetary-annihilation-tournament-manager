@@ -188,7 +188,7 @@ class tournamentSignup {
                 SELECT
                   user_email,
                   ID AS user_id,
-                  (SELECT meta_value FROM wp_usermeta  WHERE user_id = user.ID AND meta_key = 'player_id') AS player_id
+                  (SELECT meta_value FROM $wpdb->usermeta  WHERE user_id = user.ID AND meta_key = 'player_id') AS player_id
                     FROM $wpdb->users AS user
                       WHERE user_email = %s
                 ",
@@ -207,9 +207,9 @@ class tournamentSignup {
                 SELECT
                     user_email,
                     post.ID,
-                    (SELECT meta_value FROM wp_postmeta  WHERE post_id = post.ID AND meta_key = 'user_id') AS user_id
-                      FROM wp_posts AS post
-                        LEFT JOIN wp_users AS user ON user.ID = (SELECT meta_value FROM wp_postmeta  WHERE post_id = post.ID AND meta_key = 'user_id')
+                    (SELECT meta_value FROM $wpdb->postmeta  WHERE post_id = post.ID AND meta_key = 'user_id') AS user_id
+                      FROM $wpdb->posts AS post
+                        LEFT JOIN $wpdb->users AS user ON user.ID = (SELECT meta_value FROM $wpdb->postmeta  WHERE post_id = post.ID AND meta_key = 'user_id')
                           WHERE post_title = '%s'
                             AND user_email != ''
                 ",
@@ -236,7 +236,7 @@ class tournamentSignup {
                 "
                 SELECT
                 user_email
-                    FROM $wpdb->users AS user WHERE user.ID IN ( SELECT ( SELECT meta_value FROM $wpdb->postmeta WHERE post_id = p2p_to AND meta_key = 'user_id') FROM wp_p2p  WHERE p2p_type = 'tournament_excluded_players' AND p2p_from = %s)
+                    FROM $wpdb->users AS user WHERE user.ID IN ( SELECT ( SELECT meta_value FROM $wpdb->postmeta WHERE post_id = p2p_to AND meta_key = 'user_id') FROM {$wpdb->prefix}p2p  WHERE p2p_type = 'tournament_excluded_players' AND p2p_from = %s)
                 ",
                 $this->tournament_id
             )
@@ -320,18 +320,18 @@ class tournamentSignup {
         $er1 = array_key_exists('email', $_POST['signup_data']);
 
         if(empty($_POST['signup_data']['email']) && !array_key_exists('email', $_POST['signup_data']))
-            $error->add('validation', 'Email is a required field.');
+            return new WP_Error( 'validation', __( "Plesse make sure all fields have been filled in.", "wp_tournament_manager" ) );
 
         if(empty($_POST['signup_data']['inGameName']) && !array_key_exists('inGameName', $_POST['signup_data']) &&  strlen($_POST['inGameName'] < 2))
-            $error->add('validation', 'In game name is a required field and must ne longer than 2');
+            return new WP_Error( 'validation', __( "Plesse make sure all fields have been filled in.", "wp_tournament_manager" ) );
 
         if(get_tournament_type($this->tournament_id) == 'teamarmies' && !empty($_POST['signup_data']['teamName']) && !array_key_exists('teamName', $_POST['signup_data']))
-            $error->add('validation', 'Team name is a required field.');
+            return new WP_Error( 'validation', __( "Plesse make sure all fields have been filled in.", "wp_tournament_manager" ) );
 
         if(get_tournament_type($this->tournament_id) == 'clanwars' && !empty($_POST['signup_data']['clan']) && !array_key_exists('clan', $_POST['signup_data']))
-            $error->add('validation', 'Clan name is a required field.');
+            return new WP_Error( 'validation', __( "Plesse make sure all fields have been filled in.", "wp_tournament_manager" ) );
 
-        return $error;
+        return true;
 
     }
 
@@ -403,12 +403,10 @@ class tournamentSignup {
         $signup = new tournamentSignup();
         $signup->setTournamentId($tournament_id);
 
+        if( is_wp_error( $signup->validate_signup_data() ) )
+            wp_send_json_error(['message' => $signup->validate_signup_data()->get_error_message() , 'type' => 'validation']);
+
         try{
-
-            $t = $signup->validate_signup_data()->get_error_messages();
-
-            if(count( $signup->validate_signup_data()->get_error_messages() ) )
-                wp_send_json_error(['message' => $signup->validate_signup_data()->get_error_messages() , 'type' => 'validation']);
 
             if(!$signup->is_tournament_signup_open($tournament_id))
                 throw new Exception('Tournament sign ups are closed.');
