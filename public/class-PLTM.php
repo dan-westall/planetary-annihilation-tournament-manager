@@ -69,6 +69,8 @@ class Planetary_Annihilation_Tournament_Manager {
 	 */
 	private function __construct() {
 
+        $is_live = false;
+
         require_once (dirname (__FILE__) . '/../bootstrap.php');
 
         // Load plugin text domain
@@ -96,7 +98,7 @@ class Planetary_Annihilation_Tournament_Manager {
 
         userPolling::register();
         tournament_in_progress::register();
-        ruleCPT::register();
+//        ruleCPT::register();
         awards::register();
         tournamentSignup::register();
 //        acfCustomRules::register();
