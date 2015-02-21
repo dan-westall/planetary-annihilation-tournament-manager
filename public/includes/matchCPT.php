@@ -687,7 +687,7 @@ class matchCPT {
     public function edit_posts_fields($statment_fields, $query){
         global $wpdb;
 
-        if($query->query_vars['orderby'] == 'tournament_date'){
+        if(isset($query->query_vars['orderby']) && $query->query_vars['orderby'] == 'tournament_date'){
 
             if(in_array(matchCPT::$post_type, $query->query_vars['post_type']) && empty($query->query_vars['fields'])){
 
@@ -711,7 +711,7 @@ class matchCPT {
 
     public function order_matches_by_tournament_date($orderby_statement, $query) {
 
-        if($query->query_vars['orderby'] == 'tournament_date'){
+        if(isset($query->query_vars['orderby']) && $query->query_vars['orderby'] == 'tournament_date'){
 
             if(in_array(tournamentCPT::$post_type, $query->query_vars['post_type'])){
 

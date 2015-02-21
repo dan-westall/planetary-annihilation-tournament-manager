@@ -398,7 +398,7 @@ class playerCPT {
 
             $player_profile_id = self::get_user_player_profile_id($current_user->ID);
 
-            if ($_GET['post'] == $player_profile_id) {
+            if (isset($_GET['post']) && $_GET['post'] == $player_profile_id) {
 
                 $labels = & $wp_post_types[playerCPT::$post_type]->labels;
 
