@@ -56,7 +56,7 @@ class matchCPT {
 
         //
 
-        if((get_post_type($_GET['post']) == matchCPT::$post_type || get_post_type($_REQUEST['post_ID']) == matchCPT::$post_type || get_post_type($_POST['from']) == matchCPT::$post_type) && $args['name'] == 'player_vote'){
+        if(( ( isset($_GET['post']) && get_post_type($_GET['post']) == matchCPT::$post_type ) || ( isset($_GET['post_ID']) && get_post_type($_REQUEST['post_ID']) == matchCPT::$post_type ) || ( isset($_GET['post_ID']) && get_post_type($_POST['from']) == matchCPT::$post_type ) ) && $args['name'] == 'player_vote'){
 
             $args['fields']['team'] = [
                 'title' => 'Team',

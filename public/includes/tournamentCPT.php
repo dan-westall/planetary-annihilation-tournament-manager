@@ -186,7 +186,15 @@ class tournamentCPT {
 
         global $post;
 
-        $object_id = (isset($_REQUEST['post_ID']) ? $_REQUEST['post_ID'] : $_GET['post']);
+        $object_id = 0;
+
+        if(isset($_REQUEST['post_ID'])){
+            $object_id = $_REQUEST['post_ID'];
+        } else if( isset($_GET['post']) ){
+            $object_id = $_GET['post'];
+        }
+
+
         $post_type = get_post_type($object_id);
 
 
@@ -241,7 +249,7 @@ class tournamentCPT {
             )
         );
 
-        if(get_tournament_type($_GET['post']) == 'clanwars' || get_tournament_type($_REQUEST['post_ID']) == 'clanwars'){
+        if( get_tournament_type($object_id) == 'clanwars' || get_tournament_type($object_id) == 'clanwars'){
 
             $tournament_players_args = array_merge_recursive($tournament_players_args, [ 'fields' => [
                 'clan_contact' => array(
@@ -252,7 +260,7 @@ class tournamentCPT {
 
         }
 
-        if(get_tournament_type($_GET['post']) == 'teamarmies' || get_tournament_type($_REQUEST['post_ID']) == 'teamarmies'){
+        if(get_tournament_type($object_id) == 'teamarmies' || get_tournament_type($object_id) == 'teamarmies'){
 
             $tournament_players_args = array_merge_recursive($tournament_players_args, [ 'fields' => [
                 'team_name' => array(
@@ -271,7 +279,7 @@ class tournamentCPT {
             'result' => array(
                 'title'  => 'Result',
                 'type'   => 'select',
-                'values' => apply_filters('tournament_prize_tiers', (isset($_GET['post']) ? $_GET['post'] : $_REQUEST['post_ID']))
+                'values' => apply_filters('tournament_prize_tiers', $object_id)
             )
         ]]);
 
@@ -302,7 +310,7 @@ class tournamentCPT {
         ];
 
 
-        if(get_tournament_type($_GET['post']) == 'clanwars' || get_tournament_type($_REQUEST['post_ID']) == 'clanwars' || count(self::tournament_fixtures()) > 0){
+        if(get_tournament_type($object_id) == 'clanwars' || get_tournament_type($object_id) == 'clanwars' || count(self::tournament_fixtures()) > 0){
 
             $tournament_matches_args = array_merge_recursive($tournament_matches_args, [ 'fields' => [
                     'match_fixture' => [
@@ -1876,7 +1884,12 @@ class tournamentCPT {
         global $post;
 
         $fixtures = [];
-        $tournament_id = ( isset($_GET['post']) ? $_GET['post'] : $_POST['post_ID'] );
+
+        if( isset($_GET['post']) ){
+            $tournament_id = $_GET['post'];
+        } else if(isset($_POST['post_ID'])){
+            $tournament_id = $_POST['post_ID'];
+        }
 
         if(!function_exists('have_Rows'))
             return false;
