@@ -4,6 +4,7 @@ namespace MyApp;
 use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\WampServerInterface;
 
+$is_live = true;
 
 require_once __DIR__ .'/../../../includes/class-tournament-in-progress.php';
 
