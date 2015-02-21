@@ -2015,11 +2015,11 @@ class tournamentCPT {
 
         $query = "SELECT
                   COUNT($wpdb->posts.ID) as total_players
-                    FROM $wpdb->p2p
+                    FROM {$wpdb->prefix}p2p
                         LEFT JOIN $wpdb->posts ON p2p_to = $wpdb->posts.ID
                             WHERE p2p_from = %s && p2p_type = 'tournament_players'
-                            AND (SELECT meta_value FROM $wpdb->p2pmeta WHERE $wpdb->p2pmeta.meta_key = 'status'
-                            AND $wpdb->p2pmeta.p2p_id = $wpdb->p2p.p2p_id) IN ('".implode("', '", $status)."')";
+                            AND (SELECT meta_value FROM {$wpdb->prefix}p2pmeta WHERE {$wpdb->prefix}p2pmeta.meta_key = 'status'
+                            AND {$wpdb->prefix}p2pmeta.p2p_id = {$wpdb->prefix}p2p.p2p_id) IN ('".implode("', '", $status)."')";
 
         $player_count_query = $wpdb->prepare($query,
             $tournament_id
