@@ -361,6 +361,9 @@ class tournamentSignup {
         $participant = (array) $c->createParticipant($challonge_tournament_id, $params);
 
         if($participant['active']){
+
+            p2p_add_meta($connection_id, 'challonge_participant_id', $participant['id']);
+
             return $participant;
         }
 
@@ -368,17 +371,24 @@ class tournamentSignup {
 
     }
 
-    public static function challonge_remove_player_from_tournament($challonge_tournament_id, $challonge_participant_id){
+    public static function challonge_remove_player_from_tournament($player_id, $tournament_id){
 
-        $c = new ChallongeAPI(Planetary_Annihilation_Tournament_Manager::fetch_challonge_API());
+        if(false === ($challonge_tournament_id  = tournamentCPT::get_the_challonge_tournament_id($tournament_id)))
+            return false;
+
+        $connection_id            = p2p_type('tournament_players')->get_p2p_id($tournament_id, $player_id);
+        $challonge_participant_id = p2p_get_meta($connection_id, 'challonge_participant_id', true);
+        $challonge_api_key        = Planetary_Annihilation_Tournament_Manager::fetch_challonge_API();
+
+        $c = new ChallongeAPI($challonge_api_key);
 
         $c->verify_ssl = false;
 
-        $participant = $c->deleteParticipant($challonge_tournament_id, $challonge_participant_id);
+        $participant = (array) $c->deleteParticipant($challonge_tournament_id, $challonge_participant_id);
 
-        $result = json_decode( json_encode( (array) $participant), false );
+        p2p_delete_meta($connection_id, 'challonge_participant_id', $challonge_participant_id);
 
-        return $result;
+        return $participant;
     }
 
     public function get_signup_message(){
