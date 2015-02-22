@@ -983,17 +983,17 @@ class tournamentCPT {
 
     }
 
-    public function get_the_challonge_tournament_id($post_id){
+    public static function get_the_challonge_tournament_id($post_id){
 
 
         //todo move into a single id this is a pain to reverse from challonge id -> tournament id
         if(get_post_meta($post_id, 'challonge_tournament_link',true) == "Custom Tournament ID"){
-            $challonge_tournament_id = get_post_meta($post_id, 'custom_tournament_id',true);
+            return get_post_meta($post_id, 'custom_tournament_id',true);
         } else {
-            $challonge_tournament_id = get_post_meta($post_id, 'challonge_tournament_link',true);
+            return get_post_meta($post_id, 'challonge_tournament_link',true);
         }
 
-        return $challonge_tournament_id;
+        return false;
 
     }
 
