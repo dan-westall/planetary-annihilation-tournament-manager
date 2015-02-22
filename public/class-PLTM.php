@@ -149,7 +149,7 @@ class Planetary_Annihilation_Tournament_Manager {
 
     public static function fetch_challonge_API(){
 
-        $challongeAPI = get_field('challonge_api','option');
+        $challongeAPI = get_option('options_challonge_api');
 
         return $challongeAPI;
 
