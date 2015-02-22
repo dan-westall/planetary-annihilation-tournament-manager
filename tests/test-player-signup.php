@@ -1,10 +1,10 @@
 <?php
 /**
- * Test case for the Ajax callback to update 'some_option'.
+ * Test case for the Ajax callback to signup players
  *
  * @group ajax
  */
-class My_Some_Option_Ajax_Test extends WP_Ajax_UnitTestCase {
+class Player_Signup_Ajax_Test extends WP_Ajax_UnitTestCase {
 
     /**
      * to understand setUp, view Setup_Teardown_Example.php
@@ -23,10 +23,6 @@ class My_Some_Option_Ajax_Test extends WP_Ajax_UnitTestCase {
     function tearDown() {
         parent::tearDown();
 
-
-        //P2P_Storage::uninstall();
-
-//        wp_delete_post( $this->post_id );
     }
 
     public function test_blank_signup(){
