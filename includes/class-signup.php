@@ -136,6 +136,10 @@ class tournamentSignup {
 
         add_action( 'wp_enqueue_scripts',  [ $plugin, 'register_scripts'] );
 
+        add_action( 'tournament_signup',  [ $plugin, 'challonge_add_player_to_tournament'] );
+
+
+
         add_shortcode( 'tournament_signup_form', [ $plugin,  'tournament_signup_form'] );
 
     }
@@ -335,38 +339,36 @@ class tournamentSignup {
 
     }
 
-    public function challonge_add_player_to_tournament($challonge_tournament_id, $email, $ign){
+    public static function challonge_add_player_to_tournament($player_id, $tournament_id){
 
+        if(false === ($challonge_tournament_id  = tournamentCPT::get_the_challonge_tournament_id($tournament_id)))
+            return false;
 
-        $name = (get_tournament_type($tournament_id) == 'teamarmies' ? $values['team_name']['value'] : $values['ign']['value']);
+        $player        = get_post($player_id);
+        $connection_id = p2p_type('tournament_players')->get_p2p_id($tournament_id, $player_id);
+        $challonge_api_key = Planetary_Annihilation_Tournament_Manager::fetch_challonge_API();
 
-        if(isset($connection_meta['challonge_result'])){
-            update_post_meta($player_id, 'challonge_data', $connection_meta['challonge_result']);
+        $name = (get_tournament_type($tournament_id) == 'teamarmies' ? p2p_get_meta($connection_id, 'team_name', true) : $player->post_title);
 
-            //easy search
-            update_post_meta($player_id, 'challonge_participant_id', $meta['challonge_result']->id);
-
-            $connection_meta = array_merge($connection_meta, [ 'challonge_tournament_id'  => $connection_meta['challonge_tournament_id'], 'challonge_participant_id' => $connection_meta['challonge_result']->id ] );
-
-        }
-
-        $c = new ChallongeAPI(Planetary_Annihilation_Tournament_Manager::fetch_challonge_API());
+        $c = new ChallongeAPI($challonge_api_key);
 
         $c->verify_ssl = false;
 
         $params = array(
-            'participant[name]'               => $ign
+            'participant[name]' => $player->post_title
         );
 
-        $participant = $c->createParticipant($challonge_tournament_id, $params);
+        $participant = (array) $c->createParticipant($challonge_tournament_id, $params);
 
-        $result = json_decode( json_encode( (array) $participant), false );
+        if($participant['active']){
+            return $participant;
+        }
 
-        return $result;
+        return false;
 
     }
 
-    public function challonge_remove_player_from_tournament($challonge_tournament_id, $challonge_participant_id){
+    public static function challonge_remove_player_from_tournament($challonge_tournament_id, $challonge_participant_id){
 
         $c = new ChallongeAPI(Planetary_Annihilation_Tournament_Manager::fetch_challonge_API());
 
@@ -387,7 +389,7 @@ class tournamentSignup {
 
         //active
         if($this->getTournamentJoinStatus() == tournamentCPT::$tournament_player_status[1])
-            return sprintf('Unfortunately the tournament is full, but you\'ve been placed on the resevation list.');
+            return sprintf('Unfortunately the tournament is full, but you\'ve been placed on the reservation list.');
 
     }
 
@@ -412,7 +414,7 @@ class tournamentSignup {
                 throw new Exception('Tournament sign ups are closed.');
 
             if(!is_user_logged_in() && $signup->is_existing_player($signup_data))
-                throw new Exception('Please login to sign up for this tournament');
+                throw new Exception(sprintf('Please login to sign up for this tournament'));
 
 
             //ok this is not an existing player we need to make an account!, call to playerCPT
