@@ -28,7 +28,7 @@ class Challonge_Intergration_Tests extends WP_UnitTestCase {
     function test_create_challonge_signup(){
 
 
-        add_site_option( 'options_challonge_api', 'IxbewkPR6Skr3HBi0fdklZ2KowDdDtbSptTcyjtQ' );
+        add_site_option( 'options_challonge_api', '' );
 
         $tournament_id = $this->factory->tournament->create();
 
