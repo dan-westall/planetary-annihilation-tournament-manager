@@ -4,3 +4,5 @@
 /realtime/vendor/
 
 /library/php-zmq
+
+/node_modules/
