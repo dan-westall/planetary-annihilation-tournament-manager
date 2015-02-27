@@ -26,8 +26,8 @@ class tournament_staff extends WP_Widget {
             'connected_meta' => array(
                 array(
                     'key' => 'role',
-                    'value' => 'Caster',
-                    'compare' => '!='
+                    'value' => ['Caster','Analyst'],
+                    'compare' => 'NOT IN'
                 )
             )
         );
@@ -111,7 +111,8 @@ class tournament_staff extends WP_Widget {
                 'connected_meta' => array(
                     array(
                         'key' => 'role',
-                        'value' => 'Caster'
+                        'value' => ['Caster','Analyst'],
+                        'compare' => 'IN'
                     )
                 )
             );
