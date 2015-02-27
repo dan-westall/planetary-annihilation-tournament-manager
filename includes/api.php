@@ -44,9 +44,6 @@ class PLTM_API_Endpoint{
      */
     public function add_endpoint(){
 
-
-
-
         add_rewrite_rule('^site-status/?([^/]*)?/?','index.php?__site-status=1','top');
 
         //add_rewrite_rule('^api/tournament-matches/?([0-9]+)?/?','index.php?__api=1&tournament-matches=$matches[1]','top');
@@ -68,14 +65,6 @@ class PLTM_API_Endpoint{
         add_rewrite_tag('%tournaments%','([^&]+)');
         add_rewrite_tag('%id_type%','([^&]+)');
 
-        //add_rewrite_rule('^api/videos/?([^/]*)?/?','index.php?__api=1&videos=$videos[1]','top');
-
-
-        //add_rewrite_rule('^nutrition/([^/]*)/([^/]*)/?','index.php?page_id=12&food=$matches[1]&variety=$matches[2]','top');
-//        This example would match a requested URL like this:
-//example.com/nutrition/milkshakes/strawberry/
-//...and interpret it to actually mean...
-//example.com/index.php?page_id=12&food=milkshake&variety=strawberry
     }
 
     /**	Sniff Requests
