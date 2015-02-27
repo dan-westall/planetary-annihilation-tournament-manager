@@ -1083,6 +1083,8 @@ class tournamentCPT {
 
     public static function tournament_menu($post_id = 0){
 
+        //todo remove html spit out to different function
+
         global $wp_query,$current_user;
 
         get_currentuserinfo();

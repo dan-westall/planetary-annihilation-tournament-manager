@@ -47,7 +47,7 @@ class Planetary_Annihilation_Tournament_Manager {
 
     //todo move tournament endpoint functionality down into the tournament cpt class
     //public static $endpoints = array('signup', 'matches', 'players', 'results', 'schedule', 'rules', 'planets');
-    public static $tournament_endpoints = array('signup', 'rules', 'matches', 'players', 'countdown', 'brackets', 'brackets-full', 'results');
+    public static $tournament_endpoints = array('sign-up', 'rules', 'matches', 'players', 'countdown', 'brackets', 'brackets-full', 'results');
 
     public static $match_endpoints = array('roster');
     public static $planet_servers = 'https://raw.githubusercontent.com/pamods/mods-conundrum/master/cShareSystems_serverList/serverlist.json';
