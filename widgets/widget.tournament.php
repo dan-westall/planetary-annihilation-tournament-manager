@@ -176,7 +176,7 @@ class tournament_info extends WP_Widget {
                 <dl class="col-lg-6">
                     <?php if(get_post_meta($post->ID, 'slots', true)) : ?>
                         <dt>Slots/Open/Reserves</dt>
-                        <dd><?php echo get_post_meta($post->ID, 'slots', true); ?>/<?php echo ( get_post_meta($post->ID, 'slots', true) - count(get_tournament_players($post->ID, array(tournamentCPT::$tournament_player_status[0]))) ) ?>/ <?php echo count(get_tournament_players($post->ID, array(tournamentCPT::$tournament_player_status[1]))) ?></dd>
+                        <dd><?php echo get_post_meta($post->ID, 'slots', true); ?>/<?php echo ( get_post_meta($post->ID, 'slots', true) - tournamentCPT::get_tournament_player_count($post->ID, [tournamentCPT::$tournament_player_status[0]]) ) ?> / <?php echo tournamentCPT::get_tournament_player_count($post->ID, [tournamentCPT::$tournament_player_status[1]]) ?></dd>
                     <?php endif; ?>
                 </dl>
 
