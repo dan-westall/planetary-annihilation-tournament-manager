@@ -435,7 +435,7 @@ class statistic {
                 SELECT
                     COUNT(p2p_to) as match_total,
                     ceil(SUM(SEC_TO_TIME(((SELECT meta_value FROM $wpdb->postmeta WHERE post_id = p2p_to AND meta_key = 'pa_stats_stop') - (SELECT meta_value FROM $wpdb->postmeta WHERE post_id = p2p_to AND meta_key = 'pa_stats_start'))/1000))/60) AS duration
-                        FROM $wpdb->p2p WHERE p2p_type = 'tournament_matches' GROUP BY p2p_from
+                        FROM $wpdb->p2p WHERE p2p_type = 'tournament_matches' AND (SELECT meta_value FROM $wpdb->postmeta WHERE post_id = p2p_to AND meta_key = 'pa_stats_stop') > 0 AND (SELECT meta_value FROM $wpdb->postmeta WHERE post_id = p2p_to AND meta_key = 'pa_stats_start') > 0 GROUP BY p2p_from
                     ",
                 ''
             );
