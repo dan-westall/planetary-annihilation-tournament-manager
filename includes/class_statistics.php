@@ -260,7 +260,7 @@ class statistic {
                     SELECT
                         count(post.ID),
                         SEC_TO_TIME(AVG(((SELECT meta_value FROM wp_postmeta WHERE post_id = post.ID AND meta_key = 'pa_stats_stop') - (SELECT meta_value FROM wp_postmeta WHERE post_id = post.ID AND meta_key = 'pa_stats_start')))/1000) AS duration
-                          FROM $wpdb->posts as post WHERE post_type = 'match'
+                          FROM $wpdb->posts as post WHERE post_type = 'match' AND (SELECT meta_value FROM $wpdb->postmeta WHERE post_id = post.ID AND meta_key = 'pa_stats_stop') > 0 AND (SELECT meta_value FROM $wpdb->postmeta WHERE post_id = post.ID AND meta_key = 'pa_stats_start') > 0
                     ",
                 ''
             );
