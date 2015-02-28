@@ -138,6 +138,9 @@ class tournamentSignup {
 
         add_action( 'tournament_signup',  [ $plugin, 'challonge_add_player_to_tournament'] );
 
+        add_action( 'tournament_player_withdrawn',  [ $plugin, 'challonge_remove_player_from_tournament'] );
+        add_action( 'tournament_player_reentered',  [ $plugin, 'challonge_add_player_to_tournament'] );
+
 
 
         add_shortcode( 'tournament_signup_form', [ $plugin,  'tournament_signup_form'] );
@@ -521,7 +524,7 @@ class tournamentSignup {
                 p2p_update_meta($p2p_id, 'note', $_POST['reason']);
             }
 
-            do_action('tournament_player_withdrawn', $tournament_id, $player_id );
+            do_action('tournament_player_withdrawn', $player_id , $tournament_id );
 
             echo json_encode(array('result' => true, 'message' => 'You have been removed from the tournament.'));
 
@@ -551,7 +554,7 @@ class tournamentSignup {
 
             p2p_update_meta($p2p_id, 'status', self::$tournament_player_status[0]);
 
-            do_action('tournament_player_reentered', $tournament_id, $player_id );
+            do_action('tournament_player_reentered', $player_id, $tournament_id );
 
             echo json_encode(array('result' => true, 'message' => 'You have been re-entered into the tournament.'));
 
