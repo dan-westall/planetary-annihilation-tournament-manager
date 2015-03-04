@@ -65,7 +65,7 @@ class playerCPT {
             'labels'              => $playerLabel,
             'description'         => 'Tournament Players',
             'public'              => true,
-            'has_archive'         => true,
+            'has_archive'         => 'players',
             'show_ui'             => true,
             'menu_position'       => 10,
             'menu_icon'           => 'dashicons-id',
@@ -477,9 +477,11 @@ class playerCPT {
 
     public static function get_player_avatar($player_id, $size = 'player-profile-thumbnail'){
 
+        $default_avatar    = 1886;
+
         $player_user_id    = get_post_meta($player_id, 'user_id', true);
         $user              = get_userdata($player_user_id);
-        $transient_key     = sprintf('player_%s_avatar_%s', $user->ID, $size);
+        $transient_key     = sprintf('player_%s_avatar_%s', $player_id, $size);
         $logged_in_user_id = get_current_user_id();
 
         if(is_user_logged_in() && DW_Helper::is_site_administrator())
@@ -488,13 +490,18 @@ class playerCPT {
         if ( false === ( $user_avatar_img = get_transient( $transient_key ) ) ) {
 
             if($player_user_id == 'null' || $player_user_id ==  false) {
-                $user_avatar_img = get_avatar($user->ID, $size);
+                $user_avatar_img = wp_get_attachment_image($default_avatar, $size);
             } else {
 
                 if (function_exists('get_wp_user_avatar')) {
                     $user_avatar_img = get_wp_user_avatar($user->ID, $size);
                 } else {
-                    $user_avatar_img = get_avatar($user->ID, $size);
+
+                    if('' === ($user_avatar_id = get_user_meta($user->ID, 'wp_user_avatar', true))){
+                        $user_avatar_img = wp_get_attachment_image($default_avatar, $size);
+                    } else {
+                        $user_avatar_img = wp_get_attachment_image($user_avatar_id, $size);
+                    }
                 }
 
             }

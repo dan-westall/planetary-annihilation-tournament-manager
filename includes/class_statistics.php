@@ -104,13 +104,11 @@ class statistic {
 
     public function total_matches($template = '<div><div>%1$s</div><a href="%2$s"><span>%3$s</span></a></div>'){
 
-        $matches = $this->get_matches();
-
-        sprintf(
+        return sprintf(
             $template,
             __('Total Match'),
             '',
-            count($matches)
+            count($this->matches)
         );
 
     }
@@ -233,6 +231,51 @@ class statistic {
 
 
     }
+
+
+
+    public function get_tournament_total($template = '<div><div>%1$s</div><a href="%2$s"><span>%3$s</span></a></div>'){
+
+        global $wpdb;
+
+        if(empty($this->players)){
+            $query = $wpdb->prepare(
+                "
+                    SELECT
+                        count(post.ID) as total_tournaments
+                          FROM $wpdb->posts as post WHERE post_type = 'tournament' AND post_status = 'publish'
+                    ",
+                ''
+            );
+        } else {
+            $query = $wpdb->prepare(
+                "
+                    SELECT
+                        count(Distinct p2p_from) as total_tournaments
+                          FROM $wpdb->p2p as p2p WHERE p2p_type = 'tournament_players' AND p2p_to IN ('".implode("', '", $this->players)."')
+                    ",
+                ''
+            );
+        }
+
+        if(true)
+            delete_transient(__FUNCTION__);
+
+        if ( false === ( $totals = get_transient( __FUNCTION__ ) ) ) {
+
+            $totals = $wpdb->get_row( $query );
+
+            set_transient( __FUNCTION__ , $totals, 12 * HOUR_IN_SECONDS );
+        }
+
+        return sprintf(
+            $template,
+            __('Total Tournaments on record'),
+            'javascript:void(0);',
+            $totals->total_tournaments
+        );
+    }
+
 
     public function set_statistic(){
 
