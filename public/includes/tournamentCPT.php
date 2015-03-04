@@ -348,9 +348,17 @@ class tournamentCPT {
             }
 
         }
-        /*
-        TODO ADD brackets-full
-        */
+
+        if ($post->post_type == 'tournament' && self::is_tournament_endpoint('brackets') && isset($_GET['overlay'])) {
+
+            $template_path = get_template_directory() . "/overlays/tournament-brackets.php";
+
+            if(file_exists($template_path)){
+                return $template_path;
+            }
+
+        }
+
 
         return $template_path;
     }
@@ -376,6 +384,22 @@ class tournamentCPT {
 
         include($template_path);
 
+    }
+
+    public static function is_tournament_endpoint($endpoint_check){
+
+        global $wp_query, $post;
+
+        foreach(Planetary_Annihilation_Tournament_Manager::$tournament_endpoints as $endpoint){
+
+            if ($post->post_type == 'tournament' && isset( $wp_query->query_vars[$endpoint_check] )) {
+
+                return true;
+
+            }
+        }
+
+        return false;
     }
 
     public function filter_tournament_rounds($rounds){
