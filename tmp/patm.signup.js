@@ -8,9 +8,11 @@ signupForm.controller('signupFormController', [ '$scope', '$http', 'wordpressJS'
     function($scope, $http, wordpressJS) {
 
         $scope.signupData = {};
-        $scope.message = '';
+        $scope.result = {};
+        $scope.submission = false;
         $scope.submitSignup = function (formData, validity) {
             if (validity) {
+                $scope.submission = true;
                 $http({
                     method: 'POST',
                     url: wordpressJS.ajaxurl,
@@ -23,22 +25,21 @@ signupForm.controller('signupFormController', [ '$scope', '$http', 'wordpressJS'
                     }),  // pass in data as strings
                     headers: {'Content-Type': 'application/x-www-form-urlencoded'}  // set the headers so angular passing info as form data (not request payload)
                 })
-                    .success(function (data) {
-
-                        if (!data.success) {
-                            // if not successful, bind errors to error variables
-                            $scope.message = data.data.message;
-                            console.log(data.data.message);
-                            //$scope.errorSuperhero = data.errors.superheroAlias;
-                        } else {
-                            $scope.message = data.data.message;
-                        }
-                    });
-            }
-            ;
-        }
+                .success(function (data) {
+                    $scope.submission = false;
+                    if (!data.success) {
+                        $scope.result.message = data.data.message;
+                        $scope.result.type = data.data.type;
+                    } else {
+                        $scope.result.message = data.data.message;
+                        $scope.result.type = data.data.type;
+                    }
+                });
+            };
+        };
     }
 ]);
+
 signupForm.directive('input', function ($parse) {
     return {
         restrict: 'E',

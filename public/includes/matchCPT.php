@@ -1058,8 +1058,6 @@ class matchCPT {
             delete_transient( 'tournament_result_' . $tournament_id );
         }
 
-
-
     }
 
 }
