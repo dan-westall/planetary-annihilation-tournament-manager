@@ -411,7 +411,7 @@ class tournamentSignup {
 
         //active
         if($this->getTournamentJoinStatus() == tournamentCPT::$tournament_player_status[0])
-            return sprintf('Congratulations you have you had entered %s, you will receive your welcome email shortly.', get_the_title($this->getTournamentId()));
+            return sprintf('Congratulations you have you had entered %s, you will receive your welcome email shortly.<br /><br />Don\'t forget to follow us on <a href="https://twitter.com/exodusesport">Twitter</a> or <a href="https://www.facebook.com/exodus.es">Facebook</a>', get_the_title($this->getTournamentId()));
 
         //reservation
         if($this->getTournamentJoinStatus() == tournamentCPT::$tournament_player_status[1])
@@ -442,7 +442,7 @@ class tournamentSignup {
                 throw new Exception('Tournament sign ups are closed.');
 
             if(!is_user_logged_in() && $signup->is_existing_player($signup_data))
-                throw new Exception(sprintf('Please login to sign up for this tournament'));
+                throw new Exception(sprintf('Please <a href="%s">login</a> to sign up for this tournament', wp_login_url( get_permalink($tournament_id).'sign-up' ) ));
 
 
             //ok this is not an existing player we need to make an account!, call to playerCPT
@@ -621,21 +621,13 @@ class tournamentSignup {
             <div ng-message="email">Your email address invalid</div>
         </script>
 
-        <script type="text/ng-template" id="signup-success.html">
-
-            <p>Don't forget to follow us on <a href="https://twitter.com/exodusesport">Twitter</a> or <a href="https://www.facebook.com/exodus.es">Facebook</a></p>
-
-        </script>
-
         <script type="text/ng-template" id="signupform.html">
 
             <div ng-controller="signupFormController">
 
                 <div ng-show="result.message" class="form-message" ng-class="{ '__error': result.type == 'error', '__validation': result.type == 'validation', '__success': result.type == 'success' }">
 
-                    <div><p>{{result.message}}</p></div>
-
-                    <div ng-if="result.type == 'success'" ng-include="'signup-success.html'"></div>
+                    <div ng-bind-html="result.message"></div>
 
                 </div>
 

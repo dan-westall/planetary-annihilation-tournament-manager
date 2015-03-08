@@ -1,4 +1,4 @@
-var signupForm = angular.module('main', ['ngMessages']);
+var signupForm = angular.module('main', ['ngMessages', 'ngSanitize']);
 
 
 signupForm.constant('wordpressJS', js);
