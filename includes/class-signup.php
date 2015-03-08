@@ -259,8 +259,8 @@ class tournamentSignup {
         return false;
     }
 
-    public function is_existing_tournament_player($player_id){
-        $p2p_id = p2p_type('tournament_players')->get_p2p_id($this->tournament_id, $player_id);
+    public static function is_existing_tournament_player($player_id, $tournament_id){
+        $p2p_id = p2p_type('tournament_players')->get_p2p_id($tournament_id, $player_id);
 
         //is linked to tournament
         if ($p2p_id) {
@@ -411,9 +411,9 @@ class tournamentSignup {
 
         //active
         if($this->getTournamentJoinStatus() == tournamentCPT::$tournament_player_status[0])
-            return sprintf('Congratulations you have signuped to this tournament');
+            return sprintf('Congratulations you have you had entered %s, you will receive your welcome email shortly.', get_the_title($this->getTournamentId()));
 
-        //active
+        //reservation
         if($this->getTournamentJoinStatus() == tournamentCPT::$tournament_player_status[1])
             return sprintf('Unfortunately the tournament is full, but you\'ve been placed on the reservation list.');
 
@@ -473,7 +473,7 @@ class tournamentSignup {
             if($signup->is_excluded_player($player_id))
                 throw new Exception('Sorry but you are excluded from this tournament.');
 
-            if($signup->is_existing_tournament_player($player_id))
+            if($signup->is_existing_tournament_player($player_id, $tournament_id))
                 throw new Exception('Great news, Your already signed up to this tournament.');
 
             $signup->join_tournament($player_id);
@@ -613,9 +613,6 @@ class tournamentSignup {
             $clan  = get_post_meta($user_player_profile->ID, 'clan', true);
 
         }
-
-
-
         ?>
         <script type="text/ng-template" id="error-messages">
             <div ng-message="required">You left the field blank</div>
@@ -624,11 +621,23 @@ class tournamentSignup {
             <div ng-message="email">Your email address invalid</div>
         </script>
 
+        <script type="text/ng-template" id="signup-success.html">
+
+            <p>Don't forget to follow us on <a href="https://twitter.com/exodusesport">Twitter</a> or <a href="https://www.facebook.com/exodus.es">Facebook</a></p>
+
+        </script>
+
         <script type="text/ng-template" id="signupform.html">
 
             <div ng-controller="signupFormController">
 
-                <div ng-show="result.message" class="form-message" ng-class="{ '__error': result.type == 'error', '__validation': result.type == 'validation', '__success': result.type == 'success' }">{{result.message}}</div>
+                <div ng-show="result.message" class="form-message" ng-class="{ '__error': result.type == 'error', '__validation': result.type == 'validation', '__success': result.type == 'success' }">
+
+                    <div><p>{{result.message}}</p></div>
+
+                    <div ng-if="result.type == 'success'" ng-include="'signup-success.html'"></div>
+
+                </div>
 
                 <form class="tournament-signup-form" name="playerSignupForm" ng-class="{ 'submission-in-progress': submission }" ng-submit="submitted = true; submitSignup( signupData, playerSignupForm.$valid )" novalidate>
 
@@ -695,8 +704,6 @@ class tournamentSignup {
 
                     <input type="submit" value="Join this tournament" class="tournament-btn __signup"/>
     <br />
-
-                    <pre>{{signupData | json}}</pre>
                 </form>
 
             </div>

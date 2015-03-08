@@ -116,29 +116,15 @@ class playerCPT {
 
     }
 
-    public static function new_player_profile($user_id, $values = []){
-
-        //todo need a better signup form before we can do this automatically
-
-        if(empty($values)){
-            $user = get_user_by( 'id', $user_id );
-        }
-
-        //compatiblity for exsiting player signup system to new system.
-        $ign = ($values['ign']['value'] ? $values['ign']['value'] : $values['value']);
+    public static function new_player_profile($user_id, $values){
 
         // Insert the post into the database
         $player_id = wp_insert_post([
-            'post_title'  => $ign,
+            'post_title'  => $values['inGameName'],
             'post_status' => 'publish',
             'post_author' => $user_id,
             'post_type'   => playerCPT::$post_type
-        ]);
-
-        //fix!
-        if(get_post_type($player_id) != playerCPT::$post_type){
-            wp_update_post( ['ID' => $player_id, 'post_type' => playerCPT::$post_type, 'post_author' => $user_id ] );
-        }
+        ], true);
 
         update_post_meta($player_id, 'player_email', $values['email']['value']);
         update_post_meta($player_id, 'user_id', $user_id);
