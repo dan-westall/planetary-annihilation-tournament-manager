@@ -178,7 +178,7 @@ class tournamentSignup {
     public function update_user($user_id, $meta){
 
         foreach($meta as $key => $value){
-            update_post_meta($player_id, $key, $value);
+            update_user_meta($user_id, $key, $value);
         }
 
     }
@@ -504,7 +504,7 @@ class tournamentSignup {
                 $signup->set_clan_contact();
 
             //$signup->update_profile(['site_notifications' => 1]);
-            $signup->update_user(['site_notifications' => ( $signup_data['communication'] ? $signup_data['communication'] : "0" ) ]);
+            $signup->update_user( get_post_meta($player_id, 'user_id', true ), ['site_notifications' => ( $signup_data['communication'] ? $signup_data['communication'] : "0" ) ]);
 
 
         } catch (Exception $e) {
