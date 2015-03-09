@@ -167,7 +167,19 @@ class tournamentSignup {
 
     }
 
-    public function update_profile(){
+    public function update_profile($player_id, $meta){
+
+        foreach($meta as $key => $value){
+            update_post_meta($player_id, $key, $value);
+        }
+
+    }
+
+    public function update_user($user_id, $meta){
+
+        foreach($meta as $key => $value){
+            update_post_meta($player_id, $key, $value);
+        }
 
     }
 
@@ -479,25 +491,31 @@ class tournamentSignup {
             $signup->join_tournament($player_id);
 
             if(get_tournament_type($tournament_id) == 'teamarmies')
-                $signup->join_team();
+                $signup->join_team($signup_data['teamName']);
 
             if(get_tournament_type($tournament_id) == 'clanwars'){
-                $signup->set_clan();
+                $signup->set_clan($signup_data['clanName']);
 
                 if(isset($signup_data['clan_contact']) && !empty($signup_data['clan_contact']))
                     $signup->set_clan_contact();
             }
 
-            $signup->update_profile();
+            if(!empty($signup_data['otherDetails']))
+                $signup->set_clan_contact();
+
+            //$signup->update_profile(['site_notifications' => 1]);
+            $signup->update_user(['site_notifications' => ( $signup_data['communication'] ? $signup_data['communication'] : "0" ) ]);
 
 
         } catch (Exception $e) {
+
+            do_action( "tournament_signup_error", $player_id, $tournament_id, $e->getMessage(), $signup_data );
 
             wp_send_json_error(['message' => $e->getMessage(), 'type' => 'error']);
 
         }
 
-        do_action( "tournament_signup", [ 'player_id' => $signup->getPlayerId(), 'tournament_id' => $signup->getTournamentId() ] );
+        do_action( "tournament_signup", [ 'player_id' => $signup->getPlayerId(), 'tournament_id' => $signup->getTournamentId(), $signup_data ] );
 
         wp_send_json_success(['message' => $signup->get_signup_message(), 'type' => 'success']);
 
@@ -634,7 +652,7 @@ class tournamentSignup {
                 <form class="tournament-signup-form" name="playerSignupForm" ng-class="{ 'submission-in-progress': submission }" ng-submit="submitted = true; submitSignup( signupData, playerSignupForm.$valid )" novalidate>
 
                     <div id="in-game-name" class="form-group" ng-class="{ 'has-error' : inGameName }">
-                        <label>In game Name</label>
+                        <label for="inGameName">In game Name</label>
                         <input type="text" name="inGameName" ng-model="signupData.inGameName" class="form-control" placeholder="In game name" value="<?php echo $ign; ?>" ng-minlength="2" required>
                         <div class="ng-message" ng-class="{'__highlight': submitted == true}" ng-messages="playerSignupForm.inGameName.$error" ng-messages-include="error-messages" ng-if="submitted || playerSignupForm.inGameName.$touched">
                             <div ng-message="required">You left your in game name blank.</div>
@@ -643,7 +661,7 @@ class tournamentSignup {
                     </div>
 
                     <div id="email" class="form-group" ng-class="{ 'has-error' : email }">
-                        <label>Email Address</label>
+                        <label for="email">Email Address</label>
                         <input type="email" name="email" ng-model="signupData.email" class="form-control" placeholder="Email Address" value="<?php echo $email; ?>" required>
                         <div class="ng-message" ng-class="{'__highlight': submitted == true}" ng-messages="playerSignupForm.email.$error" ng-messages-include="error-messages" ng-if="submitted || playerSignupForm.email.$touched">
                             <div ng-message="required">You left your email blank.</div>
@@ -654,7 +672,7 @@ class tournamentSignup {
                     <?php if(get_tournament_type($tournament_id) == 'teamarmies') : ?>
 
                         <div id="team-name" class="form-group" ng-class="{ 'has-error' : teamName }">
-                            <label>Team Name</label>
+                            <label for="teamName">Team Name</label>
                             <input type="text" name="teamName" ng-model="signupData.teamName" class="form-control" placeholder="Team name" required>
                             <div class="ng-message" ng-class="{'__highlight': submitted == true}" ng-messages="playerSignupForm.teamName.$error" ng-messages-include="error-messages" ng-if="submitted || playerSignupForm.teamName.$touched"></div>
                         </div>
@@ -664,13 +682,13 @@ class tournamentSignup {
                     <?php if(get_tournament_type($tournament_id) == 'clanwars') : ?>
 
                         <div id="clan-name" class="form-group" ng-class="{ 'has-error' : clanName }">
-                            <label>Clan Name</label>
-                            <input type="text" name="teamName" ng-model="signupData.clanName" class="form-control" placeholder="Clan name" value="<?php echo $clan; ?>" required>
+                            <label for="clanName">Clan Name</label>
+                            <input type="text" name="clanName" ng-model="signupData.clanName" class="form-control" placeholder="Clan name" value="<?php echo $clan; ?>" required>
                             <div class="ng-message" ng-class="{'__highlight': submitted == true}" ng-messages="playerSignupForm.clanName.$error" ng-messages-include="error-messages" ng-if="submitted || playerSignupForm.clanName.$touched"></div>
                         </div>
 
                         <div id="clan-contact" class="form-group" ng-class="{ 'has-error' : clanContact }">
-                            <label>I am clan contact</label><br />
+                            <label for="clan-contact">I am clan contact</label><br />
                             <div class="custom-checkbox-style">
                                 <input type="checkbox" value="None" id="clan-contact" name="clanContact"  ng-model="signupData.clanContact"/>
                                 <label for="clan-contact"></label>
@@ -686,7 +704,7 @@ class tournamentSignup {
                     </div>
 
                     <div id="team-name" class="form-group">
-                        <label>Future Communication</label><br />
+                        <label for="communication">Future Communication</label><br />
                         <div class="custom-checkbox-style">
                             <input type="checkbox" value="None" id="communication" name="check"  ng-model="signupData.communication"/>
                             <label for="communication"></label>
