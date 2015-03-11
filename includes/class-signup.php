@@ -141,6 +141,8 @@ class tournamentSignup {
         add_action( 'tournament_player_withdrawn',  [ $plugin, 'challonge_remove_player_from_tournament'] );
         add_action( 'tournament_player_reentered',  [ $plugin, 'challonge_add_player_to_tournament'] );
 
+        add_action( 'updated_p2p_meta',  [ $plugin, 'challonge_add_player_to_tournament'], 10, 4  );
+
 
 
         add_shortcode( 'tournament_signup_form', [ $plugin,  'tournament_signup_form'] );
@@ -194,6 +196,17 @@ class tournamentSignup {
     public function set_clan_contact(){
 
         p2p_add_meta($this->getJoinId(), 'clan_contact', 1);
+
+    }
+
+    public function player_signup_status_change($p2p_id, $meta_key, $meta_value, $prev_value){
+
+        if($meta_key == 'status' && $meta_value == tournamentCPT::$tournament_player_status[5] && $prev_value == tournamentCPT::$tournament_player_status[0]){
+
+
+
+
+        }
 
     }
 
@@ -271,14 +284,14 @@ class tournamentSignup {
         return false;
     }
 
-    public static function is_existing_tournament_player($player_id, $tournament_id){
-        $p2p_id = p2p_type('tournament_players')->get_p2p_id($tournament_id, $player_id);
+    public static function is_existing_tournament_player($player_id, $tournament_id, $player_status = []){
+
+        $p2p_id        = p2p_type('tournament_players')->get_p2p_id($tournament_id, $player_id);
+        $player_status = empty($player_status) ? tournamentCPT::$tournament_player_status : $player_status;
 
         //is linked to tournament
-        if ($p2p_id) {
-
+        if ($p2p_id && in_array(p2p_get_meta($p2p_id, 'status', true), $player_status)) {
             return true;
-
         }
 
         return false;

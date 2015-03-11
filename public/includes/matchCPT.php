@@ -620,21 +620,10 @@ class matchCPT {
 
                 $user_id = get_post_meta($player->ID, 'user_id', true);
 
-
-                //delete_transient('player_user_avatar_' .$user_id. '_src');
-
-                if ( false === ( $avatar_src = get_transient( 'player_user_avatar_' .$user_id. '_src'  ) ) ) {
-
-                    $avatar_src = get_wp_user_avatar_src($user_id, 'medium-player-profile-thumbnail');
-
-                    set_transient( 'player_user_avatar_' .$user_id. '_src', $avatar_src, ( HOUR_IN_SECONDS / 1 ) );
-
-                }
-
                 $match_players[] = array(
                     'wp_player_id'       => $player->ID,
                     'player_name'        => $player->post_title,
-                    'player_avatar'      => $avatar_src,
+                    'player_avatar'      => playerCPT::get_player_avatar_src($player->ID),
                     'pa_stats_player_id' => get_post_meta($player->ID, 'pastats_player_id', true),
                     'winner'             => p2p_get_meta($player->p2p_id, 'winner', true),
                     'team'               => p2p_get_meta($player->p2p_id, 'team', true),

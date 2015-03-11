@@ -499,6 +499,44 @@ class playerCPT {
 
     }
 
+    public static function get_player_avatar_src($player_id, $size = 'player-profile-thumbnail'){
+
+        $default_avatar    = 1886;
+
+        $player_user_id    = get_post_meta($player_id, 'user_id', true);
+        $user              = get_userdata($player_user_id);
+        $transient_key     = sprintf('player_%s_avatar_%s_src', $player_id, $size);
+        $logged_in_user_id = get_current_user_id();
+
+        if(is_user_logged_in() && DW_Helper::is_site_administrator())
+            delete_transient( $transient_key );
+
+        if ( false === ( $user_avatar_img = get_transient( $transient_key ) ) ) {
+
+            if($player_user_id == 'null' || $player_user_id ==  false) {
+                $user_avatar_img = wp_get_attachment_image_src($default_avatar, $size);
+            } else {
+
+                if (function_exists('get_wp_user_avatar')) {
+                    $user_avatar_img = get_wp_user_avatar($user->ID, $size);
+                } else {
+
+                    if('' === ($user_avatar_id = get_user_meta($user->ID, 'wp_user_avatar', true))){
+                        $user_avatar_img = wp_get_attachment_image_src($default_avatar, $size);
+                    } else {
+                        $user_avatar_img = wp_get_attachment_image_src($user_avatar_id, $size);
+                    }
+                }
+
+            }
+
+            set_transient( $transient_key, $user_avatar_img, 1 * HOUR_IN_SECONDS );
+        }
+
+        return $user_avatar_img;
+
+    }
+
     public function player_missing_pa_stats_id(){
 
         check_ajax_referer( 'missing_pa_stats_id', 'security' );

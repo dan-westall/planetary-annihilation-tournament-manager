@@ -1085,7 +1085,7 @@ class tournamentCPT {
 
         //todo remove html spit out to different function
 
-        global $wp_query,$current_user;
+        global $wp_query, $current_user;
 
         get_currentuserinfo();
 
@@ -1095,7 +1095,6 @@ class tournamentCPT {
         $tournament_closed = get_post_meta($tournament->ID, 'signup_closed', true);
 
         $endpoint_set = false;
-
 
         foreach (Planetary_Annihilation_Tournament_Manager::$tournament_endpoints as $tournament_endpoint):
 
@@ -1112,9 +1111,9 @@ class tournamentCPT {
 
             switch($tournament_endpoint){
 
-                case "signup":
+                case "sign-up":
 
-                    if(self::is_tournament_signup_open($tournament->ID) && is_player_in_tournament($tournament->ID, $current_user->player_id) == false){
+                    if(self::is_tournament_signup_open($tournament->ID) && !tournamentSignup::is_existing_tournament_player($current_user->player_id, $tournament->ID)){
 
                         $html .= sprintf('<li class="%4$s"><a href="%1$s/%2$s">%3$s</a></li>', get_permalink(), $tournament_endpoint, ucwords($tournament_endpoint), $classes);
 
@@ -1149,6 +1148,10 @@ class tournamentCPT {
                         }
 
                     }
+
+                    break;
+
+                case "results" :
 
                     break;
                 default :

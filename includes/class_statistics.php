@@ -258,7 +258,8 @@ class statistic {
             );
         }
 
-        if(true)
+
+        if($this->cache || is_dev())
             delete_transient(__FUNCTION__);
 
         if ( false === ( $totals = get_transient( __FUNCTION__ ) ) ) {
