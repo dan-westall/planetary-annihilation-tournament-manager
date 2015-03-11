@@ -1115,7 +1115,7 @@ class tournamentCPT {
 
                     if(self::is_tournament_signup_open($tournament->ID) && !tournamentSignup::is_existing_tournament_player($current_user->player_id, $tournament->ID)){
 
-                        $html .= sprintf('<li class="%4$s"><a href="%1$s/%2$s">%3$s</a></li>', get_permalink(), $tournament_endpoint, ucwords($tournament_endpoint), $classes);
+                        $html .= sprintf('<li class="%4$s"><a href="%1$s%2$s">%3$s</a></li>', get_permalink(), $tournament_endpoint, ucwords($tournament_endpoint), $classes);
 
                     }
 
@@ -1125,7 +1125,7 @@ class tournamentCPT {
 
                     if(get_tournament_matches($tournament->ID)) {
 
-                        $html .= sprintf('<li class="%4$s"><a href="%1$s/%2$s">%3$s</a></li>', get_permalink(), $tournament_endpoint, ucwords($tournament_endpoint), $classes);
+                        $html .= sprintf('<li class="%4$s"><a href="%1$s%2$s">%3$s</a></li>', get_permalink(), $tournament_endpoint, ucwords($tournament_endpoint), $classes);
 
                     }
 
@@ -1136,7 +1136,7 @@ class tournamentCPT {
                     $template_path = get_template_directory() . "/brackets/bracket-" . $tournament->ID . ".php";
                     
                     if(file_exists($template_path)){
-                        $html .= sprintf('<li class="%4$s"><a href="%1$s/%2$s">%3$s</a></li>', get_permalink(), $tournament_endpoint, ucwords($tournament_endpoint), $classes);
+                        $html .= sprintf('<li class="%4$s"><a href="%1$s%2$s">%3$s</a></li>', get_permalink(), $tournament_endpoint, ucwords($tournament_endpoint), $classes);
                     }
                     else
                     {
@@ -1144,7 +1144,7 @@ class tournamentCPT {
                         //$html .= $bracketlink;
 
                         if(strpos($bracketlink,"challonge.com") !== FALSE){
-                            $html .= sprintf('<li class="%4$s"><a href="%1$s/%2$s">%3$s</a></li>', get_permalink(), $tournament_endpoint, ucwords($tournament_endpoint),  $classes);
+                            $html .= sprintf('<li class="%4$s"><a href="%1$s%2$s">%3$s</a></li>', get_permalink(), $tournament_endpoint, ucwords($tournament_endpoint),  $classes);
                         }
 
                     }
@@ -1156,7 +1156,7 @@ class tournamentCPT {
                     break;
                 default :
 
-                    $html .= sprintf('<li class="%4$s"><a href="%1$s/%2$s">%3$s</a></li>', get_permalink(), $tournament_endpoint, ucwords($tournament_endpoint), $classes);
+                    $html .= sprintf('<li class="%4$s"><a href="%1$s%2$s">%3$s</a></li>', get_permalink(), $tournament_endpoint, ucwords($tournament_endpoint), $classes);
 
                     break;
 
