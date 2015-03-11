@@ -567,7 +567,7 @@ class tournamentSignup {
 
         if ( $p2p_id ) {
 
-            p2p_update_meta($p2p_id, 'status', self::$tournament_player_status[5]);
+            p2p_update_meta($p2p_id, 'status', tournamentCPT::$tournament_player_status[5]);
 
             if (!empty($_POST['reason'])) {
                 p2p_update_meta($p2p_id, 'note', $_POST['reason']);
@@ -601,7 +601,7 @@ class tournamentSignup {
 
         if ( $p2p_id ) {
 
-            p2p_update_meta($p2p_id, 'status', self::$tournament_player_status[0]);
+            p2p_update_meta($p2p_id, 'status', tournamentCPT::$tournament_player_status[0]);
 
             do_action('tournament_player_reentered', $player_id, $tournament_id );
 
