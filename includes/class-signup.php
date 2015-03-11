@@ -138,8 +138,8 @@ class tournamentSignup {
 
         add_action( 'tournament_signup',  [ $plugin, 'challonge_add_player_to_tournament'] );
 
-        add_action( 'tournament_player_withdrawn',  [ $plugin, 'challonge_remove_player_from_tournament'] );
-        add_action( 'tournament_player_reentered',  [ $plugin, 'challonge_add_player_to_tournament'] );
+        add_action( 'tournament_player_withdrawn',  [ $plugin, 'challonge_remove_player_from_tournament'], 10, 2 );
+        add_action( 'tournament_player_reentered',  [ $plugin, 'challonge_add_player_to_tournament'], 10, 2 );
 
         add_action( 'updated_p2p_meta',  [ $plugin, 'challonge_add_player_to_tournament'], 10, 4  );
 
@@ -391,15 +391,24 @@ class tournamentSignup {
 
         $name = (get_tournament_type($tournament_id) == 'teamarmies' ? p2p_get_meta($connection_id, 'team_name', true) : $player->post_title);
 
-        $c = new ChallongeAPI($challonge_api_key);
+        try {
 
-        $c->verify_ssl = false;
+            $c = new ChallongeAPI($challonge_api_key);
 
-        $params = array(
-            'participant[name]' => $player->post_title
-        );
+            $c->verify_ssl = false;
 
-        $participant = (array) $c->createParticipant($challonge_tournament_id, $params);
+            $params = array(
+                'participant[name]' => $player->post_title
+            );
+
+            $participant = (array) $c->createParticipant($challonge_tournament_id, $params);
+
+        } catch (Exception $e){
+
+            do_action('challonge_add_player_error', $challonge_tournament_id, $player_id, $tournament_id);
+
+        }
+
 
         if($participant['active']){
 
@@ -421,11 +430,19 @@ class tournamentSignup {
         $challonge_participant_id = p2p_get_meta($connection_id, 'challonge_participant_id', true);
         $challonge_api_key        = Planetary_Annihilation_Tournament_Manager::fetch_challonge_API();
 
-        $c = new ChallongeAPI($challonge_api_key);
+        try {
 
-        $c->verify_ssl = false;
+            $c = new ChallongeAPI($challonge_api_key);
 
-        $participant = (array) $c->deleteParticipant($challonge_tournament_id, $challonge_participant_id);
+            $c->verify_ssl = false;
+
+            $participant = (array)$c->deleteParticipant($challonge_tournament_id, $challonge_participant_id);
+
+        } catch (Exception $e){
+
+            do_action('challonge_remove_player_error', $challonge_tournament_id, $challonge_participant_id, $player_id, $tournament_id);
+
+        }
 
         p2p_delete_meta($connection_id, 'challonge_participant_id', $challonge_participant_id);
 
@@ -558,8 +575,8 @@ class tournamentSignup {
 
         check_ajax_referer('security-' . date('dmy'), 'security');
 
-        $tournament_id = $_POST['tournament_id'];
-        $player_id     = $_POST['player_id'];
+        $tournament_id = intval($_POST['tournament_id']);
+        $player_id     = intval($_POST['player_id']);
 
         //todo make sure tournament signup are open
 
@@ -592,8 +609,8 @@ class tournamentSignup {
 
         check_ajax_referer('security-' . date('dmy'), 'security');
 
-        $tournament_id = $_POST['tournament_id'];
-        $player_id     = $_POST['player_id'];
+        $tournament_id = intval($_POST['tournament_id']);
+        $player_id     = intval($_POST['player_id']);
 
         //todo make sure tournament signup are open
 
