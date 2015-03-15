@@ -1509,6 +1509,8 @@ class tournamentCPT {
 
             foreach ($players->posts as $player) {
 
+                $avatar =  playerCPT::get_player_avatar_src($player->ID, [20, 20]);
+
                 $result = [];
 
                 $player_details = array(
@@ -1516,7 +1518,8 @@ class tournamentCPT {
                     'player_name'        => $player->post_title,
                     'pa_stats_player_id' => get_post_meta($player->ID, 'pastats_player_id', true),
                     'url'                => get_permalink($player->ID),
-                    'status'             => p2p_get_meta($player->p2p_id, 'status', true)
+                    'status'             => p2p_get_meta($player->p2p_id, 'status', true),
+                    'player_avatar'             => $avatar[0]
                 );
 
                 //tournament finished
