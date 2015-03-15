@@ -461,12 +461,12 @@ class playerCPT {
         }
     }
 
-    public static function get_player_avatar($player_id, $size = 'player-profile-thumbnail'){
+    public static function get_player_avatar($player_id = 0, $size = 'player-profile-thumbnail', $user_id = 0){
 
         $default_avatar    = 1886;
 
         $player_user_id    = get_post_meta($player_id, 'user_id', true);
-        $user              = get_userdata($player_user_id);
+        $user              = $player_user_id ? get_userdata($player_user_id) : get_userdata($user_id);
         $transient_key     = sprintf('player_%s_avatar_%s', $player_id, $size);
         $logged_in_user_id = get_current_user_id();
 
@@ -475,7 +475,7 @@ class playerCPT {
 
         if ( false === ( $user_avatar_img = get_transient( $transient_key ) ) ) {
 
-            if($player_user_id == 'null' || $player_user_id ==  false) {
+            if(($player_user_id == 'null' || $player_user_id ==  false) && $player_id !== 0) {
                 $user_avatar_img = wp_get_attachment_image($default_avatar, $size);
             } else {
 
@@ -499,12 +499,12 @@ class playerCPT {
 
     }
 
-    public static function get_player_avatar_src($player_id, $size = 'player-profile-thumbnail'){
+    public static function get_player_avatar_src($player_id = 0, $size = 'player-profile-thumbnail', $user_id = 0){
 
         $default_avatar    = 1886;
 
         $player_user_id    = get_post_meta($player_id, 'user_id', true);
-        $user              = get_userdata($player_user_id);
+        $user              = $player_user_id ? get_userdata($player_user_id) : get_userdata($user_id);
         $transient_key     = sprintf('player_%s_avatar_%s_src', $player_id, $size);
         $logged_in_user_id = get_current_user_id();
 
@@ -513,7 +513,7 @@ class playerCPT {
 
         if ( false === ( $user_avatar_img = get_transient( $transient_key ) ) ) {
 
-            if($player_user_id == 'null' || $player_user_id ==  false) {
+            if(($player_user_id == 'null' || $player_user_id ==  false) && $player_id !== 0) {
                 $user_avatar_img = wp_get_attachment_image_src($default_avatar, $size);
             } else {
 
