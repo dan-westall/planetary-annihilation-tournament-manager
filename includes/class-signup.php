@@ -453,7 +453,7 @@ class tournamentSignup {
 
         //active
         if($this->getTournamentJoinStatus() == tournamentCPT::$tournament_player_status[0])
-            return sprintf('Congratulations you have you had entered %s, you will receive your welcome email shortly.<br /><br />Don\'t forget to follow us on <a href="https://twitter.com/exodusesport">Twitter</a> or <a href="https://www.facebook.com/exodus.es">Facebook</a>', get_the_title($this->getTournamentId()));
+            return sprintf('Congratulations you have entered %s, you will receive your welcome email shortly.<br /><br />Don\'t forget to follow us on <a href="https://twitter.com/exodusesport">Twitter</a> or <a href="https://www.facebook.com/exodus.es">Facebook</a>', get_the_title($this->getTournamentId()));
 
         //reservation
         if($this->getTournamentJoinStatus() == tournamentCPT::$tournament_player_status[1])
