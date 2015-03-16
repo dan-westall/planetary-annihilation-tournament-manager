@@ -30,13 +30,13 @@ class tournament_info extends WP_Widget {
 
             <?php
 
-            if(get_field('tournament_status') === '0' || get_field('tournament_status') === '4'){
-                if(get_field('run_date') && get_field('run_time')){  ?>
+            if(get_post_meta($post->ID, 'tournament_status', true) === '0' || get_post_meta($post->ID, 'tournament_status', true) === '4'){
+                if(get_post_meta($post->ID, 'run_date', true) && get_post_meta($post->ID, 'run_time', true)){  ?>
 
                     <section class="text tournament-count-down">
                     <?php
 
-                    $form_short_code = sprintf('[countdown date="%s %s" size="large"]', $rundate->format('Y-m-d'), get_field('run_time'));
+                    $form_short_code = sprintf('[countdown date="%s %s" size="large"]', $rundate->format('Y-m-d'), get_post_meta($post->ID, 'run_time', true));
                     //echo $form_short_code;
                     echo do_shortcode($form_short_code); ?>
                     </section>
@@ -56,21 +56,39 @@ class tournament_info extends WP_Widget {
 
                     if(count($streams) > 1){
                         $title = 'Watch Stream '. ($key + 1);
-                    }
+                    } ?>
 
-            ?>
+                    <section class="text __twitch tournament-stream" data-twitch-stream="<?php echo $stream; ?>">
 
+                        <a href="http://www.twitch.tv/<?php echo $stream; ?>"><span><?php echo $title; ?></span></a>
+                        <small>/<?php echo $stream; ?></small>
 
-            <section class="text tournament-stream" data-twitch-stream="<?php echo $stream; ?>">
+                    </section>
 
-                <a href="http://www.twitch.tv/<?php echo $stream; ?>"><span><?php echo $title; ?></span></a>
-                <small>/<?php echo $stream; ?></small>
+                <?php endforeach;
 
-            </section>
+            endif; ?>
 
-            <?php
+            <?php if(($twitch = get_post_meta($post->ID, 'hitbox', true)) && !in_array(get_post_meta($post->ID, 'tournament_status', true), [2, 3] ) ):
 
-            endforeach;
+                $streams = explode(',', $twitch);
+
+                foreach($streams as $key => $stream):
+
+                    $title = 'Watch Here';
+
+                    if(count($streams) > 1){
+                        $title = 'Watch Stream '. ($key + 1);
+                    } ?>
+
+                    <section class="text __hitbox tournament-stream" data-twitch-stream="<?php echo $stream; ?>">
+
+                        <a href="http://www.hitbox.tv/<?php echo $stream; ?>"><span><?php echo $title; ?></span></a>
+                        <small>/<?php echo $stream; ?></small>
+
+                    </section>
+
+                <?php endforeach;
 
             endif; ?>
 
@@ -144,21 +162,21 @@ class tournament_info extends WP_Widget {
                 <div class="row">
 
                 <dl class="col-lg-6">
-                    <?php if(get_field('rounds')) : ?>
+                    <?php if(get_post_meta($post->ID, 'rounds', true)) : ?>
                         <dt>Rounds</dt>
-                        <dd><?php the_field('rounds'); ?></dd>
+                        <dd><?php echo get_post_meta($post->ID, 'rounds', true); ?></dd>
                     <?php endif; ?>
 
-                    <?php if(get_field('tournament_type')) : ?>
+                    <?php if(get_post_meta($post->ID, 'tournament_type', true)) : ?>
                         <dt>Type</dt>
-                        <dd><?php the_field('tournament_type'); ?></dd>
+                        <dd><?php echo get_post_meta($post->ID, 'tournament_type', true); ?></dd>
                     <?php endif; ?>
                 </dl>
 
                 <dl class="col-lg-6">
-                    <?php if(get_field('slots')) : ?>
+                    <?php if(get_post_meta($post->ID, 'slots', true)) : ?>
                         <dt>Slots/Open/Reserves</dt>
-                        <dd><?php the_field('slots'); ?>/<?php echo ( get_field('slots') - count(get_tournament_players($post->ID, array(tournamentCPT::$tournament_player_status[0]))) ) ?>/ <?php echo count(get_tournament_players($post->ID, array(tournamentCPT::$tournament_player_status[1]))) ?></dd>
+                        <dd><?php echo get_post_meta($post->ID, 'slots', true); ?>/<?php echo ( get_post_meta($post->ID, 'slots', true) - tournamentCPT::get_tournament_player_count($post->ID, [tournamentCPT::$tournament_player_status[0]]) ) ?> / <?php echo tournamentCPT::get_tournament_player_count($post->ID, [tournamentCPT::$tournament_player_status[1]]) ?></dd>
                     <?php endif; ?>
                 </dl>
 
@@ -201,20 +219,20 @@ class tournament_info extends WP_Widget {
 
                 <ul class="row">
                     <li class="col-lg-4">
-                        <?php if(get_field('forum_link')) : ?>
-                        <a href="<?php the_field('forum_link'); ?>">Forum Link</a>
+                        <?php if(get_post_meta($post->ID, 'forum_link', true)) : ?>
+                        <a href="<?php echo get_post_meta($post->ID, 'forum_link', true); ?>">Forum Link</a>
                         <?php endif; ?>
                     </li>
 
                     <li class="col-lg-4">
-                        <?php if(get_field('brackets')) : ?>
-                        <a href="<?php the_field('brackets'); ?>">Bracket Link</a>
+                        <?php if(get_post_meta($post->ID, 'brackets', true)) : ?>
+                        <a href="<?php echo get_post_meta($post->ID, 'brackets', true); ?>">Bracket Link</a>
                         <?php endif; ?>
                     </li>
 
                     <li class="col-lg-4">
-                        <?php if(get_field('irc')) : ?>
-                        <a href="<?php the_field('irc'); ?>">Player Meeting Point</a>
+                        <?php if(get_post_meta($post->ID, 'irc', true)) : ?>
+                        <a href="<?php echo get_post_meta($post->ID, 'irc', true); ?>">Player Meeting Point</a>
                         <?php endif; ?>
                     </li>
 

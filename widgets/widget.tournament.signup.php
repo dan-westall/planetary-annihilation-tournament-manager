@@ -20,9 +20,9 @@ class tournament_signup extends WP_Widget {
         $message 	= $instance['message'];
 
         ?>
-        <?php if(!isset($wp_query->query_vars['signup']) && is_tournament_signup_open($post->ID) && is_player_in_tournament($post->ID, $current_user->player_id) == false): ?>
+        <?php if(!isset($wp_query->query_vars['sign-up']) && is_tournament_signup_open($post->ID) && is_player_in_tournament($post->ID, $current_user->player_id) == false): ?>
 
-            <a href="<?php the_permalink(); ?>signup" class='tournament-btn __signup tournament-signup-button'><span>Sign-up to tournament</span></a>
+            <a href="<?php the_permalink(); ?>sign-up" class='tournament-btn __signup tournament-signup-button'><span>Sign-up to tournament</span></a>
 
         <?php elseif(is_player_in_tournament($post->ID, $current_user->player_id, tournamentCPT::$tournament_player_status[0]) == true && tournamentCPT::allow_withdraw($post->ID) == true):
 

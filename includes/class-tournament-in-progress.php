@@ -1,13 +1,16 @@
 <?php
 
+if($is_live) {
 
-require_once( __DIR__ . '/../../../../wp-load.php' );
+    require_once(__DIR__ . '/../../../../wp-load.php');
 
 
-if (!$wpdb) {
-    $wpdb = new wpdb( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST);
-} else {
-    global $wpdb;
+    if (!$wpdb) {
+        $wpdb = new wpdb(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST);
+    } else {
+        global $wpdb;
+    }
+
 }
 
 

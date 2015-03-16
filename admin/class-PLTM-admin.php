@@ -252,8 +252,9 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
                 $tournament_slots         = get_post_meta($post_id, 'slots', true);
                 $tournament_reserve_slots = get_post_meta($post_id, 'reserve_slots', true);
                 $total_tournament_slots   = ($tournament_slots + $tournament_reserve_slots);
+                $tournament_player_status = tournamentCPT::$tournament_player_status;
 
-                $current_player_total     = count(get_tournament_players($post_id, array(tournamentCPT::$tournament_player_status[0], tournamentCPT::$tournament_player_status[1])));
+                $current_player_total     = tournamentCPT::get_tournament_player_count($post_id, [$tournament_player_status[0], $tournament_player_status[1]]);
 
                 echo sprintf('%s/%s', $total_tournament_slots, $current_player_total);
 

@@ -47,7 +47,7 @@ class Planetary_Annihilation_Tournament_Manager {
 
     //todo move tournament endpoint functionality down into the tournament cpt class
     //public static $endpoints = array('signup', 'matches', 'players', 'results', 'schedule', 'rules', 'planets');
-    public static $tournament_endpoints = array('signup', 'rules', 'matches', 'players', 'countdown', 'brackets', 'brackets-full');
+    public static $tournament_endpoints = array('sign-up', 'rules', 'matches', 'players', 'countdown', 'brackets', 'brackets-full', 'results');
 
     public static $match_endpoints = array('roster');
     public static $planet_servers = 'https://raw.githubusercontent.com/pamods/mods-conundrum/master/cShareSystems_serverList/serverlist.json';
@@ -68,6 +68,8 @@ class Planetary_Annihilation_Tournament_Manager {
 	 * @since     1.0.0
 	 */
 	private function __construct() {
+
+        $is_live = false;
 
         require_once (dirname (__FILE__) . '/../bootstrap.php');
 
@@ -96,8 +98,9 @@ class Planetary_Annihilation_Tournament_Manager {
 
         userPolling::register();
         tournament_in_progress::register();
-        ruleCPT::register();
+//        ruleCPT::register();
         awards::register();
+        tournamentSignup::register();
 //        acfCustomRules::register();
 
         remove_action( 'wp_head', 'wp_generator');
@@ -146,7 +149,7 @@ class Planetary_Annihilation_Tournament_Manager {
 
     public static function fetch_challonge_API(){
 
-        $challongeAPI = get_field('challonge_api','option');
+        $challongeAPI = get_option('options_challonge_api');
 
         return $challongeAPI;
 

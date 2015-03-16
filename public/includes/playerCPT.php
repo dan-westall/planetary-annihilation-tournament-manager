@@ -65,7 +65,7 @@ class playerCPT {
             'labels'              => $playerLabel,
             'description'         => 'Tournament Players',
             'public'              => true,
-            'has_archive'         => true,
+            'has_archive'         => 'players',
             'show_ui'             => true,
             'menu_position'       => 10,
             'menu_icon'           => 'dashicons-id',
@@ -116,34 +116,22 @@ class playerCPT {
 
     }
 
-    public static function action_new_player_profile($user_id, $values = []){
+    public static function new_player_profile($user_id, $values){
 
-        //todo need a better signup form before we can do this automatically
-
-        if(empty($values)){
-            $user = get_user_by( 'id', $user_id );
-        }
-
-        //create new player post
-        $new_player = array(
-            'post_title'  => $values['ign']['value'],
+        // Insert the post into the database
+        $player_id = wp_insert_post([
+            'post_title'  => $values['inGameName'],
             'post_status' => 'publish',
             'post_author' => $user_id,
             'post_type'   => playerCPT::$post_type
-        );
-
-        // Insert the post into the database
-        $player_id = wp_insert_post($new_player);
-
-        //fix!
-        if(get_post_type($player_id) != playerCPT::$post_type){
-            wp_update_post( ['ID' => $player_id, 'post_type' => playerCPT::$post_type, 'post_author' => $user_id ] );
-        }
+        ], true);
 
         update_post_meta($player_id, 'player_email', $values['email']['value']);
         update_post_meta($player_id, 'user_id', $user_id);
 
         update_user_meta($user_id, 'player_id', $player_id);
+
+        do_action('new_player_profile');
 
         return $player_id;
 
@@ -396,7 +384,7 @@ class playerCPT {
 
             $player_profile_id = self::get_user_player_profile_id($current_user->ID);
 
-            if ($_GET['post'] == $player_profile_id) {
+            if (isset($_GET['post']) && $_GET['post'] == $player_profile_id) {
 
                 $labels = & $wp_post_types[playerCPT::$post_type]->labels;
 
@@ -473,11 +461,13 @@ class playerCPT {
         }
     }
 
-    public static function get_player_avatar($player_id, $size = 'player-profile-thumbnail'){
+    public static function get_player_avatar($player_id = 0, $size = 'player-profile-thumbnail', $user_id = 0){
+
+        $default_avatar    = 1886;
 
         $player_user_id    = get_post_meta($player_id, 'user_id', true);
-        $user              = get_userdata($player_user_id);
-        $transient_key     = sprintf('player_%s_avatar_%s', $user->ID, $size);
+        $user              = $player_user_id ? get_userdata($player_user_id) : get_userdata($user_id);
+        $transient_key     = sprintf('player_%s_avatar_%s', $player_id, $size);
         $logged_in_user_id = get_current_user_id();
 
         if(is_user_logged_in() && DW_Helper::is_site_administrator())
@@ -485,14 +475,57 @@ class playerCPT {
 
         if ( false === ( $user_avatar_img = get_transient( $transient_key ) ) ) {
 
-            if($player_user_id == 'null' || $player_user_id ==  false) {
-                $user_avatar_img = get_avatar($user->ID, $size);
+            if(($player_user_id == 'null' || $player_user_id ==  false) && $player_id !== 0) {
+                $user_avatar_img = wp_get_attachment_image($default_avatar, $size);
             } else {
 
                 if (function_exists('get_wp_user_avatar')) {
                     $user_avatar_img = get_wp_user_avatar($user->ID, $size);
                 } else {
-                    $user_avatar_img = get_avatar($user->ID, $size);
+
+                    if('' === ($user_avatar_id = get_user_meta($user->ID, 'wp_user_avatar', true))){
+                        $user_avatar_img = wp_get_attachment_image($default_avatar, $size);
+                    } else {
+                        $user_avatar_img = wp_get_attachment_image($user_avatar_id, $size);
+                    }
+                }
+
+            }
+
+            set_transient( $transient_key, $user_avatar_img, 1 * HOUR_IN_SECONDS );
+        }
+
+        return $user_avatar_img;
+
+    }
+
+    public static function get_player_avatar_src($player_id = 0, $size = 'player-profile-thumbnail', $user_id = 0){
+
+        $default_avatar    = 1886;
+
+        $player_user_id    = get_post_meta($player_id, 'user_id', true);
+        $user              = $player_user_id ? get_userdata($player_user_id) : get_userdata($user_id);
+        $transient_key     = sprintf('player_%s_avatar_%s_src', $player_id, $size);
+        $logged_in_user_id = get_current_user_id();
+
+        if(is_user_logged_in() && DW_Helper::is_site_administrator())
+            delete_transient( $transient_key );
+
+        if ( false === ( $user_avatar_img = get_transient( $transient_key ) ) ) {
+
+            if(($player_user_id == 'null' || $player_user_id ==  false) && $player_id !== 0) {
+                $user_avatar_img = wp_get_attachment_image_src($default_avatar, $size);
+            } else {
+
+                if (function_exists('get_wp_user_avatar')) {
+                    $user_avatar_img = get_wp_user_avatar($user->ID, $size);
+                } else {
+
+                    if('' === ($user_avatar_id = get_user_meta($user->ID, 'wp_user_avatar', true))){
+                        $user_avatar_img = wp_get_attachment_image_src($default_avatar, $size);
+                    } else {
+                        $user_avatar_img = wp_get_attachment_image_src($user_avatar_id, $size);
+                    }
                 }
 
             }

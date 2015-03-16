@@ -36,6 +36,7 @@ class matchCPT {
 
 
         add_action( 'save_post',  array( $this, 'match_time'), 10, 1 );
+        add_action( 'save_post',  array( $this, 'delete_match_caches'), 10, 1 );
 
         //moved outside to our own api endpoint
 //        add_action('wp_ajax_pltm_get_match_results',  array( $this, 'get_match_json') );
@@ -55,7 +56,7 @@ class matchCPT {
 
         //
 
-        if((get_post_type($_GET['post']) == matchCPT::$post_type || get_post_type($_REQUEST['post_ID']) == matchCPT::$post_type || get_post_type($_POST['from']) == matchCPT::$post_type) && $args['name'] == 'player_vote'){
+        if(( ( isset($_GET['post']) && get_post_type($_GET['post']) == matchCPT::$post_type ) || ( isset($_GET['post_ID']) && get_post_type($_REQUEST['post_ID']) == matchCPT::$post_type ) || ( isset($_GET['post_ID']) && get_post_type($_POST['from']) == matchCPT::$post_type ) ) && $args['name'] == 'player_vote'){
 
             $args['fields']['team'] = [
                 'title' => 'Team',
@@ -619,21 +620,10 @@ class matchCPT {
 
                 $user_id = get_post_meta($player->ID, 'user_id', true);
 
-
-                //delete_transient('player_user_avatar_' .$user_id. '_src');
-
-                if ( false === ( $avatar_src = get_transient( 'player_user_avatar_' .$user_id. '_src'  ) ) ) {
-
-                    $avatar_src = get_wp_user_avatar_src($user_id, 'medium-player-profile-thumbnail');
-
-                    set_transient( 'player_user_avatar_' .$user_id. '_src', $avatar_src, ( HOUR_IN_SECONDS / 1 ) );
-
-                }
-
                 $match_players[] = array(
                     'wp_player_id'       => $player->ID,
                     'player_name'        => $player->post_title,
-                    'player_avatar'      => $avatar_src,
+                    'player_avatar'      => playerCPT::get_player_avatar_src($player->ID, [20, 20])[0],
                     'pa_stats_player_id' => get_post_meta($player->ID, 'pastats_player_id', true),
                     'winner'             => p2p_get_meta($player->p2p_id, 'winner', true),
                     'team'               => p2p_get_meta($player->p2p_id, 'team', true),
@@ -686,7 +676,7 @@ class matchCPT {
     public function edit_posts_fields($statment_fields, $query){
         global $wpdb;
 
-        if($query->query_vars['orderby'] == 'tournament_date'){
+        if(isset($query->query_vars['orderby']) && $query->query_vars['orderby'] == 'tournament_date'){
 
             if(in_array(matchCPT::$post_type, $query->query_vars['post_type']) && empty($query->query_vars['fields'])){
 
@@ -710,7 +700,7 @@ class matchCPT {
 
     public function order_matches_by_tournament_date($orderby_statement, $query) {
 
-        if($query->query_vars['orderby'] == 'tournament_date'){
+        if(isset($query->query_vars['orderby']) && $query->query_vars['orderby'] == 'tournament_date'){
 
             if(in_array(tournamentCPT::$post_type, $query->query_vars['post_type'])){
 
@@ -1036,6 +1026,26 @@ class matchCPT {
     }
 
     public static function match_time(){
+
+    }
+
+    public function delete_match_caches($post_id){
+
+        if ( wp_is_post_revision( $post_id ) )
+            return;
+
+        //clear apc system cache!
+
+        if(function_exists('apc_clear_cache'))
+            apc_clear_cache();
+
+        //todo is this being used? should be moved to match class
+        if ( matchCPT::$post_type == get_post_type($post_id) ) {
+
+            $tournament_id = matchCPT::get_match_tournament_id($post_id);
+
+            delete_transient( 'tournament_result_' . $tournament_id );
+        }
 
     }
 
