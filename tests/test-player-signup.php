@@ -54,8 +54,8 @@ class Player_Signup_Ajax_Test extends WP_Ajax_UnitTestCase {
         $_POST['tournament_id'] = $tournament_id;
         $_POST['player_id'] = $player_id;
         $_POST['signup_data'] = [
-            'inGameName' => 'bsport',
-            'email' => 'dan.westall@googlemail.com'
+            'inGameName' => 'test_user',
+            'email' => 'test_user@email.com'
         ];
 
         try {
@@ -77,8 +77,8 @@ class Player_Signup_Ajax_Test extends WP_Ajax_UnitTestCase {
         $_POST['tournament_id'] = $tournament_id;
         $_POST['player_id'] = $player_id;
         $_POST['signup_data'] = [
-            'inGameName' => 'bsport',
-            'email' => 'dan.westall@googlemail.com'
+            'inGameName' => 'test_user',
+            'email' => 'test_user@email.com'
         ];
 
         try {
@@ -100,8 +100,8 @@ class Player_Signup_Ajax_Test extends WP_Ajax_UnitTestCase {
         $_POST['tournament_id'] = $tournament_id;
         $_POST['player_id'] = $player_id;
         $_POST['signup_data'] = [
-            'inGameName' => 'bsport',
-            'email' => 'dan.westall@googlemail.com'
+            'inGameName' => 'test_user',
+            'email' => 'test_user@email.com'
         ];
 
         try {
@@ -123,8 +123,8 @@ class Player_Signup_Ajax_Test extends WP_Ajax_UnitTestCase {
         $_POST['tournament_id'] = $tournament_id;
         $_POST['player_id'] = $player_id;
         $_POST['signup_data'] = [
-            'inGameName' => 'bsport',
-            'email' => 'dan.westall@googlemail.com'
+            'inGameName' => 'test_user',
+            'email' => 'test_user@email.com'
         ];
 
         try {
@@ -146,8 +146,8 @@ class Player_Signup_Ajax_Test extends WP_Ajax_UnitTestCase {
         $_POST['tournament_id'] = $tournament_id;
         $_POST['player_id'] = $player_id;
         $_POST['signup_data'] = [
-            'inGameName' => 'bsport',
-            'email' => 'dan.westall@googlemail.com'
+            'inGameName' => 'test_user',
+            'email' => 'test_user@email.com'
         ];
 
         try {
@@ -169,8 +169,8 @@ class Player_Signup_Ajax_Test extends WP_Ajax_UnitTestCase {
         $_POST['tournament_id'] = $tournament_id;
         $_POST['player_id'] = $player_id;
         $_POST['signup_data'] = [
-            'inGameName' => 'bsport',
-            'email' => 'dan.westall@googlemail.com'
+            'inGameName' => 'test_user',
+            'email' => 'test_user@email.com'
         ];
 
         try {
@@ -192,8 +192,8 @@ class Player_Signup_Ajax_Test extends WP_Ajax_UnitTestCase {
         $_POST['tournament_id'] = $tournament_id;
         $_POST['player_id'] = $player_id;
         $_POST['signup_data'] = [
-            'inGameName' => 'bsport',
-            'email' => 'dan.westall@googlemail.com'
+            'inGameName' => 'test_user',
+            'email' => 'test_user@email.com'
         ];
 
         try {
@@ -215,8 +215,8 @@ class Player_Signup_Ajax_Test extends WP_Ajax_UnitTestCase {
         $_POST['tournament_id'] = $tournament_id;
         $_POST['player_id'] = $player_id;
         $_POST['signup_data'] = [
-            'inGameName' => 'bsport',
-            'email' => 'dan.westall@googlemail.com'
+            'inGameName' => 'test_user',
+            'email' => 'test_user@email.com'
         ];
 
         try {
@@ -238,8 +238,8 @@ class Player_Signup_Ajax_Test extends WP_Ajax_UnitTestCase {
         $_POST['tournament_id'] = $tournament_id;
         $_POST['player_id'] = $player_id;
         $_POST['signup_data'] = [
-            'inGameName' => 'bsport',
-            'email' => 'dan.westall@googlemail.com'
+            'inGameName' => 'test_user',
+            'email' => 'test_user@email.com'
         ];
 
         try {
@@ -261,8 +261,8 @@ class Player_Signup_Ajax_Test extends WP_Ajax_UnitTestCase {
         $_POST['tournament_id'] = $tournament_id;
         $_POST['player_id'] = $player_id;
         $_POST['signup_data'] = [
-            'inGameName' => 'bsport',
-            'email' => 'dan.westall@googlemail.com'
+            'inGameName' => 'test_user',
+            'email' => 'test_user@email.com'
         ];
 
         try {
@@ -284,8 +284,8 @@ class Player_Signup_Ajax_Test extends WP_Ajax_UnitTestCase {
         $_POST['tournament_id'] = $tournament_id;
         $_POST['player_id'] = $player_id;
         $_POST['signup_data'] = [
-            'inGameName' => 'bsport',
-            'email' => 'dan.westall@googlemail.com'
+            'inGameName' => 'test_user',
+            'email' => 'test_user@email.com'
         ];
 
         try {
@@ -309,8 +309,8 @@ class Player_Signup_Ajax_Test extends WP_Ajax_UnitTestCase {
         $_POST['tournament_id'] = $tournament_id;
         $_POST['player_id'] = $player_id;
         $_POST['signup_data'] = [
-            'inGameName' => 'bsport',
-            'email' => 'dan.westall@googlemail.com'
+            'inGameName' => 'test_user',
+            'email' => 'test_user@email.com'
         ];
 
         try {
@@ -332,8 +332,8 @@ class Player_Signup_Ajax_Test extends WP_Ajax_UnitTestCase {
         $_POST['tournament_id'] = $tournament_id;
         $_POST['player_id'] = $player_id;
         $_POST['signup_data'] = [
-            'inGameName' => 'bsport',
-            'email' => 'dan.westall@googlemail.com'
+            'inGameName' => 'test_user',
+            'email' => 'test_user@email.com'
         ];
 
         try {
@@ -355,8 +355,8 @@ class Player_Signup_Ajax_Test extends WP_Ajax_UnitTestCase {
         $_POST['tournament_id'] = $tournament_id;
         $_POST['player_id'] = $player_id;
         $_POST['signup_data'] = [
-            'inGameName' => 'bsport',
-            'email' => 'dan.westall@googlemail.com'
+            'inGameName' => 'test_user',
+            'email' => 'test_user@email.com'
         ];
 
         try {
