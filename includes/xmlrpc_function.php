@@ -195,14 +195,14 @@ function pltm_update_uber_id($data){
     $args = json_decode($data,true);
 
     $pastats_id = $args['pastats_player_id'];
-    $uber_id    = $args['uber_id'];
+    $uber_id    = $args['uberid'];
 
     $player = DW_Helper::get_post_by_meta('pastats_player_id', $pastats_id);
 
     if($player){
-        update_post_meta($player->ID, 'uber_id', $uber_id);
+        update_post_meta($player->ID, 'uberid', $uber_id);
 
-        return 'Player uber id updated';
+        return 'Player uberid updated';
     }
 
     return 'Player not found.';
@@ -221,7 +221,7 @@ function pltm_tournament_players_uber_id($data){
                 $wpdb->posts.ID,
                 $wpdb->posts.post_title,
                 (SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = 'pastats_player_id' AND $wpdb->postmeta.post_id = $wpdb->p2p.p2p_to) AS pastats_player_id,
-                (SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = 'uber_id' AND $wpdb->postmeta.post_id = $wpdb->p2p.p2p_to) AS uber_id,
+                (SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = 'uberid' AND $wpdb->postmeta.post_id = $wpdb->p2p.p2p_to) AS uberid,
                 (SELECT meta_value FROM $wpdb->p2pmeta WHERE meta_key = 'status' AND p2p_id = $wpdb->p2p.p2p_id) AS player_tournament_status
                     FROM $wpdb->p2p
                         LEFT JOIN $wpdb->posts ON p2p_to = $wpdb->posts.ID
