@@ -238,11 +238,13 @@ class DW_Helper {
             "
                 SELECT post_id
                 FROM $wpdb->postmeta
-                WHERE meta_value = %s AND meta_key = %s LIMIT 1
+                WHERE meta_value = %s AND meta_key = '%s' LIMIT 1
             ",
             $meta_value,
             $meta_key
         );
+
+        var_dump($statment);
 
         $post_id = $wpdb->get_var($statment);
 

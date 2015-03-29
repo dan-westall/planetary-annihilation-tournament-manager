@@ -126,12 +126,16 @@ class playerCPT {
             'post_type'   => playerCPT::$post_type
         ], true);
 
-        update_post_meta($player_id, 'player_email', $values['email']['value']);
-        update_post_meta($player_id, 'user_id', $user_id);
+        if(!is_wp_error($player_id)) {
 
-        update_user_meta($user_id, 'player_id', $player_id);
+            update_post_meta($player_id, 'player_email', $values['email']['value']);
+            update_post_meta($player_id, 'user_id', $user_id);
 
-        do_action('new_player_profile');
+            update_user_meta($user_id, 'player_id', $player_id);
+
+            do_action('new_player_profile');
+
+        }
 
         return $player_id;
 

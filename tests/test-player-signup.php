@@ -54,8 +54,309 @@ class Player_Signup_Ajax_Test extends WP_Ajax_UnitTestCase {
         $_POST['tournament_id'] = $tournament_id;
         $_POST['player_id'] = $player_id;
         $_POST['signup_data'] = [
-            'inGameName' => 'bsport',
-            'email' => 'dan.westall@googlemail.com'
+            'inGameName' => 'test_user',
+            'email' => 'test_user@email.com'
+        ];
+
+        try {
+            $this->_handleAjax( 'player_signup' );
+        } catch ( WPAjaxDieContinueException $e ) {
+            unset( $e );
+        }
+
+        $this->assertEquals( 'Tournament sign ups are closed.', json_decode($this->_last_response)->data->message );
+
+    }
+
+    public function test_tournament_full_no_reserve(){
+
+        $tournament_id = $this->factory->tournament->create();
+        $player_id = $this->factory->player->create();
+
+        $_POST['security'] = wp_create_nonce( 'security-' . date('dmy') );
+        $_POST['tournament_id'] = $tournament_id;
+        $_POST['player_id'] = $player_id;
+        $_POST['signup_data'] = [
+            'inGameName' => 'test_user',
+            'email' => 'test_user@email.com'
+        ];
+
+        try {
+            $this->_handleAjax( 'player_signup' );
+        } catch ( WPAjaxDieContinueException $e ) {
+            unset( $e );
+        }
+
+        $this->assertEquals( 'Tournament sign ups are closed.', json_decode($this->_last_response)->data->message );
+
+    }
+
+    public function test_tournament_full_with_reserve(){
+
+        $tournament_id = $this->factory->tournament->create();
+        $player_id = $this->factory->player->create();
+
+        $_POST['security'] = wp_create_nonce( 'security-' . date('dmy') );
+        $_POST['tournament_id'] = $tournament_id;
+        $_POST['player_id'] = $player_id;
+        $_POST['signup_data'] = [
+            'inGameName' => 'test_user',
+            'email' => 'test_user@email.com'
+        ];
+
+        try {
+            $this->_handleAjax( 'player_signup' );
+        } catch ( WPAjaxDieContinueException $e ) {
+            unset( $e );
+        }
+
+        $this->assertEquals( 'Tournament sign ups are closed.', json_decode($this->_last_response)->data->message );
+
+    }
+
+    public function test_tournament_signup_existing_user(){
+
+        $tournament_id = $this->factory->tournament->create();
+        $player_id = $this->factory->player->create();
+
+        $_POST['security'] = wp_create_nonce( 'security-' . date('dmy') );
+        $_POST['tournament_id'] = $tournament_id;
+        $_POST['player_id'] = $player_id;
+        $_POST['signup_data'] = [
+            'inGameName' => 'test_user',
+            'email' => 'test_user@email.com'
+        ];
+
+        try {
+            $this->_handleAjax( 'player_signup' );
+        } catch ( WPAjaxDieContinueException $e ) {
+            unset( $e );
+        }
+
+        $this->assertEquals( 'Tournament sign ups are closed.', json_decode($this->_last_response)->data->message );
+
+    }
+
+    public function test_tournament_signup_new_user(){
+
+        $tournament_id = $this->factory->tournament->create();
+        $player_id = $this->factory->player->create();
+
+        $_POST['security'] = wp_create_nonce( 'security-' . date('dmy') );
+        $_POST['tournament_id'] = $tournament_id;
+        $_POST['player_id'] = $player_id;
+        $_POST['signup_data'] = [
+            'inGameName' => 'test_user',
+            'email' => 'test_user@email.com'
+        ];
+
+        try {
+            $this->_handleAjax( 'player_signup' );
+        } catch ( WPAjaxDieContinueException $e ) {
+            unset( $e );
+        }
+
+        $this->assertEquals( 'Tournament sign ups are closed.', json_decode($this->_last_response)->data->message );
+
+    }
+
+    public function test_tournament_signup_user_no_player_profile(){
+
+        $tournament_id = $this->factory->tournament->create();
+        $player_id = $this->factory->player->create();
+
+        $_POST['security'] = wp_create_nonce( 'security-' . date('dmy') );
+        $_POST['tournament_id'] = $tournament_id;
+        $_POST['player_id'] = $player_id;
+        $_POST['signup_data'] = [
+            'inGameName' => 'test_user',
+            'email' => 'test_user@email.com'
+        ];
+
+        try {
+            $this->_handleAjax( 'player_signup' );
+        } catch ( WPAjaxDieContinueException $e ) {
+            unset( $e );
+        }
+
+        $this->assertEquals( 'Tournament sign ups are closed.', json_decode($this->_last_response)->data->message );
+
+    }
+
+    public function test_tournament_signup_player_no_user_profile(){
+
+        $tournament_id = $this->factory->tournament->create();
+        $player_id = $this->factory->player->create();
+
+        $_POST['security'] = wp_create_nonce( 'security-' . date('dmy') );
+        $_POST['tournament_id'] = $tournament_id;
+        $_POST['player_id'] = $player_id;
+        $_POST['signup_data'] = [
+            'inGameName' => 'test_user',
+            'email' => 'test_user@email.com'
+        ];
+
+        try {
+            $this->_handleAjax( 'player_signup' );
+        } catch ( WPAjaxDieContinueException $e ) {
+            unset( $e );
+        }
+
+        $this->assertEquals( 'Tournament sign ups are closed.', json_decode($this->_last_response)->data->message );
+
+    }
+
+    public function test_tournament_signup_player_excluded(){
+
+        $tournament_id = $this->factory->tournament->create();
+        $player_id = $this->factory->player->create();
+
+        $_POST['security'] = wp_create_nonce( 'security-' . date('dmy') );
+        $_POST['tournament_id'] = $tournament_id;
+        $_POST['player_id'] = $player_id;
+        $_POST['signup_data'] = [
+            'inGameName' => 'test_user',
+            'email' => 'test_user@email.com'
+        ];
+
+        try {
+            $this->_handleAjax( 'player_signup' );
+        } catch ( WPAjaxDieContinueException $e ) {
+            unset( $e );
+        }
+
+        $this->assertEquals( 'Tournament sign ups are closed.', json_decode($this->_last_response)->data->message );
+
+    }
+
+    public function test_tournament_signup(){
+
+        $tournament_id = $this->factory->tournament->create();
+        $player_id = $this->factory->player->create();
+
+        $_POST['security'] = wp_create_nonce( 'security-' . date('dmy') );
+        $_POST['tournament_id'] = $tournament_id;
+        $_POST['player_id'] = $player_id;
+        $_POST['signup_data'] = [
+            'inGameName' => 'test_user',
+            'email' => 'test_user@email.com'
+        ];
+
+        try {
+            $this->_handleAjax( 'player_signup' );
+        } catch ( WPAjaxDieContinueException $e ) {
+            unset( $e );
+        }
+
+        $this->assertEquals( 'Tournament sign ups are closed.', json_decode($this->_last_response)->data->message );
+
+    }
+
+    public function test_tournament_exsiting_tournament_player(){
+
+        $tournament_id = $this->factory->tournament->create();
+        $player_id = $this->factory->player->create();
+
+        $_POST['security'] = wp_create_nonce( 'security-' . date('dmy') );
+        $_POST['tournament_id'] = $tournament_id;
+        $_POST['player_id'] = $player_id;
+        $_POST['signup_data'] = [
+            'inGameName' => 'test_user',
+            'email' => 'test_user@email.com'
+        ];
+
+        try {
+            $this->_handleAjax( 'player_signup' );
+        } catch ( WPAjaxDieContinueException $e ) {
+            unset( $e );
+        }
+
+        $this->assertEquals( 'Tournament sign ups are closed.', json_decode($this->_last_response)->data->message );
+
+    }
+
+    public function test_tournament_exsiting_user_different_email(){
+
+        $tournament_id = $this->factory->tournament->create();
+        $player_id = $this->factory->player->create();
+
+        $_POST['security'] = wp_create_nonce( 'security-' . date('dmy') );
+        $_POST['tournament_id'] = $tournament_id;
+        $_POST['player_id'] = $player_id;
+        $_POST['signup_data'] = [
+            'inGameName' => 'test_user',
+            'email' => 'test_user@email.com'
+        ];
+
+        try {
+            $this->_handleAjax( 'player_signup' );
+        } catch ( WPAjaxDieContinueException $e ) {
+            unset( $e );
+        }
+
+        $this->assertEquals( 'Tournament sign ups are closed.', json_decode($this->_last_response)->data->message );
+
+    }
+
+    public function test_tournament_exsiting_user_different_name(){
+
+        //same email
+
+        $tournament_id = $this->factory->tournament->create();
+        $player_id = $this->factory->player->create();
+
+        $_POST['security'] = wp_create_nonce( 'security-' . date('dmy') );
+        $_POST['tournament_id'] = $tournament_id;
+        $_POST['player_id'] = $player_id;
+        $_POST['signup_data'] = [
+            'inGameName' => 'test_user',
+            'email' => 'test_user@email.com'
+        ];
+
+        try {
+            $this->_handleAjax( 'player_signup' );
+        } catch ( WPAjaxDieContinueException $e ) {
+            unset( $e );
+        }
+
+        $this->assertEquals( 'Tournament sign ups are closed.', json_decode($this->_last_response)->data->message );
+
+    }
+
+    public function test_tournament_withdrawn_player(){
+
+        $tournament_id = $this->factory->tournament->create();
+        $player_id = $this->factory->player->create();
+
+        $_POST['security'] = wp_create_nonce( 'security-' . date('dmy') );
+        $_POST['tournament_id'] = $tournament_id;
+        $_POST['player_id'] = $player_id;
+        $_POST['signup_data'] = [
+            'inGameName' => 'test_user',
+            'email' => 'test_user@email.com'
+        ];
+
+        try {
+            $this->_handleAjax( 'player_signup' );
+        } catch ( WPAjaxDieContinueException $e ) {
+            unset( $e );
+        }
+
+        $this->assertEquals( 'Tournament sign ups are closed.', json_decode($this->_last_response)->data->message );
+
+    }
+
+    public function test_tournament_reenter_player(){
+
+        $tournament_id = $this->factory->tournament->create();
+        $player_id = $this->factory->player->create();
+
+        $_POST['security'] = wp_create_nonce( 'security-' . date('dmy') );
+        $_POST['tournament_id'] = $tournament_id;
+        $_POST['player_id'] = $player_id;
+        $_POST['signup_data'] = [
+            'inGameName' => 'test_user',
+            'email' => 'test_user@email.com'
         ];
 
         try {

@@ -3,8 +3,10 @@
 add_filter( 'xmlrpc_methods', 'add_xml_rpc_methods' );
 
 function add_xml_rpc_methods( $methods ) {
-    $methods['pltm.addMatch'] = 'pltm_add_match';
-    $methods['pltm.playerAttendance'] = 'pltm_player_attendance';
+    $methods['pltm.addMatch']          = 'pltm_add_match';
+    $methods['pltm.playerAttendance']  = 'pltm_player_attendance';
+    $methods['pltm.playerUberID']      = 'pltm_update_uber_id';
+    $methods['pltm.tournamentPlayers'] = 'pltm_tournament_players_uber_id';
     //$methods['pltm.addMatch'] = 'pltm_add_match';
 
     return $methods;
@@ -186,8 +188,52 @@ function pltm_player_attendance($data){
         return 'Player Marked as no show';
 
     }
+}
 
+function pltm_update_uber_id($data){
+    global $wp_xmlrpc_server;
 
+    $args = json_decode($data,true);
+
+    $pastats_id = $args['pastats_player_id'];
+    $uber_id    = $args['uberid'];
+
+    $player = DW_Helper::get_post_by_meta('pastats_player_id', $pastats_id);
+
+    if($player){
+        update_post_meta($player->ID, 'uberid', $uber_id);
+
+        return 'Player '.$player->ID.' updated uberid '.$uber_id;
+    }
+
+    return 'Player not found.';
+}
+
+function pltm_tournament_players_uber_id($data){
+    global $wp_xmlrpc_server, $wpdb;
+    $args = json_decode($data,true);
+
+    $tournament_id = $args['tournament_id'];
+
+    $player_query = $wpdb->prepare(
+        "
+                SELECT
+                p2p_id,
+                $wpdb->posts.ID,
+                $wpdb->posts.post_title,
+                (SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = 'pastats_player_id' AND $wpdb->postmeta.post_id = $wpdb->p2p.p2p_to) AS pastats_player_id,
+                (SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = 'uberid' AND $wpdb->postmeta.post_id = $wpdb->p2p.p2p_to) AS uberid,
+                (SELECT meta_value FROM $wpdb->p2pmeta WHERE meta_key = 'status' AND p2p_id = $wpdb->p2p.p2p_id) AS player_tournament_status
+                    FROM $wpdb->p2p
+                        LEFT JOIN $wpdb->posts ON p2p_to = $wpdb->posts.ID
+                            WHERE p2p_from = %s && p2p_type = 'tournament_players'
+                ",
+        $tournament_id
+    );
+
+    $players = $wpdb->get_results( $player_query );
+
+    return $players;
 
 
 }
