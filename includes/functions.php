@@ -244,8 +244,6 @@ class DW_Helper {
             $meta_key
         );
 
-        var_dump($statment);
-
         $post_id = $wpdb->get_var($statment);
 
         if($post_id)
