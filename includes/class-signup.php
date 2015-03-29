@@ -165,7 +165,7 @@ class tournamentSignup {
 
     public function join_team($team){
 
-        p2p_add_meta($this->getJoinId(), 'team_name', $team);
+        p2p_add_meta($this->getJoinId(), 'team_name', strtolower($team));
 
     }
 

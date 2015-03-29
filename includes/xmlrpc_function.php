@@ -202,7 +202,7 @@ function pltm_update_uber_id($data){
     if($player){
         update_post_meta($player->ID, 'uberid', $uber_id);
 
-        return 'Player uberid updated';
+        return 'Player '.$player->ID.' updated -> uberid -> '.$uber_id;
     }
 
     return 'Player not found.';
