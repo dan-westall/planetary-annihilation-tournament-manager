@@ -3,9 +3,9 @@
 add_filter( 'xmlrpc_methods', 'add_xml_rpc_methods' );
 
 function add_xml_rpc_methods( $methods ) {
-    $methods['pltm.addMatch'] = 'pltm_add_match';
-    $methods['pltm.playerAttendance'] = 'pltm_player_attendance';
-    $methods['pltm.playerUberID'] = 'pltm_update_uber_id';
+    $methods['pltm.addMatch']          = 'pltm_add_match';
+    $methods['pltm.playerAttendance']  = 'pltm_player_attendance';
+    $methods['pltm.playerUberID']      = 'pltm_update_uber_id';
     $methods['pltm.tournamentPlayers'] = 'pltm_tournament_players_uber_id';
     //$methods['pltm.addMatch'] = 'pltm_add_match';
 
