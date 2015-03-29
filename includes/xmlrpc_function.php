@@ -192,17 +192,18 @@ function pltm_player_attendance($data){
 
 function pltm_update_uber_id($data){
     global $wp_xmlrpc_server;
+
     $args = json_decode($data,true);
 
-    $pastats_id = $args['pastats_player_id'];
-    $uber_id    = $args['uberid'];
+    $pastats_id = $data['pastats_player_id'];
+    $uber_id    = $data['uberid'];
 
     $player = DW_Helper::get_post_by_meta('pastats_player_id', $pastats_id);
 
     if($player){
         update_post_meta($player->ID, 'uberid', $uber_id);
 
-        return 'Player '.$player->ID.' updated -> uberid -> '.$uber_id;
+        return 'Player '.$player->ID.' updated uberid '.$uber_id;
     }
 
     return 'Player not found.';
