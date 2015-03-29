@@ -365,16 +365,16 @@ class tournamentSignup {
         $er1 = array_key_exists('email', $_POST['signup_data']);
 
         if(empty($_POST['signup_data']['email']) || !array_key_exists('email', $_POST['signup_data']) || !is_email($_POST['signup_data']['email']))
-            return new WP_Error( 'validation', __( "Plesse make sure all fields have been filled in.", "wp_tournament_manager" ) );
+            return new WP_Error( 'validation', __( "Plesse make sure all email has been filled in.", "wp_tournament_manager" ) );
 
-        if(empty($_POST['signup_data']['inGameName']) || !array_key_exists('inGameName', $_POST['signup_data']) ||  strlen($_POST['inGameName'] < 2))
-            return new WP_Error( 'validation', __( "Plesse make sure all fields have been filled in.", "wp_tournament_manager" ) );
+        if(empty($_POST['signup_data']['inGameName']) || !array_key_exists('inGameName', $_POST['signup_data']) ||  strlen($_POST['signup_data']['inGameName']) < 2)
+            return new WP_Error( 'validation', __( "Plesse make sure all in game name has been filled in.", "wp_tournament_manager" ) );
 
         if(get_tournament_type($this->tournament_id) == 'teamarmies' && (!empty($_POST['signup_data']['teamName']) || !array_key_exists('teamName', $_POST['signup_data'])))
-            return new WP_Error( 'validation', __( "Plesse make sure all fields have been filled in.", "wp_tournament_manager" ) );
+            return new WP_Error( 'validation', __( "Plesse make sure all teamname have been filled in.", "wp_tournament_manager" ) );
 
         if(get_tournament_type($this->tournament_id) == 'clanwars' && (!empty($_POST['signup_data']['clan']) && !array_key_exists('clan', $_POST['signup_data'])))
-            return new WP_Error( 'validation', __( "Plesse make sure all fields have been filled in.", "wp_tournament_manager" ) );
+            return new WP_Error( 'validation', __( "Plesse make sure all clan name has been filled in.", "wp_tournament_manager" ) );
 
         return true;
 
