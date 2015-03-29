@@ -195,8 +195,8 @@ function pltm_update_uber_id($data){
 
     $args = json_decode($data,true);
 
-    $pastats_id = $data['pastats_player_id'];
-    $uber_id    = $data['uberid'];
+    $pastats_id = $args['pastats_player_id'];
+    $uber_id    = $args['uberid'];
 
     $player = DW_Helper::get_post_by_meta('pastats_player_id', $pastats_id);
 
