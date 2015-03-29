@@ -1,6 +1,5 @@
 <?php
 
-if($is_live) {
 
     require_once(__DIR__ . '/../../../../wp-load.php');
 
@@ -11,7 +10,6 @@ if($is_live) {
         global $wpdb;
     }
 
-}
 
 
 class tournament_in_progress {
