@@ -120,7 +120,8 @@ class playerCPT {
 
         // Insert the post into the database
         $player_id = wp_insert_post([
-            'post_title'  => $values['inGameName'],
+            'post_title'  => wp_strip_all_tags($values['inGameName']),
+            'post_name'   => wp_unique_post_slug(sanitize_title($values['inGameName'])),
             'post_status' => 'publish',
             'post_author' => $user_id,
             'post_type'   => playerCPT::$post_type
@@ -138,7 +139,6 @@ class playerCPT {
         }
 
         return $player_id;
-
 
     }
 
