@@ -712,31 +712,31 @@ class tournamentSignup {
                     <?php if(get_tournament_type($tournament_id) == 'clanwars') : ?>
 
                         <div id="clan-name" class="form-group" ng-class="{ 'has-error' : clanName }">
-                            <label for="clanName">Clan Name</label>
-                            <input type="text" name="clanName" ng-model="signupData.clanName" class="form-control" placeholder="Clan name" value="<?php echo $clan; ?>" required>
+                            <label for="clanName">Clan Tag</label>
+                            <input type="text" name="clanName" ng-model="signupData.clanName" class="form-control" placeholder="Clan tag" value="<?php echo $clan; ?>" required>
                             <div class="ng-message" ng-class="{'__highlight': submitted == true}" ng-messages="playerSignupForm.clanName.$error" ng-messages-include="error-messages" ng-if="submitted || playerSignupForm.clanName.$touched"></div>
                         </div>
 
                         <div id="clan-contact" class="form-group" ng-class="{ 'has-error' : clanContact }">
-                            <label for="clan-contact">I am clan contact</label><br />
+                            <label for="clanContact">I am clan contact</label><br />
                             <div class="custom-checkbox-style">
-                                <input type="checkbox" value="None" id="clan-contact" name="clanContact"  ng-model="signupData.clanContact"/>
-                                <label for="clan-contact"></label>
+                                <input type="checkbox" value="false" id="clanContact" name="clan-contact"  ng-model="signupData.clanContact"/>
+                                <label for="clanContact"></label>
                             </div>
-                            <label for="communication" class="description">When dealing with clans its easier for everyone, if there is just one point of contact</label>
+                            <label for="clanContact" class="description">When dealing with clans it's easier for everyone if there is just one point of contact</label>
                         </div>
 
                     <?php endif; ?>
 
-                    <div id="team-name" class="form-group">
+                    <div id="other-details" class="form-group">
                         <label>Is there anything else we need to know?</label>
                         <textarea ng-model="signupData.otherDetails"></textarea>
                     </div>
 
-                    <div id="team-name" class="form-group">
+                    <div id="communication-option" class="form-group">
                         <label for="communication">Future Communication</label><br />
                         <div class="custom-checkbox-style">
-                            <input type="checkbox" value="None" id="communication" name="check"  ng-model="signupData.communication"/>
+                            <input type="checkbox" value="false" id="communication" name="communication"  ng-model="signupData.communication"/>
                             <label for="communication"></label>
                         </div>
                         <label for="communication" class="description" ng-class="{ 'happy': signupData.communication }">I agree to receive emails from eXodus eSports regarding new products, services or upcoming events. Collected information will not be shared with any third party.<span></span></label>
@@ -744,6 +744,7 @@ class tournamentSignup {
 
                     <input type="submit" value="Join this tournament" class="tournament-btn __signup"/>
     <br />
+
                 </form>
 
             </div>
