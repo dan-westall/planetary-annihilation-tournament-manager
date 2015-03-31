@@ -193,6 +193,14 @@ class tournamentSignup {
 
     }
 
+    public function set_clan_tag($clan_tag){
+
+        update_post_meta($this->getPlayerId(),'clan_tag', $clan_tag);
+
+        p2p_add_meta($this->getJoinId(), 'clan_tag', $clan_tag);
+
+    }
+
     public function set_clan_contact(){
 
         p2p_add_meta($this->getJoinId(), 'clan_contact', 1);
@@ -526,12 +534,14 @@ class tournamentSignup {
             if(get_tournament_type($tournament_id) == 'clanwars'){
                 $signup->set_clan($signup_data['clanName']);
 
+                $signup->set_clan_tag($signup_data['clanTag']);
+
                 if(isset($signup_data['clan_contact']) && !empty($signup_data['clan_contact']))
                     $signup->set_clan_contact();
             }
 
             if(!empty($signup_data['otherDetails']))
-                $signup->set_clan_contact();
+                //$signup->set_clan_contact();
 
             //$signup->update_profile(['site_notifications' => 1]);
             $signup->update_user( get_post_meta($player_id, 'user_id', true ), ['site_notifications' => ( $signup_data['communication'] ? $signup_data['communication'] : "0" ) ]);
@@ -711,12 +721,22 @@ class tournamentSignup {
 
                     <?php if(get_tournament_type($tournament_id) == 'clanwars') : ?>
 
-                        <div id="clan-name" class="form-group" ng-class="{ 'has-error' : clanName }">
-                            <label for="clanName">Clan Tag</label>
-                            <input type="text" name="clanName" ng-model="signupData.clanName" class="form-control" placeholder="Clan tag" value="<?php echo $clan; ?>" required>
-                            <div class="ng-message" ng-class="{'__highlight': submitted == true}" ng-messages="playerSignupForm.clanName.$error" ng-messages-include="error-messages" ng-if="submitted || playerSignupForm.clanName.$touched"></div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div id="clan-name" class="form-group" ng-class="{ 'has-error' : clanName }">
+                                    <label for="clanName">Clan Name</label>
+                                    <input type="text" name="clanName" ng-model="signupData.clanName" class="form-control" placeholder="Clan tag" value="<?php echo $clan; ?>" required>
+                                    <div class="ng-message" ng-class="{'__highlight': submitted == true}" ng-messages="playerSignupForm.clanName.$error" ng-messages-include="error-messages" ng-if="submitted || playerSignupForm.clanName.$touched"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div id="clan-tag" class="form-group" ng-class="{ 'has-error' : clanTag }">
+                                    <label for="clanTag">Clan Tag</label>
+                                    <input type="text" tag="clanTag" ng-model="signupData.clanTag" class="form-control" placeholder="Clan tag" required>
+                                    <div class="ng-message" ng-class="{'__highlight': submitted == true}" ng-messages="playerSignupForm.clanTag.$error" ng-messages-include="error-messages" ng-if="submitted || playerSignupForm.clanTag.$touched"></div>
+                                </div>
+                            </div>
                         </div>
-
                         <div id="clan-contact" class="form-group" ng-class="{ 'has-error' : clanContact }">
                             <label for="clanContact">I am clan contact</label><br />
                             <div class="custom-checkbox-style">
