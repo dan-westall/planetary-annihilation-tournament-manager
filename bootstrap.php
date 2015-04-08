@@ -16,6 +16,8 @@ require_once( PLTM_PLUGIN_DIR.'/includes/class-acf-rules.php');
 require_once( PLTM_PLUGIN_DIR.'/includes/class-awards.php');
 require_once( PLTM_PLUGIN_DIR.'/includes/class_shortcodes.php');
 require_once( PLTM_PLUGIN_DIR.'/includes/class-signup.php');
+require_once( PLTM_PLUGIN_DIR.'/includes/class-better-hipchat-addon.php');
+require_once( PLTM_PLUGIN_DIR.'/includes/class-clans.php');
 
 
 //3rd party library
