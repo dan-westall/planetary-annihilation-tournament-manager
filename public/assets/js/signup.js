@@ -1,14 +1,25 @@
-var signupForm = angular.module('main', ['ngMessages', 'ngSanitize']);
+var signupForm = angular.module('main', ['ngMessages', 'ngSanitize', 'angucomplete-alt']);
 
 
 signupForm.constant('wordpressJS', js);
+signupForm.constant('clanList', clansListing);
 
 // create angular controller and pass in $scope and $http
-signupForm.controller('signupFormController', [ '$scope', '$http', 'wordpressJS',
-    function($scope, $http, wordpressJS) {
+signupForm.controller('signupFormController', [ '$scope', '$http', 'wordpressJS', 'clanList',
+    function($scope, $http, wordpressJS, clanList) {
 
         $scope.signupData = {};
         $scope.result = {};
+        $scope.clans = {};
+
+        if(clanList.length){
+            $scope.clanList = clanList;
+        }
+
+        $scope.setClan = function (clan){
+            $scope.signupData.clanName = clan.title;
+        }
+
         $scope.submission = false;
         $scope.submitSignup = function (formData, validity) {
             if (validity) {

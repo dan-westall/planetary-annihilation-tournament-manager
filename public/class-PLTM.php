@@ -94,6 +94,7 @@ class Planetary_Annihilation_Tournament_Manager {
         new PLTM_shortcodes();
         new gform_filters();
 
+
         //new userWager();
 
         userPolling::register();
@@ -130,6 +131,9 @@ class Planetary_Annihilation_Tournament_Manager {
 	}
 
     public function register_tournament_endpoints(){
+
+
+        new better_hipchat_intergration();
 
         foreach(array_merge(self::$tournament_endpoints, self::$match_endpoints) as $endpoint){
             add_rewrite_endpoint($endpoint, EP_PERMALINK);

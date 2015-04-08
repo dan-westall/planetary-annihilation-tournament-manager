@@ -549,13 +549,13 @@ class tournamentSignup {
 
         } catch (Exception $e) {
 
-            do_action( "tournament_signup_error", $player_id, $tournament_id, $e->getMessage(), $signup_data );
+            do_action( "tournament_signup_error", $player_id, $tournament_id, $e->getMessage(), $_POST );
 
             wp_send_json_error(['message' => $e->getMessage(), 'type' => 'error']);
 
         }
 
-        do_action( "tournament_signup", [ 'player_id' => $signup->getPlayerId(), 'tournament_id' => $signup->getTournamentId(), $signup_data ] );
+        do_action( "tournament_signup", [ 'player_id' => $signup->getPlayerId(), 'tournament_id' => $signup->getTournamentId(), $signup->get_signup_message(), $_POST ], $signup->getTournamentJoinStatus() );
 
         wp_send_json_success(['message' => $signup->get_signup_message(), 'type' => 'success']);
 
@@ -671,12 +671,59 @@ class tournamentSignup {
             $clan  = get_post_meta($user_player_profile->ID, 'clan', true);
 
         }
+
+
         ?>
+
+        <?php if(get_tournament_type($tournament_id) == 'clanwars') : ?>
+
+            <script type="application/javascript">
+
+                var clansListing = <?php echo json_encode(clans::get_clans_listing()); ?>;
+
+            </script>
+
+        <?php endif ?>
+
         <script type="text/ng-template" id="error-messages">
             <div ng-message="required">You left the field blank</div>
             <div ng-message="minlength">Your field is too short</div>
             <div ng-message="maxlength">Your field is too long</div>
             <div ng-message="email">Your email address invalid</div>
+        </script>
+
+        <script type="text/ng-template" id="/auto-suggest-clan.html">
+            <div class="angucomplete-holder" ng-class="{'angucomplete-dropdown-visible': showDropdown}">
+                <input ng-model="searchStr"
+                       ng-disabled="disableInput"
+                       type="text"
+                       placeholder="{{placeholder}}ddd"
+                       ng-focus="onFocusHandler()"
+                       class="{{inputClass}}"
+                       ng-focus="resetHideResults()"
+                       ng-blur="hideResults($event)"
+                       autocapitalize="off"
+                       autocorrect="off"
+                       autocomplete="off"
+                       ng-change="inputChangeHandler(searchStr)"/>
+                <div class="angucomplete-dropdown" ng-show="showDropdown">
+                    <div class="angucomplete-searching" ng-show="searching" ng-bind="textSearching"></div>
+                    <div class="angucomplete-searching" ng-show="!searching && (!results || results.length == 0)" ng-bind="textNoResults"></div>
+                    <div class="angucomplete-row" ng-repeat="result in results" ng-click="selectResult(result)" ng-mouseenter="hoverRow($index)" ng-class="{'angucomplete-selected-row': $index == currentIndex}">
+                        <div ng-if="imageField" class="angucomplete-image-holder">
+                            <img ng-if="result.image && result.image != ''" ng-src="{{result.image}}" class="angucomplete-image"/>
+                            <div ng-if="!result.image && result.image != ''" class="angucomplete-image-default"></div>
+                        </div>
+                        <div class="angucomplete-title" ng-if="matchClass" ng-bind-html="result.title"></div>
+                        <div class="angucomplete-title" ng-if="!matchClass">{{ result.title }}</div>
+                        <div ng-if="matchClass && result.description && result.description != ''" class="angucomplete-description" ng-bind-html="result.description"></div>
+                        <div ng-if="!matchClass && result.description && result.description != ''" class="angucomplete-description">{{result.description}}</div>
+                    </div>
+                    <div class="angucomplete-row" ng-click="selectResult({title: searchStr, originalObject: { name: searchStr, custom: true }})" ng-mouseenter="hoverRow(results.length)" ng-class="{'angucomplete-selected-row': results.length == currentIndex}">
+                        <div class="angucomplete-title">Select custom clan name '{{ searchStr }}'</div>
+                    </div>
+                </div>
+            </div>
         </script>
 
         <script type="text/ng-template" id="signupform.html">
@@ -723,9 +770,25 @@ class tournamentSignup {
 
                         <div class="row">
                             <div class="col-md-6">
+
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
                                 <div id="clan-name" class="form-group" ng-class="{ 'has-error' : clanName }">
                                     <label for="clanName">Clan Name</label>
-                                    <input type="text" name="clanName" ng-model="signupData.clanName" class="form-control" placeholder="Clan tag" value="<?php echo $clan; ?>" required>
+
+                                    <angucomplete-alt id="ex1"
+                                                      placeholder="Clan name"
+                                                      pause="100"
+                                                      local-data="clanList"
+                                                      selected-object="setClan"
+                                                      search-fields="clan_name"
+                                                      title-field="clan_name"
+                                                      minlength="3"
+                                                      input-class="form-control"
+                                                      template-url="/auto-suggest-clan.html"/>
                                     <div class="ng-message" ng-class="{'__highlight': submitted == true}" ng-messages="playerSignupForm.clanName.$error" ng-messages-include="error-messages" ng-if="submitted || playerSignupForm.clanName.$touched"></div>
                                 </div>
                             </div>
@@ -764,7 +827,7 @@ class tournamentSignup {
 
                     <input type="submit" value="Join this tournament" class="tournament-btn __signup"/>
     <br />
-
+                    <pre>{{ signupData | json }}</pre>
                 </form>
 
             </div>
