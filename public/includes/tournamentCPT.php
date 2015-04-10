@@ -51,7 +51,7 @@ class tournamentCPT {
 
         add_filter( 'page_js_args', array( $this, 'filter_page_js_vars'), 10, 2);
 
-        add_filter( 'json_prepare_post',  array( $this, 'tournament_json_extend_v2' ), 50, 3 );
+        add_filter( 'json_prepare_post',  array( $this, 'tournament_json_extend_v2' ), 10, 3 );
 
         add_action( 'parse_query',   array( $this, 'tournament_api_filter'));
         add_action( 'pre_get_posts',   array( $this, 'pre_tournament_api_filter'));
@@ -1665,7 +1665,7 @@ class tournamentCPT {
 
     public function tournament_json_extend_v2($_post, $post, $context){
 
-        if($post['post_type'] == 'tournament'){
+        if($post['post_type'] == 'tournament' && $context == 'view'){
 
             global $wpdb;
 
