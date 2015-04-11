@@ -1697,7 +1697,8 @@ class tournamentCPT {
                 (SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = 'pastats_player_id' AND $wpdb->postmeta.post_id = $wpdb->p2p.p2p_to) AS player_clan,
                 (SELECT meta_value FROM $wpdb->p2pmeta WHERE meta_key = 'status' AND p2p_id = $wpdb->p2p.p2p_id) AS player_tournament_status,
                 (SELECT meta_value FROM $wpdb->p2pmeta WHERE meta_key = 'result' AND p2p_id = $wpdb->p2p.p2p_id) AS player_finish,
-                (SELECT meta_value FROM $wpdb->p2pmeta WHERE meta_key = 'team_name' AND p2p_id = $wpdb->p2p.p2p_id) AS team_name
+                (SELECT meta_value FROM $wpdb->p2pmeta WHERE meta_key = 'team_name' AND p2p_id = $wpdb->p2p.p2p_id) AS team_name,
+                (SELECT meta_value FROM $wpdb->postmeta WHERE meta_key = 'clan' AND $wpdb->postmeta.post_id = $wpdb->p2p.p2p_to) AS clan_name
                     FROM $wpdb->p2p
                         LEFT JOIN $wpdb->posts ON p2p_to = $wpdb->posts.ID
                             WHERE p2p_from = %s && p2p_type = 'tournament_players'
@@ -1757,6 +1758,13 @@ class tournamentCPT {
 
                     $player_details = array_merge($player_details, [
                         'team_name' => $player->team_name
+                    ]);
+                }
+
+                if(get_tournament_type($post['ID']) == 'clanwars'){
+
+                    $player_details = array_merge($player_details, [
+                        'team_name' => $player->clan_name
                     ]);
                 }
 
