@@ -392,7 +392,12 @@ class matchCPT {
             'match_id' => ''
         ), $attr));
 
-        $players       = p2p_type('match_players')->get_connected($match_id);
+        $players = new WP_Query( array(
+            'connected_type' => 'match_players',
+            'connected_items' => $match_id,
+            'nopaging' => true,
+        ) );
+
         $tournament_id = self::get_match_tournament_id($match_id);
 
         $match_cards = '';
