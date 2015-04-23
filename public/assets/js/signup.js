@@ -1,8 +1,13 @@
 var signupForm = angular.module('main', ['ngMessages', 'ngSanitize', 'angucomplete-alt']);
 
+if(typeof clansListing !== 'undefined'){
+    signupForm.constant('clanList', clansListing);
+} else {
+    signupForm.constant('clanList', {});
+}
+
 
 signupForm.constant('wordpressJS', js);
-signupForm.constant('clanList', clansListing);
 
 // create angular controller and pass in $scope and $http
 signupForm.controller('signupFormController', [ '$scope', '$http', 'wordpressJS', 'clanList',
