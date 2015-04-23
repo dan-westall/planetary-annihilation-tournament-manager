@@ -827,7 +827,7 @@ class tournamentSignup {
 
                     <input type="submit" value="Join this tournament" class="tournament-btn __signup"/>
     <br />
-                    <pre>{{ signupData | json }}</pre>
+
                 </form>
 
             </div>
