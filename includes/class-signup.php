@@ -555,7 +555,7 @@ class tournamentSignup {
 
         }
 
-        do_action( "tournament_signup", [ 'player_id' => $signup->getPlayerId(), 'tournament_id' => $signup->getTournamentId(), $signup->get_signup_message(), $_POST ], $signup->getTournamentJoinStatus() );
+        do_action( "tournament_signup", $player_id, $tournament_id, $signup->get_signup_message(), $_POST , $signup->getTournamentJoinStatus() );
 
         wp_send_json_success(['message' => $signup->get_signup_message(), 'type' => 'success']);
 
