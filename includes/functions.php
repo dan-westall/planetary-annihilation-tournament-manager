@@ -228,6 +228,52 @@ function get_tournament_badges(){
 
 }
 
+function do_offset($level){
+    $offset = "";             // offset for subarry
+    for ($i=1; $i<$level;$i++){
+        $offset = $offset . "<td></td>";
+    }
+    return $offset;
+}
+
+function show_array($array, $level, $sub, $html = ''){
+    if (is_array($array) == 1){          // check if input is an array
+        foreach($array as $key_val => $value) {
+            $offset = "";
+            if (is_array($value) == 1){   // array is multidimensional
+                $html .= "<tr>";
+                $offset = do_offset($level);
+                $html .= $offset . "<td>" . $key_val . "</td>";
+                $html .= show_array($value, $level+1, 1);
+            }
+            else{                        // (sub)array is not multidim
+                if ($sub != 1){          // first entry for subarray
+                    $html .= "<tr nosub>";
+                    $offset = do_offset($level);
+                }
+                $sub = 0;
+                $html .= $offset . "<td main ".$sub." width=\"120\">" . $key_val .
+                    "</td><td width=\"120\">" . $value . "</td>";
+                $html .= "</tr>\n";
+            }
+        } //foreach $array
+    }
+    else{ // argument $array is not an array
+        return;
+    }
+
+    return $html;
+}
+
+function html_show_array($array, $html = ''){
+    $html .= "<table cellspacing=\"0\" border=\"1\">\n";
+    $html .= show_array($array, 1, 0);
+    $html .= "</table>\n";
+
+    return $html;
+}
+
+
 class DW_Helper {
 
     public static function get_post_by_meta($meta_key, $meta_value){
