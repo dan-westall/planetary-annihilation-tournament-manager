@@ -266,7 +266,7 @@ function show_array($array, $level, $sub, $html = ''){
 }
 
 function html_show_array($array, $html = ''){
-    $html .= "<table cellspacing=\"0\" border=\"1\">\n";
+    $html .= "<table cellspacing=\"0\" border=\"0\">\n";
     $html .= show_array($array, 1, 0);
     $html .= "</table>\n";
 
