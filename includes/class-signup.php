@@ -167,6 +167,8 @@ class tournamentSignup {
 
         p2p_add_meta($this->getJoinId(), 'team_name', strtolower($team));
 
+        do_action( 'player_team_join', $this->getPlayerId(), $this->getTournamentId(), $this->getJoinId(), strtolower($team));
+
     }
 
     public function update_profile($player_id, $meta){
@@ -359,7 +361,7 @@ class tournamentSignup {
 
         $this->setJoinId($p2p_result);
 
-        do_action( "tournament_signup_$status", [ 'player_id' => $this->player_id, 'tournament_id' => $tournament_id ] );
+        do_action( "tournament_signup_$status", $this->player_id, $tournament_id );
 
         tournamentCPT::delete_tournament_caches($tournament_id);
 
@@ -549,13 +551,13 @@ class tournamentSignup {
 
         } catch (Exception $e) {
 
-            do_action( "tournament_signup_error", $player_id, $tournament_id, $e->getMessage(), $_POST );
+            do_action( "tournament_signup_error", $player_id, $tournament_id, $e->getMessage(), $_POST['signup_data'] );
 
             wp_send_json_error(['message' => $e->getMessage(), 'type' => 'error']);
 
         }
 
-        do_action( "tournament_signup", $player_id, $tournament_id, $signup->get_signup_message(), $_POST , $signup->getTournamentJoinStatus() );
+        do_action( "tournament_signup", $player_id, $tournament_id, $signup->get_signup_message(), $_POST['signup_data'] , $signup->getTournamentJoinStatus() );
 
         wp_send_json_success(['message' => $signup->get_signup_message(), 'type' => 'success']);
 
