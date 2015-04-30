@@ -119,15 +119,27 @@ class playerCPT {
     public static function new_player_profile($user_id, $values){
 
         // Insert the post into the database
-        $player_id = wp_insert_post([
+
+        $player_profile_args = [
             'post_title'  => wp_strip_all_tags($values['inGameName']),
             'post_name'   => wp_unique_post_slug(sanitize_title($values['inGameName'])),
             'post_status' => 'publish',
             'post_author' => $user_id,
             'post_type'   => playerCPT::$post_type
-        ], true);
+        ];
+
+        $player_id = wp_insert_post($player_profile_args, true);
 
         if(!is_wp_error($player_id)) {
+
+            //malformed user profile check
+            if(get_the_title($player_id) != wp_strip_all_tags($values['inGameName'])){
+
+                $_POST['signup_data']['player_profile_args'] = $player_profile_args;
+
+                throw new Exception('Malformed user profile created, Signup process halted, Staff have been notifed.');
+
+            }
 
             update_post_meta($player_id, 'player_email', $values['email']['value']);
             update_post_meta($player_id, 'user_id', $user_id);
