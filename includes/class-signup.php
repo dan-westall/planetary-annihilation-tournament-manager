@@ -797,7 +797,7 @@ class tournamentSignup {
                             <div class="col-md-6">
                                 <div id="clan-tag" class="form-group" ng-class="{ 'has-error' : clanTag }">
                                     <label for="clanTag">Clan Tag</label>
-                                    <input type="text" tag="clanTag" ng-model="signupData.clanTag" class="form-control" placeholder="Clan tag" required>
+                                    <input type="text" name="clanTag" ng-model="signupData.clanTag" class="form-control" placeholder="Clan tag" required>
                                     <div class="ng-message" ng-class="{'__highlight': submitted == true}" ng-messages="playerSignupForm.clanTag.$error" ng-messages-include="error-messages" ng-if="submitted || playerSignupForm.clanTag.$touched"></div>
                                 </div>
                             </div>
