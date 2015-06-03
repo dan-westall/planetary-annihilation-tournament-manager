@@ -59,6 +59,8 @@ class tournamentCPT {
 
         add_filter( 'tournament_prize_tiers', array( $this, 'get_tournament_prize_tiers') );
 
+        add_action ( 'the_pos', array( $this, 'amend_tournament_object'), 10, 1 );
+
     }
 
     function register_cpt_tournament(){
@@ -2059,11 +2061,11 @@ class tournamentCPT {
 
     }
 
-    public static function get_tournament_player_count($tournament_id, $status = ''){
+    public static function get_tournament_player_count($tournament_id, $status = '') {
 
         global $wpdb;
 
-        if(empty($status))
+        if (empty($status))
             $status = tournamentCPT::$tournament_player_status;
 
         $query = "SELECT
@@ -2072,18 +2074,24 @@ class tournamentCPT {
                         LEFT JOIN $wpdb->posts ON p2p_to = $wpdb->posts.ID
                             WHERE p2p_from = %s && p2p_type = 'tournament_players'
                             AND (SELECT meta_value FROM {$wpdb->prefix}p2pmeta WHERE {$wpdb->prefix}p2pmeta.meta_key = 'status'
-                            AND {$wpdb->prefix}p2pmeta.p2p_id = {$wpdb->prefix}p2p.p2p_id) IN ('".implode("', '", $status)."')";
+                            AND {$wpdb->prefix}p2pmeta.p2p_id = {$wpdb->prefix}p2p.p2p_id) IN ('" . implode("', '", $status) . "')";
 
         $player_count_query = $wpdb->prepare($query,
             $tournament_id
         );
 
 
-        $player_count = $wpdb->get_var( $player_count_query );
+        $player_count = $wpdb->get_var($player_count_query);
 
         return $player_count;
 
 
+    }
+
+    private static function amend_tournament_object($object){
+
+        if($object->post_type == tournamentCPT::$post_type)
+            $object->tournament_status = get_post_meta($object->ID, 'tournament_status', true);
 
     }
 }
