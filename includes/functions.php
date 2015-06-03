@@ -273,6 +273,32 @@ function html_show_array($array, $html = ''){
     return $html;
 }
 
+function wptm_get_post_type($post = null, $status = false){
+
+    if ( $post = get_post( $post ) ) {
+
+        switch ($post->post_type) {
+
+            case "tournamentCPT::$post_type" :
+
+                if ($status)
+                    return $post->post_type . '-' .$post->tournament_status;
+
+
+            break;
+
+            default :
+
+                return $post->post_type;
+
+        }
+
+    }
+
+    return false;
+
+}
+
 
 class DW_Helper {
 
