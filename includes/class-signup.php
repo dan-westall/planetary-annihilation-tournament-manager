@@ -369,6 +369,8 @@ class tournamentSignup {
 
     public function validate_signup_fields(){
 
+        //todo take another pass on this
+
         $error = new WP_Error();
 
         $er = empty($_POST['signup_data']['email']);
