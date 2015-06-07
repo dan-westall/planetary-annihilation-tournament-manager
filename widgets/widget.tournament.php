@@ -102,56 +102,7 @@ class tournament_info extends WP_Widget {
                 <h3>Date</h3>
                 <div class="row">
                     <div class="col-lg-12 text-center" style="margin-bottom: 15px;">
-                    <?php
-
-                        if(get_field('tournament_status') === '0' || get_field('tournament_status') === '4'){
-                            if(get_field('run_date') && get_field('run_time')){
-
-
-
-                                echo '<span  itemprop="startDate" content="'.$rundate->format('c').'">'.$rundate->format('l jS F Y') . '</span> @ <a href="http://www.timeanddate.com/worldclock/fixedtime.html?msg=Tournament&iso=' . get_field('run_date') . 'T' . str_replace(':','',get_field('run_time')) . '" target="_blank">' . get_field('run_time') . ' UTC</a><br/><br/>';
-                                echo '<meta itemprop="eventStatus" content="http://schema.org/EventScheduled">';
-                            }
-                            else{
-                                echo '<h4 style="margin-top:15px;">To be announced</h4>';
-
-                            }
-                        }
-                        else
-                        {
-                            if(get_field('tournament_status') === '1'){
-                                    if(get_field('run_date') && get_field('run_time')){
-
-                                        echo '<span  itemprop="startDate" content="'.$rundate->format('c').'">'.$rundate->format('l jS F Y') . '</span> @ <a href="http://www.timeanddate.com/worldclock/fixedtime.html?msg=Tournament&iso=' . get_field('run_date') . 'T' . str_replace(':','',get_field('run_time')) . '" target="_blank">' . get_field('run_time') . ' UTC</a><br/>';
-                                        echo '<meta itemprop="eventStatus" content="http://schema.org/EventScheduled">';
-                                    }
-
-
-                                echo '<h4 style="margin-top:15px;">LIVE NOW</h4>';
-                            }
-                            else{
-                                if(get_field('tournament_status') === '2'){
-                                    if(get_field('run_date') && get_field('run_time')){
-
-                                        echo '<span  itemprop="startDate" content="'.$rundate->format('c').'">'.$rundate->format('l jS F Y') . '</span> @ <a href="http://www.timeanddate.com/worldclock/fixedtime.html?msg=Tournament&iso=' . get_field('run_date') . 'T' . str_replace(':','',get_field('run_time')) . '" target="_blank">' . get_field('run_time') . ' UTC</a><br/>';
-                                        echo '<meta itemprop="eventStatus" content="http://schema.org/EventScheduled">';
-                                    }
-
-                                    echo '<h4 style="margin-top:15px;">CANCELLED</h4>';
-                                }
-                                else{
-
-                                    if(get_field('run_date') && get_field('run_time')){
-
-                                        echo '<span  itemprop="startDate" content="'.$rundate->format('c').'">'.$rundate->format('l jS F Y') . '</span> @ <a href="http://www.timeanddate.com/worldclock/fixedtime.html?msg=Tournament&iso=' . get_field('run_date') . 'T' . str_replace(':','',get_field('run_time')) . '" target="_blank">' . get_field('run_time') . ' UTC</a><br/>';
-                                        echo '<meta itemprop="eventStatus" content="http://schema.org/EventScheduled">';
-                                    }
-                                    echo '<h4 style="margin-top:15px;">Finished</h4>';
-                                }
-                            }
-                        }
-                    ?>
-
+                        <?php tournamentCPT::get_tournament_date(); ?>
                     </div>
                 </div>
             </section>

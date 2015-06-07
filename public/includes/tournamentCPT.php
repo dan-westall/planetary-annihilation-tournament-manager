@@ -1258,6 +1258,72 @@ class tournamentCPT {
 
     }
 
+    public static function get_tournament_date($post_id = null){
+
+        //strip out acf functions
+
+        $tournament = get_post($post_id);
+
+        $format_in = 'Ymd';
+
+        $rundate = new DateTime( date("Y-m-d", strtotime(get_field('run_date', $tournament->ID ))), new DateTimeZone('UTC'));
+
+        //check : is in time, because if not will mess datetime object up.
+        if(strpos(get_field('run_time', $tournament->ID ), ':') !== false){
+            $time = explode(':', get_field('run_time', $tournament->ID ));
+            $rundate->setTime($time[0], $time[1]);
+        }
+
+        if(get_field('tournament_status', $tournament->ID ) === '0' || get_field('tournament_status', $tournament->ID ) === '4'){
+            if(get_field('run_date', $tournament->ID ) && get_field('run_time', $tournament->ID )){
+
+
+
+                echo '<span  itemprop="startDate" content="'.$rundate->format('c').'">'.$rundate->format('l jS F Y') . '</span> @ <a href="http://www.timeanddate.com/worldclock/fixedtime.html?msg=Tournament&iso=' . get_field('run_date') . 'T' . str_replace(':','',get_field('run_time')) . '" target="_blank">' . get_field('run_time') . ' UTC</a><br/><br/>';
+                echo '<meta itemprop="eventStatus" content="http://schema.org/EventScheduled">';
+            }
+            else{
+                echo '<h4 style="margin-top:15px;">To be announced</h4>';
+
+            }
+        }
+        else
+        {
+            if(get_field('tournament_status', $tournament->ID ) === '1'){
+                if(get_field('run_date', $tournament->ID ) && get_field('run_time', $tournament->ID )){
+
+                    echo '<span  itemprop="startDate" content="'.$rundate->format('c').'">'.$rundate->format('l jS F Y') . '</span> @ <a href="http://www.timeanddate.com/worldclock/fixedtime.html?msg=Tournament&iso=' . get_field('run_date') . 'T' . str_replace(':','',get_field('run_time')) . '" target="_blank">' . get_field('run_time') . ' UTC</a><br/>';
+                    echo '<meta itemprop="eventStatus" content="http://schema.org/EventScheduled">';
+                }
+
+
+                echo '<h4 style="margin-top:15px;">LIVE NOW</h4>';
+            }
+            else{
+                if(get_field('tournament_status', $tournament->ID ) === '2'){
+                    if(get_field('run_date', $tournament->ID ) && get_field('run_time', $tournament->ID )){
+
+                        echo '<span  itemprop="startDate" content="'.$rundate->format('c').'">'.$rundate->format('l jS F Y') . '</span> @ <a href="http://www.timeanddate.com/worldclock/fixedtime.html?msg=Tournament&iso=' . get_field('run_date') . 'T' . str_replace(':','',get_field('run_time')) . '" target="_blank">' . get_field('run_time') . ' UTC</a><br/>';
+                        echo '<meta itemprop="eventStatus" content="http://schema.org/EventScheduled">';
+                    }
+
+                    echo '<h4 style="margin-top:15px;">CANCELLED</h4>';
+                }
+                else{
+
+                    if(get_field('run_date', $tournament->ID ) && get_field('run_time', $tournament->ID )){
+
+                        echo '<span  itemprop="startDate" content="'.$rundate->format('c').'">'.$rundate->format('l jS F Y') . '</span> @ <a href="http://www.timeanddate.com/worldclock/fixedtime.html?msg=Tournament&iso=' . get_field('run_date') . 'T' . str_replace(':','',get_field('run_time')) . '" target="_blank">' . get_field('run_time') . ' UTC</a><br/>';
+                        echo '<meta itemprop="eventStatus" content="http://schema.org/EventScheduled">';
+                    }
+                    echo '<h4 style="margin-top:15px;">Finished</h4>';
+                }
+            }
+        }
+
+
+    }
+
     public static function get_tournament($attr) {
 
         extract(shortcode_atts(array(
