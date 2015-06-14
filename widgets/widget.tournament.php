@@ -134,11 +134,14 @@ class tournament_info extends WP_Widget {
                 </div>
             </section>
 
+            <?php if( have_rows('prize_tiers') ): ?>
+
             <section class="prize-tiers tournament-meta-block text">
 
                 <h3>Prizes</h3>
 
-                    <?php if( have_rows('prize_tiers') ):
+
+                        <?php
 
                         $price_count = count(get_field('prize_tiers'));
 
@@ -161,9 +164,21 @@ class tournament_info extends WP_Widget {
 
                         $html .= '</ul>';
 
-                    endif; echo $html;?>
+                    echo $html;?>
 
             </section>
+
+                <?php else : ?>
+
+                <?php
+
+                if(DW_Helper::is_site_administrator())
+                    var_dump(get_field('prize_tiers'));
+
+                ?>
+
+
+            <?php endif; ?>
 
             <section class="staff tournament-meta-block text ">
                 <h3>Other Info</h3>
