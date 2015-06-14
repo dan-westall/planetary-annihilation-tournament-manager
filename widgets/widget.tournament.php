@@ -145,7 +145,7 @@ class tournament_info extends WP_Widget {
 
                         $price_count = count(get_field('prize_tiers'));
 
-                        $html = '<ul>';
+                        $html = '<ul class="prize-tiers-container" style="margin-top: 15px;">';
 
                         $column = 100;
 
