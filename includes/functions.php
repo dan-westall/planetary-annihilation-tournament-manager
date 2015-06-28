@@ -1,5 +1,6 @@
 <?php
 
+//moved to tournament helper/
 function get_tournament_players($tournament_id, $status = array('active'), $args = []){
 
     $arg = array_merge(array(
@@ -45,6 +46,7 @@ function user_has_voted($object_id){
 
 }
 
+//moved to tourmant helper
 function get_tournament_matches($tournament_id){
     $matches = get_posts(array(
         'connected_type'   => 'tournament_matches',
@@ -96,11 +98,6 @@ function get_the_tournament_endpoint(){
 
 function is_tournament_signup_open($tournament_id){
 
-
-//    $tournament_signup = new tournamentSignup();
-//
-//    return $tournament_signup->is_tournament_signup_open($tournament_id);
-
     return tournamentCPT::is_tournament_signup_open($tournament_id);
 
 }
@@ -117,6 +114,7 @@ function get_match_format($match_id){
 
 }
 
+//moved to tournament helper
 function is_tournament_in_progress(){
 
     global $wpdb;
@@ -135,6 +133,7 @@ function get_player_avatar($player_id, $size = 100){
 
 }
 
+
 function is_player_in_tournament($tournament_id, $player_id, $status = ''){
 
     $p2p_id = p2p_type( 'tournament_players' )->get_p2p_id( $tournament_id, $player_id );
@@ -148,6 +147,8 @@ function is_player_in_tournament($tournament_id, $player_id, $status = ''){
     return false;
 
 }
+
+//moved to helper
 
 function is_tournament_clan_contact($tournament_id, $clan_tag){
 
@@ -167,6 +168,7 @@ function is_tournament_clan_contact($tournament_id, $clan_tag){
 
 }
 
+//moved to clan
 function is_clan_leader($clan_tag){
 
     global $current_user;
@@ -189,6 +191,7 @@ function can_edit_match_roster($tournament_id, $clan_tag){
 
 }
 
+//moved to tournament helper
 function get_tournament_type($tournament_id){
 
     return get_post_meta($tournament_id, 'tournament_format', true);

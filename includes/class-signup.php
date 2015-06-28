@@ -1,6 +1,10 @@
 <?php
 
-class tournamentSignup {
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
+class WPTM_Tournament_Signup {
 
     /**
      * @var
@@ -153,7 +157,7 @@ class tournamentSignup {
 
         wp_register_script(
             'signupForm',
-            PLTM_PLUGIN_URI. 'public/assets/js/patm.signup.min.js', //PLTM_PLUGIN_URI
+            WPTM_PLUGIN_URI. 'public/assets/js/patm.signup.min.js', //PLTM_PLUGIN_URI
             ['defaults.main.min'],
             date('U'),
             true
@@ -528,7 +532,7 @@ class tournamentSignup {
                 throw new Exception('Sorry but you are excluded from this tournament.');
 
             if($signup->is_existing_tournament_player($player_id, $tournament_id))
-                throw new Exception('Great news, Your already signed up to this tournament.');
+                throw new Exception('Great news, you\'re already signed up to this tournament.');
 
             $signup->join_tournament($player_id);
 
@@ -547,8 +551,13 @@ class tournamentSignup {
             if(!empty($signup_data['otherDetails']))
                 //$signup->set_clan_contact();
 
+
             //$signup->update_profile(['site_notifications' => 1]);
             $signup->update_user( get_post_meta($player_id, 'user_id', true ), ['site_notifications' => ( $signup_data['communication'] ? $signup_data['communication'] : "0" ) ]);
+
+            $player_helper = new WPTM_Player_Helper($player_id);
+
+            $signup_data['PA Stats ID'] = is_int($player_helper->has_pa_stats_id()) ? $player_helper->has_pa_stats_id() : 'false';
 
 
         } catch (Exception $e) {

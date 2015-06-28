@@ -75,7 +75,7 @@ class matchCPT {
 
         $matchLabel = array(
             'name'               => __('Matches'),
-            'menu_name'          => __('Match'),
+            'menu_name'          => __('Matches'),
             'all_items'          => __('All Matches'),
             'singular_name'      => __('Match'),
             'add_new_item'       => __('Add New Match'),
