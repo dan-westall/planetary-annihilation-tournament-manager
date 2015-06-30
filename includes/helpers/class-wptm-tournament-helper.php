@@ -4,6 +4,9 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+/**
+ * Class WPTM_Tournament_Helper
+ */
 class WPTM_Tournament_Helper {
 
     private $tournament_id;
@@ -11,41 +14,39 @@ class WPTM_Tournament_Helper {
     /**
      * @return mixed
      */
-    public function getTournamentId() {
+    public function get_tournament_id() {
         return $this->tournament_id;
     }
 
     /**
      * @param mixed $tournament_id
      */
-    public function setTournamentId($tournament_id) {
+    public function set_tournament_id($tournament_id) {
         $this->tournament_id = $tournament_id;
     }
 
 
     function __construct($tournmanet_id) {
 
-        $this->setTournamentId($tournmanet_id);
+        $this->set_tournament_id($tournmanet_id);
 
     }
 
-    public function get_tourament_players(){
+    public function get_tourament_players( $args = [], $status = [ tournamentCPT::$tournament_player_status[0], tournamentCPT::$tournament_player_status[1] ] ){
 
-        $arg = array_merge(array(
+        $players = get_posts( array_merge( [
             'connected_type'   => 'tournament_players',
-            'connected_items'  => $this->getTournamentId(),
-            'connected_meta' => array(
-                array(
+            'connected_items'  => $this->get_tournament_id(),
+            'connected_meta' => [
+                [
                     'key' => 'status',
                     'value' => $status,
                     'compare' => 'IN'
-                )
-            ),
+                ]
+            ],
             'nopaging'         => true,
             'suppress_filters' => false
-        ), $args);
-
-        $players = get_posts($arg);
+        ], $args ) );
 
         return $players;
 
@@ -53,12 +54,12 @@ class WPTM_Tournament_Helper {
 
     public function get_tournament_matches(){
 
-        $matches = get_posts(array(
+        $matches = get_posts( [
             'connected_type'   => 'tournament_matches',
-            'connected_items'  => $this->getTournamentId(),
+            'connected_items'  => $this->get_tournament_id(),
             'nopaging'         => true,
             'suppress_filters' => false
-        ));
+        ] );
 
         return $matches;
 
@@ -76,14 +77,22 @@ class WPTM_Tournament_Helper {
         return false;
     }
 
-    public static function is_tournament_in_progress_v2(){
+    /**
+     * @return int
+     */
+    public static function is_tournament_in_progress_v2( $tournament_id = 0 ){
 
-        $tourmanet_site_status = get_option('tourmanet_in_progress');
+        $tournament_id = 0;
 
-
-
+        return (int) $tournament_id;
     }
 
+
+    /**
+     * @param $tournament_id
+     * @param $clan_tag
+     * @return bool
+     */
     public function is_tournament_clan_contact($tournament_id, $clan_tag){
 
         global $current_user;

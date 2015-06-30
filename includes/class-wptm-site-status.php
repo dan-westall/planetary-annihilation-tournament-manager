@@ -22,14 +22,7 @@ class WPTM_Site_Status {
     }
 
     //todo this shouldnt be here
-    public function is_tournament_in_progress(){
 
-
-        if(WPTM_Site_Status::get_site_status() === $this->$tournament_active_status)
-            return true;
-
-        return false;
-    }
 
     public static function get_site_status(){
 
@@ -64,10 +57,15 @@ class WPTM_Site_Status {
 
     }
 
-    public static function site_take_over_template($template_path){
+    public static function site_take_over_template( $template_path ){
 
+        if( false !== ( $site_take_over_page = get_option('site_take_over_page') ) ){
 
+            $site_take_over_page
 
+        }
+
+        return $template_path;
 
     }
 
