@@ -1,5 +1,7 @@
 <?php
 
+//todo autoloader!
+
 define( 'WPTM_PLUGIN_DIR' , dirname(__FILE__) );
 define( 'WPTM_PLUGIN_URI' , plugin_dir_url(__FILE__) );
 
@@ -19,6 +21,7 @@ require_once( WPTM_PLUGIN_DIR.'/includes/class-signup.php');
 require_once( WPTM_PLUGIN_DIR.'/includes/class-better-hipchat-addon.php');
 require_once( WPTM_PLUGIN_DIR.'/includes/class-wptm-clans.php');
 require_once( WPTM_PLUGIN_DIR.'/includes/class-wptm-site-status.php');
+require_once( WPTM_PLUGIN_DIR.'/includes/class-wptm-match-generation.php');
 
 
 //3rd party library

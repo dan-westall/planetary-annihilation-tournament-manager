@@ -38,7 +38,7 @@ class WPTM_Site_Status {
 
         update_option('wptm_get_site_status', $site_state);
 
-        do_action( 'site_status_chanege', $site_state );
+        do_action( 'site_status_change', $site_state );
 
     }
 
@@ -61,7 +61,7 @@ class WPTM_Site_Status {
 
         if( false !== ( $site_take_over_page = get_option('site_take_over_page') ) ){
 
-            $site_take_over_page
+            $site_take_over_page;
 
         }
 

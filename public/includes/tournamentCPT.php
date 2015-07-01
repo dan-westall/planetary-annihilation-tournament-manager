@@ -375,7 +375,7 @@ class tournamentCPT {
 
         $template_path = PLTM_PLUGIN_DIR . "/includes/templates/section-content.php";
 
-        foreach(Planetary_Annihilation_Tournament_Manager::$tournament_endpoints as $endpoint){
+        foreach(WP_Tournament_Manager::$tournament_endpoints as $endpoint){
 
             if ($post->post_type == 'tournament' && isset( $wp_query->query_vars[$endpoint] )) {
 
@@ -396,7 +396,7 @@ class tournamentCPT {
 
         global $wp_query, $post;
 
-        foreach(Planetary_Annihilation_Tournament_Manager::$tournament_endpoints as $endpoint){
+        foreach(WP_Tournament_Manager::$tournament_endpoints as $endpoint){
 
             if ($post->post_type == 'tournament' && isset( $wp_query->query_vars[$endpoint_check] )) {
 
@@ -443,7 +443,7 @@ class tournamentCPT {
         if(!is_object($post) && !isset($id) || (is_admin() || !in_the_loop()))
             return $title;
 
-        foreach(Planetary_Annihilation_Tournament_Manager::$tournament_endpoints as $endpoint){
+        foreach(WP_Tournament_Manager::$tournament_endpoints as $endpoint){
 
             if ($post->post_type == 'tournament' && isset( $wp_query->query_vars[$endpoint] )) {
 
@@ -483,7 +483,7 @@ class tournamentCPT {
 
     public function filter_challonge_tournament_listing($field){
 
-        $c = new ChallongeAPI(Planetary_Annihilation_Tournament_Manager::fetch_challonge_API());
+        $c = new ChallongeAPI(WP_Tournament_Manager::fetch_challonge_API());
 
         $form_listing[] = 'Select Tournament';
         $form_listing[] = 'Custom Tournament ID';
@@ -775,7 +775,7 @@ class tournamentCPT {
 
         $endpoint_set = false;
 
-        foreach (Planetary_Annihilation_Tournament_Manager::$tournament_endpoints as $tournament_endpoint):
+        foreach (WP_Tournament_Manager::$tournament_endpoints as $tournament_endpoint):
 
             $classes = '';
 
@@ -913,7 +913,7 @@ class tournamentCPT {
 
     public static function get_tournament_date($post_id = null){
 
-        //strip out acf functions
+        //strip out acf functions, move html out of function
 
         $tournament = get_post($post_id);
 

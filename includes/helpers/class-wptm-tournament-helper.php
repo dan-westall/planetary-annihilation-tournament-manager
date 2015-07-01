@@ -21,18 +21,18 @@ class WPTM_Tournament_Helper {
     /**
      * @param mixed $tournament_id
      */
-    public function set_tournament_id($tournament_id) {
+    public function set_tournament_id( $tournament_id ) {
         $this->tournament_id = $tournament_id;
     }
 
 
-    function __construct($tournmanet_id) {
+    function __construct( $tournmanet_id ) {
 
         $this->set_tournament_id($tournmanet_id);
 
     }
 
-    public function get_tourament_players( $args = [], $status = [ tournamentCPT::$tournament_player_status[0], tournamentCPT::$tournament_player_status[1] ] ){
+    public function get_tourament_players( array $args = [], array $status = [ tournamentCPT::$tournament_player_status[0], tournamentCPT::$tournament_player_status[1] ] ){
 
         $players = get_posts( array_merge( [
             'connected_type'   => 'tournament_players',
@@ -88,6 +88,7 @@ class WPTM_Tournament_Helper {
     }
 
 
+    //todo this should move to a extended user object one day
     /**
      * @param $tournament_id
      * @param $clan_tag
@@ -116,5 +117,7 @@ class WPTM_Tournament_Helper {
         return get_post_meta($tournament_id, 'tournament_format', true);
 
     }
+
+
 
 }

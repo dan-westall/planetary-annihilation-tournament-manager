@@ -62,6 +62,8 @@ class WP_Tournament_Manager_Admin {
         $plugin            = WP_Tournament_Manager::get_instance();
         $this->plugin_slug = $plugin->get_plugin_slug();
 
+        WPTM_Match_Generator::register();
+
         // Load admin style sheet and JavaScript.
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_styles'));
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
