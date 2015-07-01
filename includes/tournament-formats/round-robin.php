@@ -12,11 +12,7 @@ class WPTM_Tournament_Formats {
     }
 
 
-    public function schedule_format(){
-
-        $round = [];
-
-        $tournament_players = tournamentCPT::get_tournament_players($tournament);
+    public static function schedule_format($teams){
 
         if (count($teams)%2 != 0){
             array_push($teams,"bye");

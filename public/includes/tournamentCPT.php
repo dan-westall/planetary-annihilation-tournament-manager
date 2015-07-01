@@ -192,6 +192,8 @@ class tournamentCPT {
 
         global $post;
 
+        //todo move fields off into filters?
+
         $object_id = isset($_REQUEST['post_ID']) ? $_REQUEST['post_ID'] : 0;
         $object_id = isset($_REQUEST['post']) ? $_REQUEST['post']: 0;
 
@@ -277,6 +279,11 @@ class tournamentCPT {
                 'title' => 'Note',
                 'type'  => 'text',
             ),
+            'group'   => array(
+                'title' => 'Group',
+                'type'  => 'select',
+                'values' => range('A', 'Z')
+            ),
             'result' => array(
                 'title'  => 'Result',
                 'type'   => 'select',
@@ -311,7 +318,7 @@ class tournamentCPT {
         ];
 
 
-        if(get_tournament_type($object_id) == 'clanwars' || get_tournament_type($object_id) == 'clanwars' || count(self::tournament_fixtures()) > 0){
+        if(get_tournament_type($object_id) == 'clanwars' || count(self::tournament_fixtures()) > 0){
 
             $tournament_matches_args = array_merge_recursive($tournament_matches_args, [ 'fields' => [
                     'match_fixture' => [
@@ -322,6 +329,14 @@ class tournamentCPT {
             ]]);
 
         }
+
+        $tournament_matches_args = array_merge_recursive($tournament_matches_args, [ 'fields' => [
+            'match_round' => [
+                'title' => 'Round',
+                'type' => 'select',
+                'values' => range(1, 24)
+            ]
+        ]]);
 
         p2p_register_connection_type( apply_filters('patm_p2p_args', $tournament_matches_args, $object_id ) );
 

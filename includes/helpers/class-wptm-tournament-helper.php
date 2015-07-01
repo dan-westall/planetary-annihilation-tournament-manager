@@ -30,10 +30,13 @@ class WPTM_Tournament_Helper {
 
         $this->set_tournament_id($tournmanet_id);
 
+        return $this;
+
     }
 
     public function get_tourament_players( array $args = [], array $status = [ tournamentCPT::$tournament_player_status[0], tournamentCPT::$tournament_player_status[1] ] ){
 
+        //move to wp_query
         $players = get_posts( array_merge( [
             'connected_type'   => 'tournament_players',
             'connected_items'  => $this->get_tournament_id(),
@@ -54,14 +57,18 @@ class WPTM_Tournament_Helper {
 
     public function get_tournament_matches(){
 
-        $matches = get_posts( [
+        $matches = new WP_Query([
             'connected_type'   => 'tournament_matches',
             'connected_items'  => $this->get_tournament_id(),
             'nopaging'         => true,
             'suppress_filters' => false
-        ] );
+        ]);
+
+        wp_reset_postdata();
 
         return $matches;
+
+
 
     }
 
@@ -112,12 +119,22 @@ class WPTM_Tournament_Helper {
 
     }
 
-    public function get_tournament_type($tournament_id){
+    public function get_tournament_type(){
 
-        return get_post_meta($tournament_id, 'tournament_format', true);
+        return get_post_meta($this->get_tournament_id(), 'tournament_format', true);
 
     }
 
+    public function get_tournament_status_id(){
+
+        return apply_filters( 'wptm_tournament_status', get_post_meta( $this->get_tournament_id(), 'tournament_status', true), $this->get_tournament_id() );
+    }
+
+    public function get_tournament_status(){
+
+        return tournamentCPT::$tournament_status[ $this->get_tournament_status_id() ];
+
+    }
 
 
 }
