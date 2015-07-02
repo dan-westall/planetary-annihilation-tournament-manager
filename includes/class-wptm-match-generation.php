@@ -40,9 +40,9 @@ class WPTM_Match_Generator{
 
         add_action( 'add_meta_boxes', [ $plugin, 'register_meta_box' ] );
 
-        add_action( 'wp_ajax_generate_tournament_matches', [ $plugin, 'ajax_generate_tournament_matches'], 10 );
+        add_action( 'wp_ajax_ajax_generate_tournament_matches', [ $plugin, 'ajax_generate_tournament_matches'], 10, 0 );
 
-        add_action( 'admin_enqueue_scripts',  [ $plugin, 'register_scripts'] );
+        add_action( 'admin_enqueue_scripts',  [ $plugin, 'register_scripts'], 10 , 0 );
     }
 
     public static function register_scripts(){
@@ -62,42 +62,42 @@ class WPTM_Match_Generator{
         $test = $tournament->get_tournament_matches();
 
         //if has matches delete
-        if( false !== ( $matches = $tournament->get_tournament_matches() ) ){
+        if( false !== ( $matches = $tournament->get_tournament_matches()->posts ) ){
 
-            //could be moved an array_map function
-            foreach($matches as $match){
-                wp_delete_post($match, true);
-
-            }
+            array_map(function($match){
+                //wp_delete_post($match['ID'], true);
+            }, $matches);
 
         }
 
         //getPlayers, change to format needed
-        $tournament->get_tourament_players();
+        $players = $tournament->get_tourament_players();
+
+        $matches = WPTM_Tournament_Formats::schedule_format( (array) $players);
 
 
-
+    $test2 = $td;
 
         //get return schedule
 
-        //loop results and build matches
-
-        $match_name = sprintf(
-            '%s$1c' );
-
-        $new_match = [
-            'post_type'    => matchCPT::$post_type,
-            'post_title'   => $match_name,
-            'post_status'  => 'publish',
-            'post_content' => 'start'
-        ];
-
-
-        $match_id  = wp_insert_post($new_match);
-
-        $p2p_result = p2p_type('tournament_matches')->connect($this->get_tournament_id(), $match_id, [
-            'date'                    => current_time('mysql'),
-        ]);
+//        //loop results and build matches
+//
+//        $match_name = sprintf(
+//            '%s$1c' );
+//
+//        $new_match = [
+//            'post_type'    => matchCPT::$post_type,
+//            'post_title'   => $match_name,
+//            'post_status'  => 'publish',
+//            'post_content' => 'start'
+//        ];
+//
+//
+//        $match_id  = wp_insert_post($new_match);
+//
+//        $p2p_result = p2p_type('tournament_matches')->connect($this->get_tournament_id(), $match_id, [
+//            'date'                    => current_time('mysql'),
+//        ]);
 
 
 
@@ -120,7 +120,7 @@ class WPTM_Match_Generator{
 
     public function ajax_generate_tournament_matches(){
 
-        check_ajax_referer( 'generate-matches', 'security' );
+        //check_ajax_referer( 'generate-matches', 'security' );
 
         $tournament_id = intval($_POST['tournament_id']);
 
@@ -128,7 +128,10 @@ class WPTM_Match_Generator{
 
         $tournament = new WPTM_Tournament_Helper($this->get_tournament_id());
 
-        if( $tournament->get_tournament_type() === 'Round Robin' && $tournament->get_tournament_status() === tournamentCPT::$tournament_status[4] ){
+        $t = $tournament->get_tournament_status();
+
+        //if( $tournament->get_tournament_type() === 'Round Robin' && $tournament->get_tournament_status() === tournamentCPT::$tournament_status[4] ){
+        if( in_array( $tournament->get_tournament_status(), [ tournamentCPT::$tournament_status[0], tournamentCPT::$tournament_status[4]]) ){
 
 
             $this->generate_tournament_matches();

@@ -34,7 +34,10 @@ class WPTM_Tournament_Helper {
 
     }
 
-    public function get_tourament_players( array $args = [], array $status = [ tournamentCPT::$tournament_player_status[0], tournamentCPT::$tournament_player_status[1] ] ){
+    public function get_tourament_players(  $args = [], $status = [] ){
+
+        if( empty($status))
+            $status = [ tournamentCPT::$tournament_player_status[0], tournamentCPT::$tournament_player_status[1] ];
 
         //move to wp_query
         $players = get_posts( array_merge( [

@@ -32,7 +32,7 @@ var wptmGenerateMatchUI = {
             type: 'POST',
             cache: false,
             data: {
-                action: 'generate_tournament_matches',
+                action: 'ajax_generate_tournament_matches',
                 security: jQuery(wptmGenerateMatchUI.config.wrapper).find('hidden').val(),
                 tournament_id: post_id
             },

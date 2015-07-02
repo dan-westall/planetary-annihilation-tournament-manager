@@ -98,6 +98,9 @@ class WP_Tournament_Manager {
 
         new WPTM_Site_Status();
 
+
+        WPTM_Match_Generator::register();
+
         //new userWager();
 
         userPolling::register();
