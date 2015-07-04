@@ -76,11 +76,11 @@ function get_the_tournament_endpoint(){
 
     get_currentuserinfo();
 
-    foreach(Planetary_Annihilation_Tournament_Manager::$tournament_endpoints as $endpoint){
+    foreach(WP_Tournament_Manager::$tournament_endpoints as $endpoint){
 
         if ($post->post_type == 'tournament' && isset( $wp_query->query_vars[$endpoint] ) ) {
 
-            if($endpoint == Planetary_Annihilation_Tournament_Manager::$tournament_endpoints[0] && is_player_in_tournament($post->ID, $current_user->player_id) == true){
+            if($endpoint == WP_Tournament_Manager::$tournament_endpoints[0] && is_player_in_tournament($post->ID, $current_user->player_id) == true){
 
                 //return tournamentCPT::$post_type;
                 return "$post->post_type-$endpoint";
@@ -98,7 +98,9 @@ function get_the_tournament_endpoint(){
 
 function is_tournament_signup_open($tournament_id){
 
-    return tournamentCPT::is_tournament_signup_open($tournament_id);
+    $tournament_signup = new WPTM_Tournament_Signup();
+
+    return $tournament_signup->is_tournament_signup_open($tournament_id);
 
 }
 

@@ -788,6 +788,8 @@ class tournamentCPT {
         $tournament        = get_post($post_id);
         $tournament_closed = get_post_meta($tournament->ID, 'signup_closed', true);
 
+        $tournament_signup = new WPTM_Tournament_Signup();
+
         $endpoint_set = false;
 
         foreach (WP_Tournament_Manager::$tournament_endpoints as $tournament_endpoint):
@@ -807,7 +809,7 @@ class tournamentCPT {
 
                 case "sign-up":
 
-                    if(self::is_tournament_signup_open($tournament->ID) && !tournamentSignup::is_existing_tournament_player($current_user->player_id, $tournament->ID)){
+                    if( $tournament_signup->is_tournament_signup_open( $tournament->ID ) && !WPTM_Tournament_Signup::is_existing_tournament_player($current_user->player_id, $tournament->ID)){
 
                         $html .= sprintf('<li class="%4$s"><a href="%1$s%2$s/">%3$s</a></li>', get_permalink(), $tournament_endpoint, ucwords($tournament_endpoint), $classes);
 
@@ -1409,6 +1411,9 @@ class tournamentCPT {
 
             $tournament_status = self::$tournament_status[get_post_meta($post['ID'], 'tournament_status', true)];
 
+
+            $tournament_signup = new WPTM_Tournament_Signup();
+
             $tournament_result = [];
             $tournament_id = $post['ID'];
 
@@ -1538,7 +1543,8 @@ class tournamentCPT {
 
             $_post['meta']['tournament_prizes'] = self::get_tournament_prize_tiers_v2($post['ID']);
 
-            $_post['meta']['signup_open'] = is_tournament_signup_open($post['ID']);
+
+            $_post['meta']['signup_open'] = $tournament_signup->is_tournament_signup_open($post['ID']);
 
             $tournament_fixtures = tournamentCPT::get_tournament_fixtures($tournament_id);
 
