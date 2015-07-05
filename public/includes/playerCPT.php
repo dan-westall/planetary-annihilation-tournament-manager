@@ -479,6 +479,8 @@ class playerCPT {
 
     public static function get_player_avatar($player_id = 0, $size = 'player-profile-thumbnail', $user_id = 0){
 
+        //todo i hate this function!
+
         $default_avatar    = 1886;
 
         $player_user_id    = get_post_meta($player_id, 'user_id', true);
@@ -497,15 +499,10 @@ class playerCPT {
                     $user_avatar_img = wp_get_attachment_image($default_avatar, $size);
                 } else {
 
-                    if (function_exists('get_wp_user_avatar')) {
-                        $user_avatar_img = get_wp_user_avatar($user->ID, $size);
+                    if ('' === ($user_avatar_id = get_user_meta($user->ID, 'wp_user_avatar', true))) {
+                        $user_avatar_img = wp_get_attachment_image($default_avatar, $size);
                     } else {
-
-                        if ('' === ($user_avatar_id = get_user_meta($user->ID, 'wp_user_avatar', true))) {
-                            $user_avatar_img = wp_get_attachment_image($default_avatar, $size);
-                        } else {
-                            $user_avatar_img = wp_get_attachment_image($user_avatar_id, $size);
-                        }
+                        $user_avatar_img = wp_get_attachment_image($user_avatar_id, $size);
                     }
 
                 }
