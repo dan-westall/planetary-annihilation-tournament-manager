@@ -12,12 +12,12 @@ class WPTM_Site_Status {
 
     function _construct(){
 
-        add_action( 'wp_ajax_modify_site_status', [ $this, 'modify_site_status'] );
-        add_action( 'wp_ajax_nopriv_modify_site_status',  [ $this, 'modify_site_status' ] );
-
-        add_action( 'wp_dashboard_setup', [ $this, 'register_status_dashboard_widget' ] );
-
-        add_filter( 'template_include', [ $this, 'site_take_over_template' ] );
+//        add_action( 'wp_ajax_modify_site_status', [ $this, 'modify_site_status'] );
+//        add_action( 'wp_ajax_nopriv_modify_site_status',  [ $this, 'modify_site_status' ] );
+//
+//        add_action( 'wp_dashboard_setup', [ $this, 'register_status_dashboard_widget' ] );
+//
+//        add_filter( 'template_include', [ $this, 'site_take_over_template' ] );
 
     }
 
