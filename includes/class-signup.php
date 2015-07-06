@@ -403,7 +403,7 @@ class WPTM_Tournament_Signup {
 
         $player        = get_post($player_id);
         $connection_id = p2p_type('tournament_players')->get_p2p_id($tournament_id, $player_id);
-        $challonge_api_key = Planetary_Annihilation_Tournament_Manager::fetch_challonge_API();
+        $challonge_api_key = WP_Tournament_Manager::fetch_challonge_API();
 
         $name = (get_tournament_type($tournament_id) == 'teamarmies' ? p2p_get_meta($connection_id, 'team_name', true) : $player->post_title);
 
@@ -444,7 +444,7 @@ class WPTM_Tournament_Signup {
 
         $connection_id            = p2p_type('tournament_players')->get_p2p_id($tournament_id, $player_id);
         $challonge_participant_id = p2p_get_meta($connection_id, 'challonge_participant_id', true);
-        $challonge_api_key        = Planetary_Annihilation_Tournament_Manager::fetch_challonge_API();
+        $challonge_api_key        = WP_Tournament_Manager::fetch_challonge_API();
 
         try {
 

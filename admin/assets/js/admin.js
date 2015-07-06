@@ -25,8 +25,6 @@ var wptmGenerateMatchUI = {
         self.testNotifyResponse.html('');
         self.testNotifySpinner.show();
 
-        console.log(ajaxurl);
-
         var xhr = jQuery.ajax({
             url: ajaxurl,
             type: 'POST',
@@ -34,6 +32,7 @@ var wptmGenerateMatchUI = {
             data: {
                 action: 'ajax_generate_tournament_matches',
                 security: jQuery(wptmGenerateMatchUI.config.wrapper).find('hidden').val(),
+                group_matches: jQuery(wptmGenerateMatchUI.config.wrapper).find('[type="checkbox"]:checked').val(),
                 tournament_id: post_id
             },
             dataType: 'JSON',
@@ -42,13 +41,10 @@ var wptmGenerateMatchUI = {
 
         xhr.done( function( r ) {
 
-            console.log('done')
-            console.log(r)
-
             //magic line
-            P2PAdmin.boxes['tournament_matches'].candidates.sync()
+            window.location.reload();
 
-            self.testNotifyResponse.html( '<span style="color: green">OK</span>' );
+            self.testNotifyResponse.html( '<span style="color: green">' + r.data.message + '</span>' );
             self.testNotifySpinner.hide();
         } );
 

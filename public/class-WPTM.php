@@ -90,7 +90,7 @@ class WP_Tournament_Manager {
         new playerCPT();
         new tournamentCPT();
         new matchCPT();
-        new notificationCPT();
+        //new notificationCPT();
 
         new PLTM_shortcodes();
         new gform_filters();
@@ -101,15 +101,10 @@ class WP_Tournament_Manager {
 
         WPTM_Match_Generator::register();
 
-        //new userWager();
-
         userPolling::register();
         tournament_in_progress::register();
-//        ruleCPT::register();
         awards::register();
         WPTM_Tournament_Signup::register();
-//        acfCustomRules::register();
-
 
         remove_action( 'wp_head', 'wp_generator');
         remove_action( 'wp_head', 'wp_shortlink_wp_head' );

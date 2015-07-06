@@ -79,7 +79,9 @@ class WPTM_Match_Generator{
         if( false !== ( $matches = $tournament->get_tournament_matches()->posts ) ){
 
             array_map(function($match){
+
                 wp_delete_post($match->ID, true);
+
             }, $matches);
 
         }
@@ -93,7 +95,7 @@ class WPTM_Match_Generator{
 
             foreach($players as $player){
 
-                $group = p2p_get_meta($player->p2p_id, 'tournament_players', true);
+                $group = p2p_get_meta($player->p2p_id, 'group', true);
 
                 if(empty($group))
                     continue;
@@ -130,7 +132,7 @@ class WPTM_Match_Generator{
                 $round            = ($round + 1);
 
                 $match_name = sprintf(
-                    '%1$s - %2$s vs %3$s',
+                    'Group %1$s - %2$s vs %3$s',
                     $group_identifier,
                     $play["Home"]->post_name,
                     $play["Away"]->post_name);
@@ -144,17 +146,19 @@ class WPTM_Match_Generator{
 
                 $match_id = wp_insert_post($new_match, true);
 
+                if(is_wp_error($match_id)){
 
-                if(is_wp_error($match_id))
                     throw new Exception('Sorry there was a error, we could not create the matches for this tournament.');
 
-                update_post_meta($match_id, 'round', $round );
+                }
 
                 if(!is_null($group)){
 
                     update_post_meta($match_id, 'group', $group );
 
                 }
+
+                update_post_meta($match_id, 'round', $round );
 
                 $p2p_result_tm = p2p_type('tournament_matches')->connect($this->get_tournament_id(), $match_id, [
                     'date'        => current_time('mysql')
@@ -170,7 +174,6 @@ class WPTM_Match_Generator{
                     'team' => 1
                 ]);
 
-
                 $this->set_match_list( [ 'match_title' => $match_name, 'match_id' => $match_id ] );
 
             }
@@ -181,9 +184,11 @@ class WPTM_Match_Generator{
 
     public function error_match_cleanup(){
 
-        array_map(function($match){
-            wp_delete_post($match['match_id'], true);
-        }, $this->get_match_list());
+        array_map( function( $match ) {
+
+            wp_delete_post( $match['match_id'], true );
+
+        }, $this->get_match_list() );
 
     }
 
