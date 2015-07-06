@@ -128,14 +128,21 @@ class WPTM_Match_Generator{
 
             foreach($games AS $play){
 
+                //for bye exception
+                if(!isset($play["Home"]->post_name) OR !isset($play["Away"]->post_name)) {
+
+                    continue;
+
+                }
+
                 $group_identifier = is_null($group) ? ($round + 1) : $group;
                 $round            = ($round + 1);
 
                 $match_name = sprintf(
                     'Group %1$s - %2$s vs %3$s',
                     $group_identifier,
-                    $play["Home"]->post_name,
-                    $play["Away"]->post_name);
+                    $play["Home"]->post_title,
+                    $play["Away"]->post_title);
 
                 $new_match = [
                     'post_type'    => matchCPT::$post_type,
