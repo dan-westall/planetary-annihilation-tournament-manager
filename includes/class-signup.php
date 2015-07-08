@@ -486,7 +486,7 @@ class WPTM_Tournament_Signup {
         $signup_data   = array_map( 'esc_attr', $_POST['signup_data'] );
 
 
-        $signup = new tournamentSignup();
+        $signup = new WPTM_Tournament_Signup();
 
         if( is_wp_error( $signup->validate_signup_fields() ) )
             wp_send_json_error(['message' => $signup->validate_signup_fields()->get_error_message() , 'type' => 'validation']);
