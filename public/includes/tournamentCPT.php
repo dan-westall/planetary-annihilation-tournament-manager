@@ -1807,23 +1807,34 @@ class tournamentCPT {
 
         if (empty($status))
             $status = tournamentCPT::$tournament_player_status;
+//
+//        $query = "SELECT
+//                  COUNT($wpdb->posts.ID) as total_players
+//                    FROM {$wpdb->prefix}p2p
+//                        LEFT JOIN $wpdb->posts ON p2p_to = $wpdb->posts.ID
+//                            WHERE p2p_from = %s && p2p_type = 'tournament_players'
+//                            AND (SELECT meta_value FROM {$wpdb->prefix}p2pmeta WHERE {$wpdb->prefix}p2pmeta.meta_key = 'status'
+//                            AND {$wpdb->prefix}p2pmeta.p2p_id = {$wpdb->prefix}p2p.p2p_id) IN ('" . implode("', '", $status) . "')";
+//
+//        $player_count_query = $wpdb->prepare($query,
+//            $tournament_id
+//        );
+//
+//
+//        $player_count = $wpdb->get_var($player_count_query);
+//
 
-        $query = "SELECT
-                  COUNT($wpdb->posts.ID) as total_players
-                    FROM {$wpdb->prefix}p2p
-                        LEFT JOIN $wpdb->posts ON p2p_to = $wpdb->posts.ID
-                            WHERE p2p_from = %s && p2p_type = 'tournament_players'
-                            AND (SELECT meta_value FROM {$wpdb->prefix}p2pmeta WHERE {$wpdb->prefix}p2pmeta.meta_key = 'status'
-                            AND {$wpdb->prefix}p2pmeta.p2p_id = {$wpdb->prefix}p2p.p2p_id) IN ('" . implode("', '", $status) . "')";
+        $players = p2p_type( 'tournament_players' )->get_connected( $tournament_id, [
+            'connected_meta' => [
+                [
+                    'key' => 'status',
+                    'value' => $status
+                ]
+            ],
+            'posts_per_page' => -1
+        ] );
 
-        $player_count_query = $wpdb->prepare($query,
-            $tournament_id
-        );
-
-
-        $player_count = $wpdb->get_var($player_count_query);
-
-        return $player_count;
+        return count($players->posts);
 
 
     }
