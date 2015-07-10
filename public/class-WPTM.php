@@ -97,6 +97,7 @@ class WP_Tournament_Manager {
 
 
         new WPTM_Site_Status();
+        new WPTM_Match_Comments();
 
 
         WPTM_Match_Generator::register();

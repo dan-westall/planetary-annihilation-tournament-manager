@@ -22,6 +22,7 @@ require_once( WPTM_PLUGIN_DIR.'/includes/class-better-hipchat-addon.php');
 require_once( WPTM_PLUGIN_DIR.'/includes/class-wptm-clans.php');
 require_once( WPTM_PLUGIN_DIR.'/includes/class-wptm-site-status.php');
 require_once( WPTM_PLUGIN_DIR.'/includes/class-wptm-match-generation.php');
+require_once( WPTM_PLUGIN_DIR.'/includes/class-wptm-match-comments.php');
 
 
 //3rd party library
