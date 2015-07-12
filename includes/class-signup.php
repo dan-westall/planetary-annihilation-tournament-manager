@@ -425,7 +425,6 @@ class WPTM_Tournament_Signup {
 
         }
 
-
         if($participant['active']){
 
             p2p_add_meta($connection_id, 'challonge_participant_id', $participant['id']);

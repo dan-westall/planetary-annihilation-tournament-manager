@@ -178,6 +178,9 @@ class WP_Tournament_Manager_Admin {
 
     }
 
+
+
+
     public function modify_user_table($column) {
 
         $column = array(
@@ -613,6 +616,7 @@ class WP_Tournament_Manager_Admin {
     }
 
     function player_table_filter( $query ) {
+
         if( is_admin() && ( $query->query['post_type'] == playerCPT::$post_type  || $query->query['post_type'] == matchCPT::$post_type ) ) {
             $qv = &$query->query_vars;
 

@@ -358,6 +358,22 @@ class DW_Helper {
         echo '</select>';
     }
 
+    public static function generate_select($select_id, $value_array, $selected = 0) {
+
+        echo '<select name="'. $select_id .'" id="'.$select_id.'">';
+
+        echo '<option value = "" > </option>';
+
+        foreach ( $value_array as $key => $value ) {
+
+            echo '<option value="', $key, '"', $selected == $key ? ' selected="selected"' : '', '>', $value, '</option>';
+
+        }
+
+        echo '</select>';
+
+    }
+
     public static function countryListing(){
         $_countries = array(
             "GB" => "United Kingdom",
