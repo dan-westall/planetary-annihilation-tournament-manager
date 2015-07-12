@@ -4,7 +4,7 @@ class matchCPT {
 
     public static $post_type = 'match';
 
-    public static $match_status = array( 'Open', 'Pending', 'Complete');
+    public static $match_status = array( 'Open', 'Pending', 'Complete' );
 
     public static $match_format = array( 'Verses', 'FFA', 'Team');
 

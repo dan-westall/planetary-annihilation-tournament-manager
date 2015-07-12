@@ -511,7 +511,9 @@ class playerCPT {
             }
 
         } else {
-            return get_wp_user_avatar($player_user_id, $size);
+
+            return get_wp_user_avatar($user->ID, $size);
+
         }
 
         return $user_avatar_img;
