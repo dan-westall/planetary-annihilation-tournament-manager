@@ -370,14 +370,14 @@ class notificationCPT {
     public function add_meta_box( $post_type ) {
         $post_types = array('tournament');     //limit meta box to certain post types
         if ( in_array( $post_type, $post_types )) {
-            add_meta_box(
-                'tournament_players_mass_notification',
-                __('Tournament mass notification', 'PLTM'),
-                array($this, 'render_meta_box_tournament_notification'),
-                $post_type,
-                'side',
-                'high'
-            );
+//            add_meta_box(
+//                'tournament_players_mass_notification',
+//                __('Tournament mass notification', 'PLTM'),
+//                array($this, 'render_meta_box_tournament_notification'),
+//                $post_type,
+//                'side',
+//                'high'
+//            );
         }
     }
 
