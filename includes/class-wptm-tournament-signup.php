@@ -487,20 +487,43 @@ class WPTM_Tournament_Signup {
 
         $signup = new WPTM_Tournament_Signup();
 
-        if( is_wp_error( $signup->validate_signup_fields() ) )
+        if( is_wp_error( $signup->validate_signup_fields() ) ) {
+
             wp_send_json_error(['message' => $signup->validate_signup_fields()->get_error_message() , 'type' => 'validation']);
 
+        }
 
         $signup->setTournamentId($tournament_id);
 
         try{
 
-            if(!$signup->is_tournament_signup_open($tournament_id))
+            if(!$signup->is_tournament_signup_open($tournament_id)){
+
                 throw new Exception('Tournament sign ups are closed.');
 
-            if(!is_user_logged_in() && $signup->is_existing_player($signup_data))
-                throw new Exception(sprintf('Please <a href="%s">login</a> to sign up for this tournament', wp_login_url( get_permalink($tournament_id).'sign-up' ) ));
+            }
 
+            if($signup->is_existing_player($signup_data)){
+
+                if( true !== ( $can_join_tournament = apply_filters( 'can_join_tournament', true, $tournament_id, $signup->is_existing_player($signup_data) ) ) ){
+
+                    if( is_string( $can_join_tournament ) ){
+
+                        throw new Exception( $can_join_tournament );
+
+                    }
+
+                    throw new Exception('You cannot join this tournament.');
+
+                }
+
+                if( !is_user_logged_in() ) {
+
+                    throw new Exception(sprintf('Please <a href="%s">login</a> to sign up for this tournament', wp_login_url( get_permalink($tournament_id).'sign-up' ) ));
+
+                }
+
+            }
 
             //ok this is not an existing player we need to make an account!, call to playerCPT
             if(false === ( $player_id = $signup->is_existing_player($signup_data) )){
@@ -554,9 +577,17 @@ class WPTM_Tournament_Signup {
             //$signup->update_profile(['site_notifications' => 1]);
             $signup->update_user( get_post_meta($player_id, 'user_id', true ), ['site_notifications' => ( $signup_data['communication'] ? $signup_data['communication'] : "0" ) ]);
 
-            $player_helper = new WPTM_Player_Helper($player_id);
+            $player_helper = new WPTM_Player_Helper( $player_id );
 
-            $signup_data['PA Stats ID'] = is_int($player_helper->has_pa_stats_id()) ? $player_helper->has_pa_stats_id() : 'false';
+            if( is_int( $player_helper->has_pa_stats_id() ) ){
+
+                $signup_data['PA Stats ID'] = $player_helper->has_pa_stats_id();
+
+            } else {
+
+                do_action( "tournament_signup_no_pastats", $player_id, $tournament_id, $_POST['signup_data'] );
+
+            }
 
 
         } catch (Exception $e) {
