@@ -1,5 +1,9 @@
 <?php
 
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 class tournamentCPT {
 
     public static $post_type = 'tournament';
@@ -18,7 +22,7 @@ class tournamentCPT {
         add_action( 'init', array( $this, 'register_cpt_taxonomies') );
 
         add_action( 'after_setup_theme', array( $this, 'ctp_permission') );
-        
+
         add_action( 'widgets_init', array( $this, 'register_tournament_sidebar') );
 
         add_action( 'p2p_init', array( $this, 'register_p2p_connections' ) );
@@ -67,7 +71,7 @@ class tournamentCPT {
 
         $tournamentLabel = array(
             'name'               => __('Tournaments'),
-            'menu_name'          => __('Tournament'),
+            'menu_name'          => __('Tournaments'),
             'all_items'          => __('All Tournaments'),
             'singular_name'      => __('Tournament'),
             'add_new_item'       => __('Add New Tournament'),
@@ -188,13 +192,10 @@ class tournamentCPT {
 
         global $post;
 
-        $object_id = 0;
+        //todo move fields off into filters?
 
-        if(isset($_REQUEST['post_ID'])){
-            $object_id = $_REQUEST['post_ID'];
-        } else if( isset($_GET['post']) ){
-            $object_id = $_GET['post'];
-        }
+        $object_id = isset($_REQUEST['post_ID']) ? $_REQUEST['post_ID'] : 0;
+        $object_id = isset($_REQUEST['post']) ? $_REQUEST['post']: 0;
 
 
         $post_type = get_post_type($object_id);
@@ -251,7 +252,7 @@ class tournamentCPT {
             )
         );
 
-        if( get_tournament_type($object_id) == 'clanwars' || get_tournament_type($object_id) == 'clanwars'){
+        if( get_tournament_type($object_id) == 'clanwars'){
 
             $tournament_players_args = array_merge_recursive($tournament_players_args, [ 'fields' => [
                 'clan_contact' => array(
@@ -262,7 +263,7 @@ class tournamentCPT {
 
         }
 
-        if(get_tournament_type($object_id) == 'teamarmies' || get_tournament_type($object_id) == 'teamarmies'){
+        if(get_tournament_type($object_id) == 'teamarmies'){
 
             $tournament_players_args = array_merge_recursive($tournament_players_args, [ 'fields' => [
                 'team_name' => array(
@@ -277,6 +278,11 @@ class tournamentCPT {
             'note'   => array(
                 'title' => 'Note',
                 'type'  => 'text',
+            ),
+            'group'   => array(
+                'title' => 'Group',
+                'type'  => 'select',
+                'values' => range('A', 'Z')
             ),
             'result' => array(
                 'title'  => 'Result',
@@ -312,7 +318,7 @@ class tournamentCPT {
         ];
 
 
-        if(get_tournament_type($object_id) == 'clanwars' || get_tournament_type($object_id) == 'clanwars' || count(self::tournament_fixtures()) > 0){
+        if(get_tournament_type($object_id) == 'clanwars' || count(self::tournament_fixtures()) > 0){
 
             $tournament_matches_args = array_merge_recursive($tournament_matches_args, [ 'fields' => [
                     'match_fixture' => [
@@ -323,6 +329,14 @@ class tournamentCPT {
             ]]);
 
         }
+
+        $tournament_matches_args = array_merge_recursive($tournament_matches_args, [ 'fields' => [
+            'match_round' => [
+                'title' => 'Round',
+                'type' => 'select',
+                'values' => range(1, 24)
+            ]
+        ]]);
 
         p2p_register_connection_type( apply_filters('patm_p2p_args', $tournament_matches_args, $object_id ) );
 
@@ -376,7 +390,7 @@ class tournamentCPT {
 
         $template_path = PLTM_PLUGIN_DIR . "/includes/templates/section-content.php";
 
-        foreach(Planetary_Annihilation_Tournament_Manager::$tournament_endpoints as $endpoint){
+        foreach(WP_Tournament_Manager::$tournament_endpoints as $endpoint){
 
             if ($post->post_type == 'tournament' && isset( $wp_query->query_vars[$endpoint] )) {
 
@@ -397,7 +411,7 @@ class tournamentCPT {
 
         global $wp_query, $post;
 
-        foreach(Planetary_Annihilation_Tournament_Manager::$tournament_endpoints as $endpoint){
+        foreach(WP_Tournament_Manager::$tournament_endpoints as $endpoint){
 
             if ($post->post_type == 'tournament' && isset( $wp_query->query_vars[$endpoint_check] )) {
 
@@ -444,7 +458,7 @@ class tournamentCPT {
         if(!is_object($post) && !isset($id) || (is_admin() || !in_the_loop()))
             return $title;
 
-        foreach(Planetary_Annihilation_Tournament_Manager::$tournament_endpoints as $endpoint){
+        foreach(WP_Tournament_Manager::$tournament_endpoints as $endpoint){
 
             if ($post->post_type == 'tournament' && isset( $wp_query->query_vars[$endpoint] )) {
 
@@ -482,321 +496,9 @@ class tournamentCPT {
 
     }
 
-    public function signup_custom_confirmation($confirmation, $form, $lead, $ajax){
-
-        $signup_form_id          = get_field('standard_tournament_signup_form', 'option');
-        $tournament_id           = url_to_postid($entry['source_url']);
-
-        if ($tournament_id === 0 || $tournament_closed !== false)
-            return $confirmation;
-
-        foreach( $form['fields'] as $field ) {
-            $values[$field['field_mapField']] = array(
-                'id'    => $field['id'],
-                'label' => $field['label'],
-                'value' => $entry[ $field['id'] ],
-            );
-        }
-
-        $confirmation = 'Great news, your already signed up to this tournament';
-
-        return $confirmation;
-    }
-
-    public function signup_form_validation($validation_result){
-
-        global $wpdb;
-
-        $values = array();
-
-        $signup_form_id    = get_field('standard_tournament_signup_form', 'option');
-        $tournament_id     = url_to_postid($_SERVER['HTTP_REFERER']);
-        $tournament_closed = get_field('signup_closed', $tournament_id);
-        $players           = p2p_type('tournament_players')->get_connected($tournament_id);
-
-        if ($tournament_id === 0 || $tournament_closed !== false)
-            return $validation_result;
-
-        if ($signup_form_id && get_field('signup_form')) {
-            $signup_form_id = get_field('signup_form');
-        }
-
-        if ($signup_form_id != $validation_result['form']['id'])
-            return $validation_result;
-
-        if (!is_tournament_signup_open($tournament_id)){
-            $validation_result['is_valid'] = false;
-        }
-
-        foreach( $validation_result['form']['fields'] as $field ) {
-            $values[$field['field_mapField']] = array(
-                'id'    => $field['id'],
-                'label' => $field['label'],
-                'value' => $_POST[ 'input_' . $field['id'] ],
-            );
-        }
-
-        $player = $wpdb->get_row( $wpdb->prepare("SELECT user_email, ID AS user_id, (SELECT meta_value FROM wp_usermeta  WHERE user_id = user.ID AND meta_key = 'player_id') AS player_id  FROM $wpdb->users AS user WHERE user_email = %s", $values['email']['value']) );
-
-        //do name check
-        if(!isset($player->player_id)){
-
-            $player = $wpdb->get_row( $wpdb->prepare("SELECT user_email, post.ID, (SELECT meta_value FROM wp_postmeta  WHERE post_id = post.ID AND meta_key = 'user_id') AS user_id  FROM wp_posts AS post LEFT JOIN wp_users AS user ON user.ID = (SELECT meta_value FROM wp_postmeta  WHERE post_id = post.ID AND meta_key = 'user_id') WHERE post_title = '%s' AND user_email != ''", $values['ign']['value']) );
-
-        }
-
-        //$player = DW_Helper::get_post_by_meta('player_email', $values['email']['value']);
-
-        //is player
-        if(isset($player->player_id)){
-
-            $p2p_id = p2p_type('tournament_players')->get_p2p_id($tournament_id, $player->player_id);
-
-            //is linked to tournament
-            if ($p2p_id) {
-
-                $validation_result['is_valid'] = false;
-                $validation_result['form']['cssClass'] = 'already-in-tournament';
-
-            }
-
-        }
-
-        if(!is_user_logged_in() && isset($player->user_email)){
-
-            $validation_result['is_valid'] = false;
-            $validation_result['form']['cssClass'] = 'please-login-to-signup';
-
-        }
-
-        //if we have any excluded players
-        if(is_array(self::players_excluded_from_tournament($tournament_id))){
-
-            if (in_array($values['email']['value'], self::players_excluded_from_tournament($tournament_id))){
-
-                $validation_result['is_valid'] = false;
-                $validation_result['form']['cssClass'] = 'player-is-excluded';
-
-            }
-
-        }
-
-        return $validation_result;
-
-    }
-
-    public function signup_form_validation_message($message, $form){
-
-        if(strpos($form['cssClass'], 'already-in-tournament') !== false)
-            $message = '<span class="positive-message">Great news, your already signed up to this tournament!. No need to signup again.</span>';
-
-        if(strpos($form['cssClass'], 'player-is-excluded') !== false)
-            $message = '<span class="validation_error">Very Sorry but you are excluded from this tournament, if you think this is in error please contact us via the contact form.</span>';
-
-        if(strpos($form['cssClass'], 'please-login-to-signup') !== false)
-            $message = '<span class="validation_error">Please login to your account to signup.</span> <a href="'. wp_login_url( get_permalink() ).'/signup" title="Login">Login</a>';
-
-        return $message;
-
-    }
-
-    public function signup_tournament_player($entry, $form) {
-
-        global $wpdb;
-
-        $signup_form_id           = get_field('standard_tournament_signup_form', 'option');
-        $tournament_id            = url_to_postid($entry['source_url']);
-        $challonge_tournament_id  = $this->get_the_challonge_tournament_id($tournament_id);
-        $tournament_slots         = get_post_meta($tournament_id, 'slots', true);
-        $tournament_reserve_slots = get_post_meta($tournament_id, 'reserve_slots', true);
-        $total_tournament_slots   = ($tournament_slots + $tournament_reserve_slots);
-        $connection_meta = [];
-
-        //if tournament 0 bin
-        if ($tournament_id === 0)
-            return false;
-
-        //if returns false stop
-        if(!self::is_tournament_signup_open($tournament_id))
-            return false;
-
-        if ($signup_form_id && get_field('signup_form')) {
-            $signup_form_id = get_field('signup_form');
-        }
-
-        if ($signup_form_id != $entry['form_id'])
-            return false;
-
-        //todo move out to general function file as this is a useful snippit
-        foreach ($form['fields'] as $field) {
-            $values[$field['field_mapField']] = array(
-                'id'    => $field['id'],
-                'label' => $field['label'],
-                'value' => $entry[$field['id']],
-            );
-        }
-
-        //if email is in excluded players bin, if there are any
-        if(is_array(self::players_excluded_from_tournament($tournament_id))){
-            if (in_array($values['email']['value'], self::players_excluded_from_tournament($tournament_id)))
-                return false;
-
-        }
-
-
-        //what does this do?
-        $user = $wpdb->get_row( $wpdb->prepare("SELECT user_email, ID AS user_id, (SELECT meta_value FROM wp_usermeta  WHERE user_id = user.ID AND meta_key = 'player_id') AS player_id  FROM $wpdb->users AS user WHERE user_email = %s", $values['email']['value']) );
-
-
-        //existing player
-        if (!empty($user)) {
-
-            $player_id = $user->player_id;
-
-            //check to make sure they are not aleady in tournament
-            $p2p_id = p2p_type('tournament_players')->get_p2p_id($tournament_id, $player_id);
-
-            if ($p2p_id) {
-                return $form;
-            }
-
-            //wp_update_post( ['ID' => $player_id, 'post_title' => $values['ign']['value'] ] );
-
-        } else {
-
-            //new user accounts have been created to provide features going forward
-            $user = get_user_by( 'email', $values['email']['value'] );
-
-            if(!$user){
-
-                $password = wp_generate_password();
-
-                $userdata = array(
-                    'user_login' => $values['ign']['value'],
-                    'user_email' => $values['email']['value'],
-                    'user_pass'  => $password
-                );
-
-                $user_id = wp_insert_user($userdata);
-
-                wp_new_user_notification($user_id, $password);
-
-                //$player_id = playerCPT::action_new_player_profile($user_id, $values);
-
-                //create new player post
-                $new_player = array(
-                    'post_title'  => $values['ign']['value'],
-                    'post_status' => 'publish',
-                    'post_author' => $user_id,
-                    'post_type'   => playerCPT::$post_type
-                );
-
-                // Insert the post into the database
-                $player_id = wp_insert_post($new_player);
-
-                //fix!
-                if(get_post_type($player_id) != playerCPT::$post_type){
-                    wp_update_post( ['ID' => $player_id, 'post_type' => playerCPT::$post_type, 'post_author' => $user_id ] );
-                }
-
-                update_post_meta($player_id, 'player_email', $values['email']['value']);
-                update_post_meta($player_id, 'user_id', $user_id);
-
-                update_user_meta($user_id, 'player_id', $player_id);
-
-
-            } else {
-
-                $user_id = $user->ID;
-
-                //user doesnt have a profile!!!!
-                if(!is_int(get_user_meta($user_id, 'player_id', true))){
-
-                    $player_id = playerCPT::action_new_player_profile($user_id, $values);
-
-                } else {
-                    $player_id = get_user_meta($user_id, 'player_id', true);
-                }
-
-            }
-
-        }
-
-        if($values['clan']['value'])
-            $connection_meta['clan'] = $values['clan']['value'];
-
-        if(!empty($values['clan_contact']['value']))
-            $connection_meta['clan_contact'] = $values['clan_contact']['value'];
-
-        if(!empty($values['team_name']['value']))
-            $connection_meta['team_name'] = $values['team_name']['value'];
-
-        //add player to current challonge tournament
-        if($challonge_tournament_id){
-
-            $name = (get_tournament_type($tournament_id) == 'teamarmies' ? $values['team_name']['value'] : $values['ign']['value']);
-
-            $challonge_result = $this->challonge_add_player_to_tournament($challonge_tournament_id, $values['email']['value'], $name);
-            $connection_meta = array_merge($connection_meta, ['challonge_tournament_id' => $challonge_tournament_id, 'challonge_result' => $challonge_result]);
-            
-        }
-
-        $p2p_result = $this->action_add_player_to_tournament($player_id, $tournament_id, $connection_meta);
-
-        if ($p2p_result) {
-
-            //$this->player_tournament_status active or reserve
-
-            $action = "tournament_signup_$this->player_tournament_status";
-
-            do_action( $action, array( 'player_id' => $player_id, 'tournament_id' => $tournament_id ) );
-
-        }
-
-        //update details, clan tag ingame
-
-        if(!empty($values['clan']['value']))
-            update_post_meta($player_id, 'clan', $values['clan']['value']);
-
-    }
-
-    //moved to signup class
-    public static function is_tournament_signup_open($tournament_id){
-
-        $tournament_closed        = get_post_meta($tournament_id, 'signup_closed', true);
-        $tournament_slots         = get_post_meta($tournament_id, 'slots', true);
-        $tournament_reserve_slots = get_post_meta($tournament_id, 'reserve_slots', true);
-        $tournament_status        = get_post_meta($tournament_id, 'tournament_status', true);
-        $total_tournament_slots   = ($tournament_slots + $tournament_reserve_slots);
-
-
-        $current_player_total     = tournamentCPT::get_tournament_player_count($tournament_id, [self::$tournament_player_status[0], self::$tournament_player_status[1]]);
-
-        if($tournament_closed == true){
-
-            return false;
-
-        }
-
-        if($current_player_total >= $total_tournament_slots){
-
-            return false;
-
-        }
-
-        if($tournament_status >= 1){
-
-            return false;
-
-        }
-
-        return true;
-
-    }
-
     public function filter_challonge_tournament_listing($field){
 
-        $c = new ChallongeAPI(Planetary_Annihilation_Tournament_Manager::fetch_challonge_API());
+        $c = new ChallongeAPI(WP_Tournament_Manager::fetch_challonge_API());
 
         $form_listing[] = 'Select Tournament';
         $form_listing[] = 'Custom Tournament ID';
@@ -848,40 +550,6 @@ class tournamentCPT {
         return $field;
 
     }
-
-    //moved to signup class
-    public function challonge_add_player_to_tournament($challonge_tournament_id, $email, $ign){
-
-        $c = new ChallongeAPI(Planetary_Annihilation_Tournament_Manager::fetch_challonge_API());
-
-        $c->verify_ssl = false;
-
-        $params = array(
-            'participant[name]'               => $ign
-        );
-
-        $participant = $c->createParticipant($challonge_tournament_id, $params);
-
-        $result = json_decode( json_encode( (array) $participant), false );
-
-        return $result;
-
-    }
-
-    //moved to signup class
-    public function challonge_remove_player_from_tournament($challonge_tournament_id, $challonge_participant_id){
-
-        $c = new ChallongeAPI(Planetary_Annihilation_Tournament_Manager::fetch_challonge_API());
-
-        $c->verify_ssl = false;
-
-        $participant = $c->deleteParticipant($challonge_tournament_id, $challonge_participant_id);
-
-        $result = json_decode( json_encode( (array) $participant), false );
-
-        return $result;
-    }
-
 
     public function action_p2p_new_connection($p2p_id){
 
@@ -1120,9 +788,11 @@ class tournamentCPT {
         $tournament        = get_post($post_id);
         $tournament_closed = get_post_meta($tournament->ID, 'signup_closed', true);
 
+        $tournament_signup = new WPTM_Tournament_Signup();
+
         $endpoint_set = false;
 
-        foreach (Planetary_Annihilation_Tournament_Manager::$tournament_endpoints as $tournament_endpoint):
+        foreach (WP_Tournament_Manager::$tournament_endpoints as $tournament_endpoint):
 
             $classes = '';
 
@@ -1139,7 +809,7 @@ class tournamentCPT {
 
                 case "sign-up":
 
-                    if(self::is_tournament_signup_open($tournament->ID) && !tournamentSignup::is_existing_tournament_player($current_user->player_id, $tournament->ID)){
+                    if( $tournament_signup->is_tournament_signup_open( $tournament->ID ) && !WPTM_Tournament_Signup::is_existing_tournament_player($current_user->player_id, $tournament->ID)){
 
                         $html .= sprintf('<li class="%4$s"><a href="%1$s%2$s/">%3$s</a></li>', get_permalink(), $tournament_endpoint, ucwords($tournament_endpoint), $classes);
 
@@ -1260,7 +930,7 @@ class tournamentCPT {
 
     public static function get_tournament_date($post_id = null){
 
-        //strip out acf functions
+        //strip out acf functions, move html out of function
 
         $tournament = get_post($post_id);
 
@@ -1741,6 +1411,9 @@ class tournamentCPT {
 
             $tournament_status = self::$tournament_status[get_post_meta($post['ID'], 'tournament_status', true)];
 
+
+            $tournament_signup = new WPTM_Tournament_Signup();
+
             $tournament_result = [];
             $tournament_id = $post['ID'];
 
@@ -1870,7 +1543,8 @@ class tournamentCPT {
 
             $_post['meta']['tournament_prizes'] = self::get_tournament_prize_tiers_v2($post['ID']);
 
-            $_post['meta']['signup_open'] = is_tournament_signup_open($post['ID']);
+
+            $_post['meta']['signup_open'] = $tournament_signup->is_tournament_signup_open($post['ID']);
 
             $tournament_fixtures = tournamentCPT::get_tournament_fixtures($tournament_id);
 

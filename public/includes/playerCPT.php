@@ -479,6 +479,8 @@ class playerCPT {
 
     public static function get_player_avatar($player_id = 0, $size = 'player-profile-thumbnail', $user_id = 0){
 
+        //todo i hate this function!
+
         $default_avatar    = 1886;
 
         $player_user_id    = get_post_meta($player_id, 'user_id', true);
@@ -486,29 +488,32 @@ class playerCPT {
         $transient_key     = sprintf('player_%s_avatar_%s', $player_id, $size);
         $logged_in_user_id = get_current_user_id();
 
-        if(is_user_logged_in() && DW_Helper::is_site_administrator())
-            delete_transient( $transient_key );
+        if(!function_exists('get_wp_user_avatar')) {
 
-        if ( false === ( $user_avatar_img = get_transient( $transient_key ) ) ) {
+            if (is_user_logged_in() && DW_Helper::is_site_administrator())
+                delete_transient($transient_key);
 
-            if(($player_user_id == 'null' || $player_user_id ==  false) && $player_id !== 0) {
-                $user_avatar_img = wp_get_attachment_image($default_avatar, $size);
-            } else {
+            if (false === ($user_avatar_img = get_transient($transient_key))) {
 
-                if (function_exists('get_wp_user_avatar')) {
-                    $user_avatar_img = get_wp_user_avatar($user->ID, $size);
+                if (($player_user_id == 'null' || $player_user_id == false) && $player_id !== 0) {
+                    $user_avatar_img = wp_get_attachment_image($default_avatar, $size);
                 } else {
 
-                    if('' === ($user_avatar_id = get_user_meta($user->ID, 'wp_user_avatar', true))){
+                    if ('' === ($user_avatar_id = get_user_meta($user->ID, 'wp_user_avatar', true))) {
                         $user_avatar_img = wp_get_attachment_image($default_avatar, $size);
                     } else {
                         $user_avatar_img = wp_get_attachment_image($user_avatar_id, $size);
                     }
+
                 }
 
+                set_transient($transient_key, $user_avatar_img, 1 * HOUR_IN_SECONDS);
             }
 
-            set_transient( $transient_key, $user_avatar_img, 1 * HOUR_IN_SECONDS );
+        } else {
+
+            return get_wp_user_avatar($user->ID, $size);
+
         }
 
         return $user_avatar_img;

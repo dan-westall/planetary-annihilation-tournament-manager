@@ -19,7 +19,7 @@
  * @package Planetary_Annihilation_Tournament_Manager
  * @author  Dan Westall <dan.westall@googlemail.com>
  */
-class Planetary_Annihilation_Tournament_Manager {
+class WP_Tournament_Manager {
 
 	/**
 	 * Plugin version, used for cache-busting of style and script file references.
@@ -42,7 +42,7 @@ class Planetary_Annihilation_Tournament_Manager {
 	 *
 	 * @var      string
 	 */
-	protected $plugin_slug = 'PLTM';
+	protected $plugin_slug = 'WPTM';
 
 
     //todo move tournament endpoint functionality down into the tournament cpt class
@@ -84,25 +84,28 @@ class Planetary_Annihilation_Tournament_Manager {
         add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
 
+        //todo move this into the general plugin so as not to pollute name space
 //        new planetCPT();
         //new sponsorCPT();
         new playerCPT();
         new tournamentCPT();
         new matchCPT();
-        new notificationCPT();
+        //new notificationCPT();
 
         new PLTM_shortcodes();
         new gform_filters();
 
 
-        //new userWager();
+        new WPTM_Site_Status();
+        new WPTM_Match_Comments();
+
+
+        WPTM_Match_Generator::register();
 
         userPolling::register();
         tournament_in_progress::register();
-//        ruleCPT::register();
         awards::register();
-        tournamentSignup::register();
-//        acfCustomRules::register();
+        WPTM_Tournament_Signup::register();
 
         remove_action( 'wp_head', 'wp_generator');
         remove_action( 'wp_head', 'wp_shortlink_wp_head' );
@@ -215,6 +218,9 @@ class Planetary_Annihilation_Tournament_Manager {
         if ( false === ( $planet_servers = get_transient( 'planet_servers' ) ) ) {
 
             $servers = wp_remote_get(self::$planet_servers);
+
+            if(is_wp_error($servers))
+                return $field;
 
             $planet_servers = json_decode($servers['body']);
 

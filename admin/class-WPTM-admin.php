@@ -19,7 +19,7 @@
  * @package Planetary_Annihilation_Tournament_Manager_Admin
  * @author  Dan Westall <dan.westall@googlemail.com>
  */
-class Planetary_Annihilation_Tournament_Manager_Admin {
+class WP_Tournament_Manager_Admin {
 
     /**
      * Instance of this class.
@@ -59,8 +59,9 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
         /*
          * Call $plugin_slug from public plugin class.
          */
-        $plugin            = Planetary_Annihilation_Tournament_Manager::get_instance();
+        $plugin            = WP_Tournament_Manager::get_instance();
         $this->plugin_slug = $plugin->get_plugin_slug();
+
 
         // Load admin style sheet and JavaScript.
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_styles'));
@@ -176,6 +177,9 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
         return $columns;
 
     }
+
+
+
 
     public function modify_user_table($column) {
 
@@ -420,16 +424,23 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
     }
 
     public function remove_dashboard_meta() {
-        remove_meta_box('dashboard_incoming_links', 'dashboard', 'normal');
-        remove_meta_box('dashboard_plugins', 'dashboard', 'normal');
-        remove_meta_box('dashboard_primary', 'dashboard', 'normal');
-        remove_meta_box('dashboard_secondary', 'dashboard', 'normal');
-        remove_meta_box('dashboard_incoming_links', 'dashboard', 'normal');
-        remove_meta_box('dashboard_quick_press', 'dashboard', 'side');
-        remove_meta_box('dashboard_recent_drafts', 'dashboard', 'side');
-        remove_meta_box('dashboard_recent_comments', 'dashboard', 'normal');
-        remove_meta_box('dashboard_right_now', 'dashboard', 'normal');
-        remove_meta_box('dashboard_activity', 'dashboard', 'normal'); //since 3.8
+
+        $widgets = [
+            ['slug' => 'dashboard_incoming_links', 'screen' => 'dashboard', 'context' => 'normal'],
+            ['slug' => 'dashboard_plugins', 'screen' => 'dashboard', 'context' => 'normal'],
+            ['slug' => 'dashboard_primary', 'screen' => 'dashboard', 'context' => 'normal'],
+            ['slug' => 'dashboard_incoming_links', 'screen' => 'dashboard', 'context' => 'normal'],
+            ['slug' => 'dashboard_quick_press', 'screen' => 'dashboard', 'context' => 'side'],
+            ['slug' => 'dashboard_recent_drafts', 'screen' => 'dashboard', 'context' => 'side'],
+            ['slug' => 'dashboard_recent_comments', 'screen' => 'dashboard', 'context' => 'side'],
+            ['slug' => 'dashboard_right_now', 'screen' => 'dashboard', 'context' => 'side'],
+            ['slug' => 'dashboard_activity', 'screen' => 'dashboard', 'context' => 'side']
+        ];
+
+        array_map(function($widget){
+            remove_meta_box($widget['slug'], $widget['screen'], $widget['context']);
+        }, $widgets);
+
     }
 
     function tournament_player_management() {
@@ -505,11 +516,11 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
             return;
         }
 
-        wp_enqueue_style( 'default-' . $this->plugin_slug .'-admin-styles', plugins_url( 'assets/css/default.admin.css', __FILE__ ), array(), Planetary_Annihilation_Tournament_Manager::VERSION );
+        wp_enqueue_style( 'default-' . $this->plugin_slug .'-admin-styles', plugins_url( 'assets/css/default.admin.css', __FILE__ ), array(), WP_Tournament_Manager::VERSION );
 
         $screen = get_current_screen();
         if ($this->plugin_screen_hook_suffix == $screen->id) {
-            wp_enqueue_style($this->plugin_slug . '-admin-styles', plugins_url('assets/css/admin.css', __FILE__), array(), Planetary_Annihilation_Tournament_Manager::VERSION);
+            wp_enqueue_style($this->plugin_slug . '-admin-styles', plugins_url('assets/css/admin.css', __FILE__), array(), WP_Tournament_Manager::VERSION);
         }
 
     }
@@ -527,11 +538,11 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
             return;
         }
 
-        wp_enqueue_script( 'default-' . $this->plugin_slug . '-admin-script', plugins_url( 'assets/js/default.admin.js', __FILE__ ), array( 'jquery' ), Planetary_Annihilation_Tournament_Manager::VERSION );
+        wp_enqueue_script( 'default-' . $this->plugin_slug . '-admin-script', plugins_url( 'assets/js/default.admin.js', __FILE__ ), array( 'jquery' ), WP_Tournament_Manager::VERSION );
 
         $screen = get_current_screen();
         if ($this->plugin_screen_hook_suffix == $screen->id) {
-            wp_enqueue_script($this->plugin_slug . '-admin-script', plugins_url('assets/js/admin.js', __FILE__), array('jquery'), Planetary_Annihilation_Tournament_Manager::VERSION);
+            wp_enqueue_script($this->plugin_slug . '-admin-script', plugins_url('assets/js/admin.js', __FILE__), array('jquery'), WP_Tournament_Manager::VERSION);
         }
 
     }
@@ -542,6 +553,7 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
      * @since    1.0.0
      */
     public function add_plugin_admin_menu() {
+
 
         /*
          * Add a settings page for this plugin to the Settings menu.
@@ -555,13 +567,26 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
          * - Change 'manage_options' to the capability you see fit
          *   For reference: http://codex.wordpress.org/Roles_and_Capabilities
          */
-        $this->plugin_screen_hook_suffix = add_options_page(
-            __('Planetary Annihilation Tournament Manager Settings', $this->plugin_slug),
-            __('Planetary Annihilation Tournament Manager', $this->plugin_slug),
+
+
+        add_menu_page(
+            'WP Tournament Manager',
+            __('WP Tournament Manager', $this->plugin_slug),
             'manage_options',
             $this->plugin_slug,
-            array($this, 'display_plugin_admin_page')
-        );
+            [ $this, 'display_plugin_admin_page' ],
+            'dashicons-networking');
+
+        //add_submenu_page( 'my-top-level-handle', 'Page title', 'Sub-menu title', 'manage_options', 'my-submenu-handle', 'my_magic_function');
+//
+//        $this->plugin_screen_hook_suffix = add_options_page(
+//            __('WP Tournament Manager Settings', $this->plugin_slug),
+//            __('WP Tournament Manager', $this->plugin_slug),
+//            'manage_options',
+//            $this->plugin_slug,
+//            array($this, 'display_plugin_admin_page')
+//        );
+
 
     }
 
@@ -591,6 +616,7 @@ class Planetary_Annihilation_Tournament_Manager_Admin {
     }
 
     function player_table_filter( $query ) {
+
         if( is_admin() && ( $query->query['post_type'] == playerCPT::$post_type  || $query->query['post_type'] == matchCPT::$post_type ) ) {
             $qv = &$query->query_vars;
 

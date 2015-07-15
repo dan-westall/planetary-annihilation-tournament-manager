@@ -4,7 +4,7 @@ class matchCPT {
 
     public static $post_type = 'match';
 
-    public static $match_status = array( 'Open', 'Pending', 'Complete');
+    public static $match_status = array( 'Open', 'Pending', 'Complete' );
 
     public static $match_format = array( 'Verses', 'FFA', 'Team');
 
@@ -75,7 +75,7 @@ class matchCPT {
 
         $matchLabel = array(
             'name'               => __('Matches'),
-            'menu_name'          => __('Match'),
+            'menu_name'          => __('Matches'),
             'all_items'          => __('All Matches'),
             'singular_name'      => __('Match'),
             'add_new_item'       => __('Add New Match'),

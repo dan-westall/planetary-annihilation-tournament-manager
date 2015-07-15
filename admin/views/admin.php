@@ -13,50 +13,55 @@
  */
 ?>
 
-<div class="wrap">
+    <div class="wrap">
 
-	<h2><?php echo esc_html( get_admin_page_title() ); ?></h2>
+        <?php
 
-	<!-- @TODO: Provide markup for your options page here. -->
+        //must check that the user has the required capability
+        if (!current_user_can('manage_options')) {
+            wp_die(__('You do not have sufficient permissions to access this page.'));
+        }
 
-    <?php
+        // variables for the field and option names
+        $opt_name          = 'mt_favorite_color';
+        $hidden_field_name = 'mt_submit_hidden';
+        $data_field_name   = 'mt_favorite_color';
+
+        // Read in existing option value from database
+        $opt_val = get_option($opt_name);
+
+        // See if the user has posted us some information
+        // If they did, this hidden field will be set to 'Y'
+        if (isset($_POST[$hidden_field_name]) && $_POST[$hidden_field_name] == 'Y') {
+            // Read their posted value
+            $opt_val = $_POST[$data_field_name];
+
+            // Save the posted value in the database
+            update_option($opt_name, $opt_val);
+
+            // Put a "settings saved" message on the screen
+
+            ?>
+            <div class="updated"><p><strong><?php _e('settings saved.', 'menu-test'); ?></strong></p></div>
+        <?php
+
+        } ?>
 
 
-    global $wpdb;
-//
-//    $args = array(
-//        'post_type' => playerCPT::$post_type,
-//        'posts_per_page' => -1
-//    );
-//
-//    $players = get_posts($args);
-//
-//    foreach($players as $player){
-//
-//        $user_id = (int) get_post_meta($player->ID, 'user_id', true);
-//
-//        if(is_int($user_id)){
-//
-//            $user_account    = get_user_by('id', $user_id);
-//
-//            if(get_user_meta($user_id, 'nickname', true) != $player->post_title){
-//
-//                $wp_user_id = wp_update_user( array( 'ID' => $user_id, 'nickname' => $player->post_title, 'display_name' => $player->post_title ) );
-//
-//                //if(is_wp_error($user_id)){
-//
-//                    echo $user_id;
-//                    var_dump($wp_user_id);
-//                //}
-//
-//                printf('Updated user %s, new nickname = "%s", set display name <br />', $user_id, $player->post_title);
-//
-//            }
-//
-//        }
-//
-//    }
+        <h2><?php echo esc_html(get_admin_page_title()); ?></h2>
 
-    ?>
+        <form name="form1" method="post" action="">
+            <input type="hidden" name="<?php echo $hidden_field_name; ?>" value="Y">
 
-</div>
+            <p><?php _e("Favorite Color:", 'menu-test'); ?>
+                <input type="text" name="<?php echo $data_field_name; ?>" value="<?php echo $opt_val; ?>" size="20">
+            </p>
+            <hr/>
+
+            <p class="submit">
+                <input type="submit" name="Submit" class="button-primary" value="<?php esc_attr_e('Save Changes') ?>"/>
+            </p>
+
+        </form>
+    </div>
+
