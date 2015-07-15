@@ -17,7 +17,7 @@ require_once( WPTM_PLUGIN_DIR.'/includes/class_gform_filters.php');
 require_once( WPTM_PLUGIN_DIR.'/includes/class-acf-rules.php');
 require_once( WPTM_PLUGIN_DIR.'/includes/class-awards.php');
 require_once( WPTM_PLUGIN_DIR.'/includes/class_shortcodes.php');
-require_once( WPTM_PLUGIN_DIR.'/includes/class-signup.php');
+require_once( WPTM_PLUGIN_DIR.'/includes/class-wptm-tournament-signup.php');
 require_once( WPTM_PLUGIN_DIR.'/includes/class-better-hipchat-addon.php');
 require_once( WPTM_PLUGIN_DIR.'/includes/class-wptm-clans.php');
 require_once( WPTM_PLUGIN_DIR.'/includes/class-wptm-site-status.php');
