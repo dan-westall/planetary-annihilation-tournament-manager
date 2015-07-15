@@ -170,13 +170,6 @@ class tournament_info extends WP_Widget {
 
                 <?php else : ?>
 
-                <?php
-
-                if(DW_Helper::is_site_administrator())
-                    var_dump(get_field('prize_tiers'));
-
-                ?>
-
 
             <?php endif; ?>
 
