@@ -90,7 +90,7 @@ class WP_Tournament_Manager {
         new playerCPT();
         new tournamentCPT();
         new matchCPT();
-        //new notificationCPT();
+        new notificationCPT();
 
         new PLTM_shortcodes();
         new gform_filters();
