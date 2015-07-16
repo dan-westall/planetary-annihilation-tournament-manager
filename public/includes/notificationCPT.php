@@ -36,6 +36,9 @@ class notificationCPT {
         add_action('wp_ajax_tournament_2_day_notice', array($this,'tournament_2_day_notice'));
         add_action('wp_ajax_tournament_wrap_up', array($this,'tournament_wrap_up'));
 
+
+        add_action( 'admin_enqueue_scripts',  [ $this, 'register_scripts'], 10 , 0 );
+
     }
 
     function register_cpt_notification(){
@@ -388,6 +391,8 @@ class notificationCPT {
      */
     public function render_meta_box_tournament_notification( $post ) {
 
+        wp_enqueue_script('WPTM-Notification');
+
         // Display the form, using the current value.
         echo '<label for="myplugin_new_field">';
         _e( 'Send notifications', 'PLTM' );
@@ -430,6 +435,13 @@ class notificationCPT {
 
 
         return false;
+
+    }
+
+    public function register_scripts(){
+        wp_register_script(
+            'WPTM-Notification', WPTM_PLUGIN_URI . 'admin/assets/js/default.admin.js' , array( 'jquery' ), WP_Tournament_Manager::VERSION
+        );
 
     }
 }
