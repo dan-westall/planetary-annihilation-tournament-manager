@@ -647,6 +647,8 @@ class WPTM_Tournament_Signup {
 
             do_action('tournament_player_withdrawn', $player_id , $tournament_id );
 
+            do_action( "tournament_state_change", $tournament_id );
+
             echo json_encode(array('result' => true, 'message' => 'You have been removed from the tournament.'));
 
             die();
@@ -676,6 +678,8 @@ class WPTM_Tournament_Signup {
             p2p_update_meta($p2p_id, 'status', tournamentCPT::$tournament_player_status[0]);
 
             do_action('tournament_player_reentered', $player_id, $tournament_id );
+
+            do_action( "tournament_state_change", $tournament_id );
 
             echo json_encode(array('result' => true, 'message' => 'You have been re-entered into the tournament.'));
 
