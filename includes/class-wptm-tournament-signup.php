@@ -600,6 +600,8 @@ class WPTM_Tournament_Signup {
 
         do_action( "tournament_signup", $player_id, $tournament_id, $signup->get_signup_message(), $_POST['signup_data'] , $signup->getTournamentJoinStatus() );
 
+        do_action( "tournament_state_change", $tournament_id );
+
         wp_send_json_success(['message' => $signup->get_signup_message(), 'type' => 'success']);
 
     }

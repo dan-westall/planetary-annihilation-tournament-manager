@@ -42,6 +42,7 @@ class tournamentCPT {
         add_shortcode('tournament-players', array( $this, 'get_tournament_players') );
 
         add_action( 'save_post',  array( $this, 'delete_tournament_caches') );
+        add_action( 'tournament_state_change',  array( $this, 'delete_tournament_caches') );
 
         add_filter( 'tournament_rounds', array( $this, 'filter_tournament_rounds' ) );
         //add_filter( 'the_title', array( $this, 'filter_endpoint_titles'), 10, 2 );
