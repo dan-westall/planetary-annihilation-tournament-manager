@@ -99,6 +99,9 @@ class WP_Tournament_Manager {
         new WPTM_Site_Status();
         new WPTM_Match_Comments();
 
+        //API extentions
+        new WPTM_Tournament_Rest_API();
+
 
         WPTM_Match_Generator::register();
 

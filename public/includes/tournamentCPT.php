@@ -20,6 +20,7 @@ class tournamentCPT {
 
         add_action( 'init', array( $this, 'register_cpt_tournament') );
         add_action( 'init', array( $this, 'register_cpt_taxonomies') );
+        add_action( 'init', array( $this, 'cpt_api_args') );
 
         add_action( 'after_setup_theme', array( $this, 'ctp_permission') );
 
@@ -85,22 +86,31 @@ class tournamentCPT {
         );
 
         $tournamentArgs = array(
-            'labels'                  => $tournamentLabel,
-                'description'         => 'Description',
-                'public'              => true,
-                'has_archive'         => true,
-                'exclude_from_search' => true,
-                'show_ui'             => true,
-                'show_in_json'        => true,
-                'hierarchical'        => false,
-                'menu_position'       => 10,
-                'menu_icon'           => 'dashicons-networking',
-                'capability_type'     => array('tournament','tournaments'),
-                'supports'            => array('title', 'editor', 'thumbnail')
-            );
+            'labels'                => $tournamentLabel,
+            'description'           => 'Description',
+            'public'                => true,
+            'has_archive'           => true,
+            'exclude_from_search'   => true,
+            'show_ui'               => true,
+            'show_in_json'          => true,
+            'rest_base'             => 'tournament',
+            'rest_controller_class' => 'WP_REST_Posts_Controller',
+            'hierarchical'          => false,
+            'menu_position'         => 10,
+            'menu_icon'             => 'dashicons-networking',
+            'capability_type'       => array('tournament', 'tournaments'),
+            'supports'              => array('title', 'editor', 'thumbnail')
+        );
 
         register_post_type( self::$post_type, $tournamentArgs );
 
+    }
+
+    function cpt_api_args() {
+        global $wp_post_types;
+        $wp_post_types['tournament']->show_in_rest = true;
+        $wp_post_types['tournament']->rest_base = 'tournament';
+        $wp_post_types['tournament']->rest_controller_class = 'WP_REST_Posts_Controller';
     }
 
     function ctp_permission(){
@@ -1776,7 +1786,7 @@ class tournamentCPT {
 
         global $wpdb;
 
-        $fixture_query = $wpdb->prepare(
+        $fixtures = $wpdb->get_results(
             "
                 SELECT DISTINCT
                 SUBSTRING(meta_key,1,10) AS fixture_group,
@@ -1789,14 +1799,12 @@ class tournamentCPT {
                 GROUP_CONCAT(CASE
                   WHEN meta_key LIKE '%date' THEN meta_value
                 END) as fixture_date
-                    FROM $wpdb->postmeta
-                      WHERE post_id = %s AND meta_key LIKE 'fixtures_%'
+                    FROM wp_postmeta
+                      WHERE post_id = $tournament_id AND meta_key LIKE 'fixtures_%'
                         GROUP by fixture_group
-                ",
-            $tournament_id
-        );
+                "
 
-        $fixtures = $wpdb->get_results( $fixture_query );
+        );
 
         return $fixtures;
 
