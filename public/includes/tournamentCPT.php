@@ -568,7 +568,7 @@ class tournamentCPT {
 
             //add player to current challonge tournament
             if($challonge_tournament_id){
-                $challonge_result = $this->challonge_add_player_to_tournament($challonge_tournament_id, $email, $ign);
+                $challonge_result = WPTM_Tournament_Signup::challonge_add_player_to_tournament($challonge_tournament_id, $email, $ign);
 
                 p2p_add_meta( $p2p_id, 'challonge_tournament_id', $challonge_tournament_id);
                 p2p_add_meta( $p2p_id, 'challonge_participant_id', $challonge_result->id);
@@ -607,7 +607,7 @@ class tournamentCPT {
             $challonge_participant_id = p2p_get_meta( $connection->p2p_id, 'challonge_participant_id', true );
 
             if($challonge_tournament_id && !empty($challonge_participant_id)){
-                $challonge_result = $this->challonge_remove_player_from_tournament($challonge_tournament_id, $challonge_participant_id);
+                $challonge_result = WPTM_Tournament_Signup::challonge_remove_player_from_tournament($challonge_tournament_id, $challonge_participant_id);
             }
 
 
