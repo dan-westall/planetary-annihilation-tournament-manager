@@ -142,8 +142,8 @@ class WPTM_Tournament_Signup {
 
         add_action( 'tournament_signup',  [ $plugin, 'challonge_add_player_to_tournament'] );
 
-        add_action( 'tournament_player_withdrawn',  [ $plugin, 'challonge_remove_player_from_tournament'], 10, 2 );
-        add_action( 'tournament_player_active',  [ $plugin, 'challonge_add_player_to_tournament'], 10, 2 );
+        add_action( 'tournament_signup_Withdrawn',  [ $plugin, 'challonge_remove_player_from_tournament'], 10, 2 );
+        add_action( 'tournament_signup_Active',  [ $plugin, 'challonge_add_player_to_tournament'], 10, 2 );
 
         add_action( 'updated_p2p_meta',  [ $plugin, 'challonge_add_player_to_tournament'], 10, 4  );
 
@@ -432,6 +432,11 @@ class WPTM_Tournament_Signup {
             p2p_add_meta($connection_id, 'challonge_participant_id', $participant['id']);
 
             return $participant;
+
+        } else {
+
+            do_action('challonge_add_player_error', $challonge_tournament_id, $player_id, $tournament_id);
+
         }
 
         return false;
@@ -538,7 +543,7 @@ class WPTM_Tournament_Signup {
 
                 }
 
-                $player_id = playerCPT::new_player_profile($user->ID, $signup_data);
+                $player_id = playerCPT::new_player_profile($user->ID, $signup_data, $signup->getTournamentId());
 
                 if (!is_int($player_id)){
                     require_once(ABSPATH.'wp-admin/includes/user.php' );
@@ -641,13 +646,16 @@ class WPTM_Tournament_Signup {
 
         if ( $p2p_id ) {
 
-            p2p_update_meta($p2p_id, 'status', tournamentCPT::$tournament_player_status[5]);
+
+            $status = tournamentCPT::$tournament_player_status[5];
+
+            p2p_update_meta($p2p_id, 'status', $status);
 
             if (!empty($_POST['reason'])) {
                 p2p_update_meta($p2p_id, 'note', $_POST['reason']);
             }
 
-            do_action('tournament_player_withdrawn', $player_id , $tournament_id );
+            do_action( "tournament_player_{$status}", $player_id , $tournament_id );
 
             do_action( "tournament_state_change", $tournament_id );
 

@@ -116,7 +116,7 @@ class playerCPT {
 
     }
 
-    public static function new_player_profile($user_id, $values){
+    public static function new_player_profile($user_id, $values, $tournament_id){
 
         // Insert the post into the database
 
@@ -133,7 +133,7 @@ class playerCPT {
         if(!is_wp_error($player_id)) {
 
             //malformed user profile check
-            if(get_the_title($player_id) != wp_strip_all_tags($values['inGameName'])){
+            if(get_the_title($player_id) != wp_strip_all_tags($values['inGameName']) || get_the_title($player_id) == get_the_title($tournament_id) ){
 
                 $_POST['signup_data']['player_profile_args'] = $player_profile_args;
 
