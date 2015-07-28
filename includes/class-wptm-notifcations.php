@@ -16,7 +16,7 @@ register_meta
 -send tournament notification meta
 
 
-
+user meta check notifications
 
 has_notifcation_been_sent
 
