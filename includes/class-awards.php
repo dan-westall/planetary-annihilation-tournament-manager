@@ -10,7 +10,7 @@ class awards {
 
         $plugin = new self();
 
-        add_filter( 'patm_p2p_args', [ $plugin, 'awards'], 10, 2);
+        add_filter( 'wptm_p2p_args', [ $plugin, 'awards'], 10, 2);
 
     }
 
