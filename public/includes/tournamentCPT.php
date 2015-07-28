@@ -292,7 +292,7 @@ class tournamentCPT {
             )
         ]]);
 
-        p2p_register_connection_type( apply_filters('patm_p2p_args', $tournament_players_args, $object_id ) );
+        p2p_register_connection_type( apply_filters('wptm_p2p_args', $tournament_players_args, $object_id ) );
 
         p2p_register_connection_type( array(
             'name' => 'tournament_excluded_players',
@@ -339,7 +339,7 @@ class tournamentCPT {
             ]
         ]]);
 
-        p2p_register_connection_type( apply_filters('patm_p2p_args', $tournament_matches_args, $object_id ) );
+        p2p_register_connection_type( apply_filters('wptm_p2p_args', $tournament_matches_args, $object_id ) );
 
     }
 
@@ -658,6 +658,7 @@ class tournamentCPT {
         ));
 
         if(isset($connection_meta['challonge_result'])){
+
             update_post_meta($player_id, 'challonge_data', $connection_meta['challonge_result']);
 
             //easy search

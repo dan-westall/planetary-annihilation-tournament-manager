@@ -145,7 +145,7 @@ class WPTM_Tournament_Signup {
         add_action( 'tournament_signup_Withdrawn',  [ $plugin, 'challonge_remove_player_from_tournament'], 10, 2 );
         add_action( 'tournament_signup_Active',  [ $plugin, 'challonge_add_player_to_tournament'], 10, 2 );
 
-        add_action( 'updated_p2p_meta',  [ $plugin, 'challonge_add_player_to_tournament'], 10, 4  );
+        //add_action( 'updated_p2p_meta',  [ $plugin, 'challonge_add_player_to_tournament'], 10, 4  );
 
 
 
@@ -646,16 +646,19 @@ class WPTM_Tournament_Signup {
 
         if ( $p2p_id ) {
 
-
             $status = tournamentCPT::$tournament_player_status[5];
 
             p2p_update_meta($p2p_id, 'status', $status);
 
             if (!empty($_POST['reason'])) {
+
                 p2p_update_meta($p2p_id, 'note', $_POST['reason']);
+
             }
 
-            do_action( "tournament_player_{$status}", $player_id , $tournament_id );
+            $t = "tournament_player_{$status}";
+
+            do_action( "tournament_signup_{$status}", $player_id , $tournament_id );
 
             do_action( "tournament_state_change", $tournament_id );
 
@@ -680,10 +683,10 @@ class WPTM_Tournament_Signup {
         $player_id     = intval($_POST['player_id']);
 
         $tournament_player_status = tournamentCPT::$tournament_player_status;
+        $tournament_slots         = get_post_meta($tournament_id, 'slots', true);
 
         $current_player_count = tournamentCPT::get_tournament_player_count($tournament_id, [ $tournament_player_status[0] ] );
         $status = ( $current_player_count >= $tournament_slots ? $tournament_player_status[1] : $tournament_player_status[0] );
-
 
 
         $p2p_id = p2p_type( 'tournament_players' )->get_p2p_id( $tournament_id, $player_id );
