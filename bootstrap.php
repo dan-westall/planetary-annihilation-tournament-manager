@@ -48,3 +48,6 @@ require_once( WPTM_PLUGIN_DIR.'/includes/helpers/class-wptm-player-helper.php');
 require_once( WPTM_PLUGIN_DIR.'/includes/helpers/class-wptm-tournament-helper.php');
 require_once( WPTM_PLUGIN_DIR.'/includes/tournament-formats/round-robin.php');
 
+
+require_once( WPTM_PLUGIN_DIR.'/includes/class-wptm-tournamnet-players.php');
+

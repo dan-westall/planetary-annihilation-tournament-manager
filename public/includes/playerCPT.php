@@ -135,6 +135,9 @@ class playerCPT {
             //malformed user profile check
             if(get_the_title($player_id) != wp_strip_all_tags($values['inGameName']) || get_the_title($player_id) == get_the_title($tournament_id) ){
 
+                $player_profile_args['new_user_id'] = $player_id;
+                $player_profile_args['POST_ARRAY'] = $_POST;
+
                 $_POST['signup_data']['player_profile_args'] = $player_profile_args;
 
                 throw new Exception('Malformed user profile created, Signup process halted, Staff have been notifed.');

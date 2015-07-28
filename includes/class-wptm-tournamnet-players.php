@@ -15,8 +15,9 @@ class WPTM_Tournament_Players {
      */
     public function __construct() {
 
-        add_action( 'tournament_player_withdrawn', [ $this, 'player_reserve_to_active' ] );
-        add_action( 'tournament_signup_Reserve', [ $this, 'reset_reserve_quote_position' ] );
+        //when someone withdraws
+        add_action( 'tournament_signup_Withdrawn', [ $this, 'player_reserve_to_active' ], 10, 2 );
+        add_action( 'tournament_signup_Reserve', [ $this, 'reset_reserve_position' ], 10, 2 );
 
         add_action( 'tournament_player_Reserve_to_Active', [ $this, 'reset_reserve_quote_position'], 10, 2 );
 
@@ -33,13 +34,15 @@ class WPTM_Tournament_Players {
         $tournament = new WPTM_Tournament_Helper($tournament_id);
 
         //fetch tournament players order by there queue
-        $tournament_player = $tournament->get_tourament_players(['connected_orderby' => 'reserve_position', 'connected_meta' => ['key' => 'reserve_position', 'value' => 1] ], [tournamentCPT::$tournament_player_status[1]]);
+        $tournament_player = $tournament->get_tourament_players(['connected_orderby' => 'reserve_position', 'connected_meta' => [ ['key' => 'reserve_position', 'value' => 1] ] ], [tournamentCPT::$tournament_player_status[1]]);
 
         //set player with 1 queue to active
         p2p_update_meta( $tournament_player[0]->p2p_id, 'status', tournamentCPT::$tournament_player_status[0] );
 
         //reset all reserve players positions
         do_action('tournament_player_Reserve_to_Active', $player_id, $tournament_id);
+
+        do_action( "tournament_signup_" . tournamentCPT::$tournament_player_status[0], $player_id, $tournament_id );
 
         //hook for cache clear
         do_action( "tournament_state_change", $tournament_id );
@@ -51,7 +54,7 @@ class WPTM_Tournament_Players {
      * @param $player_id
      * @param $tournament_id
      */
-    public static function reset_reserve_quote_position( $player_id, $tournament_id ) {
+    public static function reset_reserve_position( $player_id, $tournament_id ) {
 
         $tournament = new WPTM_Tournament_Helper($tournament_id);
         $reserve_position = 1;
