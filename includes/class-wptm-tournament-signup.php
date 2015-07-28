@@ -142,8 +142,8 @@ class WPTM_Tournament_Signup {
 
         add_action( 'tournament_signup',  [ $plugin, 'challonge_add_player_to_tournament'] );
 
-        add_action( 'tournament_player_withdrawn',  [ $plugin, 'challonge_remove_player_from_tournament'], 10, 2 );
-        add_action( 'tournament_player_reentered',  [ $plugin, 'challonge_add_player_to_tournament'], 10, 2 );
+        add_action( 'tournament_signup_Withdrawn',  [ $plugin, 'challonge_remove_player_from_tournament'], 10, 2 );
+        add_action( 'tournament_signup_Active',  [ $plugin, 'challonge_add_player_to_tournament'], 10, 2 );
 
         add_action( 'updated_p2p_meta',  [ $plugin, 'challonge_add_player_to_tournament'], 10, 4  );
 
@@ -347,6 +347,8 @@ class WPTM_Tournament_Signup {
         $tournament_reserve_slots = get_post_meta($tournament_id, 'reserve_slots', true);
         $total_tournament_slots   = ($tournament_slots + $tournament_reserve_slots);
 
+
+        //split out, need better function to take care of can join tournament
         $current_player_count = tournamentCPT::get_tournament_player_count($tournament_id, [$tournament_player_status[0]]);
         $status               = ($current_player_count >= $tournament_slots ? $tournament_player_status[1] : $tournament_player_status[0]);
 
@@ -365,7 +367,7 @@ class WPTM_Tournament_Signup {
 
         $this->setJoinId($p2p_result);
 
-        do_action( "tournament_signup_$status", $this->player_id, $tournament_id );
+        do_action( "tournament_signup_{$status}", $this->player_id, $tournament_id );
 
         tournamentCPT::delete_tournament_caches($tournament_id);
 
@@ -430,6 +432,11 @@ class WPTM_Tournament_Signup {
             p2p_add_meta($connection_id, 'challonge_participant_id', $participant['id']);
 
             return $participant;
+
+        } else {
+
+            do_action('challonge_add_player_error', $challonge_tournament_id, $player_id, $tournament_id);
+
         }
 
         return false;
@@ -536,7 +543,7 @@ class WPTM_Tournament_Signup {
 
                 }
 
-                $player_id = playerCPT::new_player_profile($user->ID, $signup_data);
+                $player_id = playerCPT::new_player_profile($user->ID, $signup_data, $signup->getTournamentId());
 
                 if (!is_int($player_id)){
                     require_once(ABSPATH.'wp-admin/includes/user.php' );
@@ -600,6 +607,8 @@ class WPTM_Tournament_Signup {
 
         do_action( "tournament_signup", $player_id, $tournament_id, $signup->get_signup_message(), $_POST['signup_data'] , $signup->getTournamentJoinStatus() );
 
+        do_action( "tournament_state_change", $tournament_id );
+
         wp_send_json_success(['message' => $signup->get_signup_message(), 'type' => 'success']);
 
     }
@@ -637,13 +646,18 @@ class WPTM_Tournament_Signup {
 
         if ( $p2p_id ) {
 
-            p2p_update_meta($p2p_id, 'status', tournamentCPT::$tournament_player_status[5]);
+
+            $status = tournamentCPT::$tournament_player_status[5];
+
+            p2p_update_meta($p2p_id, 'status', $status);
 
             if (!empty($_POST['reason'])) {
                 p2p_update_meta($p2p_id, 'note', $_POST['reason']);
             }
 
-            do_action('tournament_player_withdrawn', $player_id , $tournament_id );
+            do_action( "tournament_player_{$status}", $player_id , $tournament_id );
+
+            do_action( "tournament_state_change", $tournament_id );
 
             echo json_encode(array('result' => true, 'message' => 'You have been removed from the tournament.'));
 
@@ -665,17 +679,24 @@ class WPTM_Tournament_Signup {
         $tournament_id = intval($_POST['tournament_id']);
         $player_id     = intval($_POST['player_id']);
 
-        //todo make sure tournament signup are open
+        $tournament_player_status = tournamentCPT::$tournament_player_status;
+
+        $current_player_count = tournamentCPT::get_tournament_player_count($tournament_id, [ $tournament_player_status[0] ] );
+        $status = ( $current_player_count >= $tournament_slots ? $tournament_player_status[1] : $tournament_player_status[0] );
+
+
 
         $p2p_id = p2p_type( 'tournament_players' )->get_p2p_id( $tournament_id, $player_id );
 
         if ( $p2p_id ) {
 
-            p2p_update_meta($p2p_id, 'status', tournamentCPT::$tournament_player_status[0]);
+            p2p_update_meta($p2p_id, 'status', $status);
 
-            do_action('tournament_player_reentered', $player_id, $tournament_id );
+            do_action( "tournament_signup_{$status}", $player_id, $tournament_id );
 
-            echo json_encode(array('result' => true, 'message' => 'You have been re-entered into the tournament.'));
+            do_action( "tournament_state_change", $tournament_id );
+
+            echo json_encode(array('result' => true, 'message' => "You have been set to $status in this tournament."));
 
             die();
 
