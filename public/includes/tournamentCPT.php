@@ -241,7 +241,6 @@ class tournamentCPT {
             'name' => 'tournament_players',
             'from' => self::$post_type,
             'to' => 'player',
-            'sortable' => 'from',
             'title' => array(
                 'from' => __( 'Players', 'PLTM' )
             ),
@@ -302,8 +301,7 @@ class tournamentCPT {
             ),
             'reserve_position' => array(
                 'title' => 'R#',
-                'type' => 'custom',
-                'render' => 'WPTM_Tournament_Players::get_reserve_position'
+                'type' => 'text'
             )
         ]]);
 
@@ -1663,6 +1661,13 @@ class tournamentCPT {
             }
         }
 
+        if( $wp_query->query_vars['connected_type'] === 'tournament_players' ){
+
+            $wp_query->set('connected_orderby', 'reserve_position');
+            $wp_query->set('connected_order', 'asc');
+            $wp_query->set('connected_order_num', true);
+
+        }
 
         return $wp_query;
 
@@ -1680,7 +1685,6 @@ class tournamentCPT {
             }
 
         }
-
 
     }
 
