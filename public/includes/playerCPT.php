@@ -679,8 +679,6 @@ class playerCPT {
 
             } else {
 
-
-
                 wp_redirect('http://pastats.com/player?player='.$_GET['pastats_player_id']);
 
                 exit;

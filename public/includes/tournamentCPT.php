@@ -299,6 +299,11 @@ class tournamentCPT {
                 'title'  => 'Result',
                 'type'   => 'select',
                 'values' => apply_filters('tournament_prize_tiers', $object_id)
+            ),
+            'reserve_position' => array(
+                'title' => 'R#',
+                'type' => 'custom',
+                'render' => 'WPTM_Tournament_Players::get_reserve_position'
             )
         ]]);
 
