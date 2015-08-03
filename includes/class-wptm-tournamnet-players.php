@@ -61,7 +61,7 @@ class WPTM_Tournament_Players {
         $tournament = new WPTM_Tournament_Helper($tournament_id);
         $reserve_position = 1;
 
-        $tournament_reserve_players = $tournament->get_tourament_players([ 'connected_orderby' => 'reserve_position' ], [tournamentCPT::$tournament_player_status[1]]);
+        $tournament_reserve_players = $tournament->get_tourament_players([ 'connected_orderby' => 'reserve_position', 'connected_order' => 'ASC' ], [tournamentCPT::$tournament_player_status[1]]);
 
         foreach($tournament_reserve_players as $player){
 
