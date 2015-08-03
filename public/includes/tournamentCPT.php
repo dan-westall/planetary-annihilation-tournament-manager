@@ -1663,9 +1663,8 @@ class tournamentCPT {
 
         if( $wp_query->query_vars['connected_type'] === 'tournament_players' ){
 
-            $wp_query->set('connected_orderby', 'reserve_position');
+            $wp_query->set('connected_orderby', 'date');
             $wp_query->set('connected_order', 'asc');
-            $wp_query->set('connected_order_num', true);
 
         }
 
