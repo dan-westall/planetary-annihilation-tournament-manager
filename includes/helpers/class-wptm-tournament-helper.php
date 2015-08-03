@@ -39,8 +39,7 @@ class WPTM_Tournament_Helper {
         if( empty($status))
             $status = [ tournamentCPT::$tournament_player_status[0], tournamentCPT::$tournament_player_status[1] ];
 
-        //move to wp_query
-        $players = get_posts( array_merge( [
+        $args = array_merge_recursive( [
             'connected_type'   => 'tournament_players',
             'connected_items'  => $this->get_tournament_id(),
             'connected_meta' => [
@@ -52,7 +51,10 @@ class WPTM_Tournament_Helper {
             ],
             'nopaging'         => true,
             'suppress_filters' => false
-        ], $args ) );
+        ], $args );
+
+        //move to wp_query
+        $players = get_posts( $args );
 
         return $players;
 
