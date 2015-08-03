@@ -39,7 +39,8 @@ class WPTM_Tournament_Players {
         //set player with 1 queue to active
         p2p_update_meta( $tournament_player[0]->p2p_id, 'status', tournamentCPT::$tournament_player_status[0] );
 
-        p2p_delete_meta( $tournament_player[0]->p2p_id, 'status', 1);
+        //remove the connection order, tidy
+        p2p_delete_meta( $tournament_player[0]->p2p_id, 'status', "1");
 
         //reset all reserve players positions
         do_action('tournament_player_Reserve_to_Active', $player_id, $tournament_id);
