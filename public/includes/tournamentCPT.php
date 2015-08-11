@@ -1662,12 +1662,7 @@ class tournamentCPT {
         }
 
         if( $wp_query->query_vars['connected_type'] === 'tournament_players' ){
-<<<<<<< HEAD
 
-=======
-//
-//            causes doubling
->>>>>>> refs/heads/development
 //            $wp_query->set('connected_orderby', 'date');
 //            $wp_query->set('connected_order', 'asc');
 
