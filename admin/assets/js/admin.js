@@ -33,7 +33,7 @@ var wptmGenerateMatchUI = {
                 action: 'ajax_generate_tournament_matches',
                 security: jQuery(wptmGenerateMatchUI.config.wrapper).find('hidden').val(),
                 group_matches: jQuery(wptmGenerateMatchUI.config.wrapper).find('[type="checkbox"]:checked').val(),
-                tournament_id: post_id
+                tournament_id: jQuery( '#post_ID' ).val()
             },
             dataType: 'JSON',
             async: true
