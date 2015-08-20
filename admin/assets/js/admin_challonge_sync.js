@@ -7,14 +7,14 @@ var wptmChallongeSync = {
     },
 
     init : function () {
-        self.testNotifySpinner  = jQuery( wptmChallongeSync.config.wrapper + ' button .spinner' );
+        self.testNotifySpinner  = jQuery( wptmChallongeSync.config.wrapper + ' .spinner' );
         self.testNotifyResponse = jQuery( '#challonge-sync-response' );
         this._bindEvents();
 
     },
 
     _bindEvents : function () {
-        console.log(jQuery(wptmChallongeSync.config.wrapper).find('button'));
+
         jQuery(wptmChallongeSync.config.wrapper).find('button').on('click', wptmChallongeSync.ajaxGenerateMatches);
     },
 
@@ -23,7 +23,9 @@ var wptmChallongeSync = {
         e.preventDefault();
 
         self.testNotifyResponse.html('');
-        self.testNotifySpinner.show();
+        self.testNotifySpinner.addClass('is-active');
+
+        console.log(self.testNotifySpinner);
 
         var xhr = jQuery.ajax({
             url: ajaxurl,
@@ -41,7 +43,7 @@ var wptmChallongeSync = {
         xhr.done( function( r ) {
 
             self.testNotifyResponse.html( '<span style="color: green">' + r.data.message + '</span>' );
-            self.testNotifySpinner.hide();
+            self.testNotifySpinner.removeClass( 'is-active' );
 
         } );
 
@@ -55,7 +57,7 @@ var wptmChallongeSync = {
                 message = xhr.statusText;
             }
             self.testNotifyResponse.html( '<span style="color: red">' + message + '</span>' );
-            self.testNotifySpinner.hide();
+            self.testNotifySpinner.removeClass( 'is-active' );
         } );
 
     }

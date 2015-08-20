@@ -91,7 +91,7 @@ class WPTM_Challonge {
 
         }
 
-        wp_send_json_success( [ 'message' => sprintf( '%s players added to challonge.', count($tournament_player) ) ] );
+        wp_send_json_success( [ 'message' => sprintf( '%s Players added to challonge.', count($tournament_player) ) ] );
 
     }
 
