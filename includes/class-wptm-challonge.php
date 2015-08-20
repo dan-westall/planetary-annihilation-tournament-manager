@@ -36,6 +36,8 @@ class WPTM_Challonge {
 
     public function challonge_resync($tournament_id){
 
+        $tournament_id = isset($_POST['tournament_id']) ? intval($_POST['tournament_id']) : $tournament_id;
+
         check_ajax_referer( 'challonge-sync', 'security' );
 
         if ( ! current_user_can( 'manage_options' ) ) {
@@ -63,9 +65,14 @@ class WPTM_Challonge {
 
             $participants = $challonge->getParticipants($challonge_tournament_id);
 
-            foreach( $participants as $participant ) {
+            //if false then challonge tournament is empty
+            if( $participants !== false ) {
 
-                $challonge->deleteParticipant($challonge_tournament_id, $participant->id);
+                foreach ($participants as $participant) {
+
+                    $challonge->deleteParticipant($challonge_tournament_id, $participant->id);
+
+                }
 
             }
 
@@ -84,7 +91,7 @@ class WPTM_Challonge {
 
         }
 
-        wp_send_json_success();
+        wp_send_json_success( [ 'message' => sprintf( '%s players added to challonge.', count($tournament_player) ) ] );
 
     }
 
@@ -95,8 +102,10 @@ class WPTM_Challonge {
 
         $tournament = new WPTM_Tournament_Helper( $post->ID );
 
-        if( !in_array( $tournament->get_tournament_status(), [ tournamentCPT::$tournament_status[0], tournamentCPT::$tournament_status[4] ] ) ) {
+        if( ! in_array( $tournament->get_tournament_status(), [ tournamentCPT::$tournament_status[0], tournamentCPT::$tournament_status[4] ] ) ) {
+
             return;
+
         }
 
         add_meta_box(

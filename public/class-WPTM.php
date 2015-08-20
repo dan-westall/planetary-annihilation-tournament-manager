@@ -104,6 +104,8 @@ class WP_Tournament_Manager {
 
         WPTM_Match_Generator::register();
 
+        WPTM_Challonge::init();
+
         userPolling::register();
         tournament_in_progress::register();
         awards::register();

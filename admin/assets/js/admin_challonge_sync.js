@@ -31,7 +31,7 @@ var wptmChallongeSync = {
             cache: false,
             data: {
                 action: 'challonge_resync',
-                security: jQuery(wptmChallongeSync.config.wrapper).find('hidden').val(),
+                security: jQuery( wptmChallongeSync.config.wrapper ).find('[type="hidden"]').val(),
                 tournament_id: jQuery( '#post_ID' ).val()
             },
             dataType: 'JSON',
@@ -40,11 +40,9 @@ var wptmChallongeSync = {
 
         xhr.done( function( r ) {
 
-            //magic line
-            window.location.reload();
-
             self.testNotifyResponse.html( '<span style="color: green">' + r.data.message + '</span>' );
             self.testNotifySpinner.hide();
+
         } );
 
         xhr.fail( function( xhr, textStatus ) {
