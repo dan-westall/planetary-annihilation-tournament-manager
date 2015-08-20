@@ -16,14 +16,27 @@ class WPTM_Challonge {
 
         $plugin = new self();
 
-        add_action( 'wp_ajax_reset_tournament', [ $plugin, 'reset_tournament'] );
-        add_action( 'wp_ajax_nopriv_reset_tournament',  [ $plugin, 'reset_tournament' ] );
+        add_action( 'wp_ajax_challonge_resync', [ $plugin, 'challonge_resync'] );
+
+        add_action( 'wptm_widget_player_controls', [ $plugin, 'challonge_sync_ui'] );
+
+        add_action( 'admin_enqueue_scripts',  [ $plugin, 'register_scripts'], 10 , 0 );
+
+        add_action( 'add_meta_boxes', [ $plugin, 'register_meta_box' ] );
 
     }
 
-    public function reset_tournament($tournament_id){
+    public static function register_scripts(){
 
-        check_ajax_referer( 'reset-tournament' );
+        wp_register_script(
+            'WPTM-Challonge-Sync', plugins_url( 'admin/assets/js/admin_challonge_sync.js', dirname(__FILE__)  ), array( 'jquery' ), WP_Tournament_Manager::VERSION
+        );
+
+    }
+
+    public function challonge_resync($tournament_id){
+
+        check_ajax_referer( 'challonge-sync', 'security' );
 
         if ( ! current_user_can( 'manage_options' ) ) {
 
@@ -58,11 +71,9 @@ class WPTM_Challonge {
 
             foreach ( $tournament_player as $player ) {
 
+                WPTM_Tournament_Signup::challonge_add_player_to_tournament($player->ID, $tournament_id);
 
-                
             }
-
-
 
         } catch (Exception $e){
 
@@ -77,6 +88,7 @@ class WPTM_Challonge {
 
     }
 
+    //todo this should be moved into a function that controls meta box's then this class should hook into a action for that meta box
     public function register_meta_box(){
 
         global $post;
@@ -88,20 +100,28 @@ class WPTM_Challonge {
         }
 
         add_meta_box(
-            'generate_match_submit',
 
-            __( 'Match Generation',
-                'wp-tournament-manager' ),
-            [ $this, 'generate_match_submit' ],
-            tournamentCPT::$post_type, 'side', 'core' );
+            'challonge-sync',
+
+            __( 'Challonge Sync', 'wp-tournament-manager' ),
+
+            [ $this, 'challonge_sync_ui' ],
+
+            tournamentCPT::$post_type,
+
+            'side',
+
+            'core'
+
+        );
 
     }
 
-    public function generate_match_submit( $post ) {
+    public function challonge_sync_ui( $post ) {
 
-        wp_enqueue_script('WPTM-Match-Generator');
+        wp_enqueue_script('WPTM-Challonge-Sync');
 
-        require_once WPTM_PLUGIN_DIR . '/admin/views/widget-match-generator.php';
+        require_once WPTM_PLUGIN_DIR . '/admin/views/widget-challonge-sync.php';
 
     }
 }
