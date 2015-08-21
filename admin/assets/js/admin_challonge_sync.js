@@ -1,21 +1,21 @@
-var wptmGenerateMatchUI = {
+var wptmChallongeSync = {
 
     config: {
-        wrapper: '.generate-match-container',
+        wrapper: '.challonge-sync-container',
         testNotifySpinner: null,
         testNotifyResponse: null
     },
 
     init : function () {
-        self.testNotifySpinner  = jQuery( wptmGenerateMatchUI.config.wrapper + ' button .spinner' );
-        self.testNotifyResponse = jQuery( '#generate-match-response' );
+        self.testNotifySpinner  = jQuery( wptmChallongeSync.config.wrapper + ' .spinner' );
+        self.testNotifyResponse = jQuery( '#challonge-sync-response' );
         this._bindEvents();
 
     },
 
     _bindEvents : function () {
-        console.log(jQuery(wptmGenerateMatchUI.config.wrapper).find('button'));
-        jQuery(wptmGenerateMatchUI.config.wrapper).find('button').on('click', wptmGenerateMatchUI.ajaxGenerateMatches);
+
+        jQuery(wptmChallongeSync.config.wrapper).find('button').on('click', wptmChallongeSync.ajaxGenerateMatches);
     },
 
     ajaxGenerateMatches : function (e) {
@@ -23,16 +23,17 @@ var wptmGenerateMatchUI = {
         e.preventDefault();
 
         self.testNotifyResponse.html('');
-        self.testNotifySpinner.show();
+        self.testNotifySpinner.addClass('is-active');
+
+        console.log(self.testNotifySpinner);
 
         var xhr = jQuery.ajax({
             url: ajaxurl,
             type: 'POST',
             cache: false,
             data: {
-                action: 'ajax_generate_tournament_matches',
-                security: jQuery(wptmGenerateMatchUI.config.wrapper).find('hidden').val(),
-                group_matches: jQuery(wptmGenerateMatchUI.config.wrapper).find('[type="checkbox"]:checked').val(),
+                action: 'challonge_resync',
+                security: jQuery( wptmChallongeSync.config.wrapper ).find('[type="hidden"]').val(),
                 tournament_id: jQuery( '#post_ID' ).val()
             },
             dataType: 'JSON',
@@ -41,11 +42,9 @@ var wptmGenerateMatchUI = {
 
         xhr.done( function( r ) {
 
-            //magic line
-            window.location.reload();
-
             self.testNotifyResponse.html( '<span style="color: green">' + r.data.message + '</span>' );
-            self.testNotifySpinner.hide();
+            self.testNotifySpinner.removeClass( 'is-active' );
+
         } );
 
         xhr.fail( function( xhr, textStatus ) {
@@ -58,7 +57,7 @@ var wptmGenerateMatchUI = {
                 message = xhr.statusText;
             }
             self.testNotifyResponse.html( '<span style="color: red">' + message + '</span>' );
-            self.testNotifySpinner.hide();
+            self.testNotifySpinner.removeClass( 'is-active' );
         } );
 
     }
@@ -72,7 +71,7 @@ var wptmGenerateMatchUI = {
 
 	$(function () {
 
-        wptmGenerateMatchUI.init();
+        wptmChallongeSync.init();
 
 	});
 
