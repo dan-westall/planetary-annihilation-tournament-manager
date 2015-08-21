@@ -145,6 +145,8 @@ class WPTM_Tournament_Signup {
         add_action( 'tournament_signup_Withdrawn',  [ $plugin, 'challonge_remove_player_from_tournament'], 10, 2 );
         add_action( 'tournament_signup_Active',  [ $plugin, 'challonge_add_player_to_tournament'], 10, 2 );
 
+        add_action( 'tournament_signup_Reserve',  [ $plugin, 'challonge_add_player_to_tournament'], 10, 2 );
+
         //add_action( 'updated_p2p_meta',  [ $plugin, 'challonge_add_player_to_tournament'], 10, 4  );
 
 
