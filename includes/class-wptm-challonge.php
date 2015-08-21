@@ -58,7 +58,11 @@ class WPTM_Challonge {
 
         $tournament_player_active = get_tournament_players(
             $tournament_id,
-            [ tournamentCPT::$tournament_player_status[0] ]
+            [ tournamentCPT::$tournament_player_status[0] ],
+            [
+                'connected_orderby' => 'date',
+                'connected_order' => 'ASC'
+            ]
         );
 
         $tournament_player_reserve = get_tournament_players(
