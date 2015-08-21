@@ -37,6 +37,7 @@ class WPTM_Challonge {
     public function challonge_resync($tournament_id){
 
         $tournament_id = isset($_POST['tournament_id']) ? intval($_POST['tournament_id']) : $tournament_id;
+        $total_players = 0;
 
         check_ajax_referer( 'challonge-sync', 'security' );
 
@@ -95,6 +96,8 @@ class WPTM_Challonge {
 
                     WPTM_Tournament_Signup::challonge_add_player_to_tournament($player->ID, $tournament_id);
 
+                    $total_players ++;
+
                 }
 
             }
@@ -104,6 +107,8 @@ class WPTM_Challonge {
                 foreach ($tournament_player_reserve as $player) {
 
                     WPTM_Tournament_Signup::challonge_add_player_to_tournament($player->ID, $tournament_id);
+
+                    $total_players ++;
 
                 }
 
@@ -117,7 +122,7 @@ class WPTM_Challonge {
 
         }
 
-        wp_send_json_success( [ 'message' => sprintf( '%s Players added to challonge.', count($tournament_player) ) ] );
+        wp_send_json_success( [ 'message' => sprintf( '%s Players added to challonge.', $total_players ) ] );
 
     }
 
