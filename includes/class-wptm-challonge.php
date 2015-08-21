@@ -55,7 +55,20 @@ class WPTM_Challonge {
 
         $challonge_api_key = WP_Tournament_Manager::fetch_challonge_API();
 
-        $tournament_player = get_tournament_players($tournament_id, array(tournamentCPT::$tournament_player_status[0], tournamentCPT::$tournament_player_status[1]));
+        $tournament_player_active = get_tournament_players(
+            $tournament_id,
+            [ tournamentCPT::$tournament_player_status[0] ]
+        );
+
+        $tournament_player_reserve = get_tournament_players(
+            $tournament_id,
+            [ tournamentCPT::$tournament_player_status[1] ],
+            [
+                'connected_orderby' => 'reserve_position',
+                'connected_order' => 'ASC',
+                'connected_order_num' => true
+            ]
+        );
 
         try {
 
@@ -66,7 +79,7 @@ class WPTM_Challonge {
             $participants = $challonge->getParticipants($challonge_tournament_id);
 
             //if false then challonge tournament is empty
-            if( $participants !== false ) {
+            if ($participants !== false) {
 
                 foreach ($participants as $participant) {
 
@@ -76,16 +89,29 @@ class WPTM_Challonge {
 
             }
 
-            foreach ( $tournament_player as $player ) {
+            if ( count( $tournament_player_active ) ) {
 
-                WPTM_Tournament_Signup::challonge_add_player_to_tournament($player->ID, $tournament_id);
+                foreach ($tournament_player_active as $player) {
+
+                    WPTM_Tournament_Signup::challonge_add_player_to_tournament($player->ID, $tournament_id);
+
+                }
+
+            }
+
+            if ( count( $tournament_player_reserve ) ) {
+
+                foreach ($tournament_player_reserve as $player) {
+
+                    WPTM_Tournament_Signup::challonge_add_player_to_tournament($player->ID, $tournament_id);
+
+                }
 
             }
 
         } catch (Exception $e){
 
             do_action('challonge_error', $challonge_tournament_id, $tournament_id, $e);
-
 
             wp_send_json_error($e->getMessage());
 
