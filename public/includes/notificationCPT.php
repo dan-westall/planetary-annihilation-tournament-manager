@@ -213,11 +213,11 @@ class notificationCPT {
                         //only continue if the message has a subject, because if not then no notification has been set
                         if(!empty($subject)){
 
-                            $notification_id = DW_Helper::get_post_by_meta('notification_actions', $key);
+                            $notification = DW_Helper::get_post_by_meta('notification_actions', $key);
 
                             $message = $this->exodus_get_notification(array('location' => $key));
 
-                            $user_id = get_post_meta($player->ID, 'user_id', true);
+                            $user_id = get_post_meta($player_id, 'user_id', true);
                             $user    = get_userdata($user_id);
                             $user_email = $user->user_email;
 
@@ -251,7 +251,7 @@ class notificationCPT {
                             $mail = wp_mail( $user_email, html_entity_decode($subject), $message, $headers );
 
                             if($mail){
-                                $p2p_result = p2p_type('tournament_players')->connect($notification_id, $user_id, array( 'date' =>  date("Y-m-d H:i:s"), 'tournament' => get_the_title($tournament_id) ));
+                                $p2p_result = p2p_type('tournament_players')->connect($notification->ID, $user_id, array( 'date' =>  date("Y-m-d H:i:s"), 'tournament' => get_the_title($tournament_id) ));
                             }
 
                             return $mail;
