@@ -134,7 +134,7 @@ class notificationCPT {
 
     }
 
-    public function email_notification($args) {
+    public function email_notification($player_id, $tournament_id ) {
 
         $action = current_filter();
 
@@ -145,7 +145,7 @@ class notificationCPT {
 
                 //todo loads of code replication needs to be removed.
 
-                $all_players = get_tournament_players($args['tournament_id'], array(tournamentCPT::$tournament_player_status[0], tournamentCPT::$tournament_player_status[1]));
+                $all_players = get_tournament_players($tournament_id, array(tournamentCPT::$tournament_player_status[0], tournamentCPT::$tournament_player_status[1]));
 
                 $subject = $this->exodus_get_notification(array('location' => $action, 'field' => 'post_title', 'filter' => 'the_title'));
 
@@ -154,8 +154,8 @@ class notificationCPT {
 
                     $notification = DW_Helper::get_post_by_meta('notification_actions', $action);
                     $message         = $this->exodus_get_notification(array('location' => $action));
-                    $tournament_name = get_the_title($args['tournament_id']);
-                    $tournament_url  = sprintf('<a href="%s">%s</a>', get_permalink($args['tournament_id']), get_the_title($args['tournament_id']));
+                    $tournament_name = get_the_title($tournament_id);
+                    $tournament_url  = sprintf('<a href="%s">%s</a>', get_permalink($tournament_id), get_the_title($tournament_id));
 
                     foreach($all_players as $player){
 
@@ -166,7 +166,7 @@ class notificationCPT {
                         if(!$user_id)
                             continue;
 
-                        if (self::has_notification_been_sent($notification->ID, $args['tournament_id'], $user_id))
+                        if (self::has_notification_been_sent($notification->ID, $tournament_id, $user_id))
                             continue;
 
 
@@ -192,7 +192,7 @@ class notificationCPT {
                         $mail = wp_mail( $user_email, html_entity_decode($subject), $message, $headers );
 
                         if($mail){
-                            $p2p_result = p2p_type('notification_players')->connect($notification->ID, $user_id, array( 'date' =>  date("Y-m-d H:i:s"), 'tournament' => get_the_title($args['tournament_id']), 'tournament_id' => $args['tournament_id'] ));
+                            $p2p_result = p2p_type('notification_players')->connect($notification->ID, $user_id, array( 'date' =>  date("Y-m-d H:i:s"), 'tournament' => get_the_title($tournament_id), 'tournament_id' => $tournament_id ));
                         }
 
                     }
@@ -224,7 +224,7 @@ class notificationCPT {
                             if(!$user_id)
                                 continue;
 
-                            if (self::has_notification_been_sent($notification->ID, $args['tournament_id'], $user_id))
+                            if (self::has_notification_been_sent($notification->ID, $tournament_id, $user_id))
                                 continue;
 
                             $find = array(
@@ -235,10 +235,10 @@ class notificationCPT {
                             );
 
                             $replace = array(
-                                get_the_title($args['tournament_id']),
-                                sprintf('<a href="%s">%s</a>', get_permalink($args['tournament_id']), get_the_title($args['player_id'])),
-                                get_the_title($args['player_id']),
-                                sprintf('<a href="%s/rules">%s</a>', get_permalink($args['tournament_id']), 'rules'),
+                                get_the_title($tournament_id),
+                                sprintf('<a href="%s">%s</a>', get_permalink($tournament_id), get_the_title($player_id)),
+                                get_the_title($player_id),
+                                sprintf('<a href="%s/rules">%s</a>', get_permalink($tournament_id), 'rules'),
                             );
 
                             $html_message = apply_filters( 'message_html', html_entity_decode( $message ) );
@@ -251,7 +251,7 @@ class notificationCPT {
                             $mail = wp_mail( $user_email, html_entity_decode($subject), $message, $headers );
 
                             if($mail){
-                                $p2p_result = p2p_type('tournament_players')->connect($notification_id, $user_id, array( 'date' =>  date("Y-m-d H:i:s"), 'tournament' => get_the_title($args['tournament_id']) ));
+                                $p2p_result = p2p_type('tournament_players')->connect($notification_id, $user_id, array( 'date' =>  date("Y-m-d H:i:s"), 'tournament' => get_the_title($tournament_id) ));
                             }
 
                             return $mail;
@@ -348,7 +348,7 @@ class notificationCPT {
 
         check_ajax_referer( 'send-players-2-day-notification', 'security' );
 
-        do_action('tournament_2_day_notice', array( 'tournament_id' => $_POST['tournament_id'] ));
+        do_action('tournament_2_day_notice', null, $_POST['tournament_id']);
 
         die();
 
@@ -358,7 +358,7 @@ class notificationCPT {
 
         check_ajax_referer( 'send-players-tournament-wrap-up', 'security' );
 
-        do_action('tournament_wrap_up', array( 'tournament_id' => $_POST['tournament_id'] ));
+        do_action('tournament_wrap_up', null, $_POST['tournament_id']);
 
         //todo link notifications to tournament for tournament wide emails.
         update_post_meta($_POST['tournament_id'], 'wrap_up_email_sent', date('Y-m-d H:i:s'));
