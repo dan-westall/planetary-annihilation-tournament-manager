@@ -1754,7 +1754,6 @@ class tournamentCPT {
     public static function get_tournament_prize_tiers($tournament_id = 0){
 
 
-//        $result = [ 0 => 'Not Ranked' ];
         $result = [];
         $position = 1;
 
@@ -1762,15 +1761,21 @@ class tournamentCPT {
             return false;
 
         if(!empty($tournament_id)){
-            while ( have_rows('prize_tiers', $tournament_id) ) : the_row();
 
-            $result[$position] = [ get_sub_field('place') => get_sub_field('prize')];
+            while ( have_rows('prize_tiers', $tournament_id) ) {
 
-                $position ++;
+                the_row();
 
-            endwhile;
+                $result[$position] = get_sub_field('place');
+
+                $position++;
+
+            }
+
         } else {
+
             return array_merge($result, range(1, 10) );
+
         }
 
         return $result;
