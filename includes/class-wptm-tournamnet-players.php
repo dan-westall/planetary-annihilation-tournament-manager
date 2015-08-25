@@ -23,6 +23,8 @@ class WPTM_Tournament_Players {
 
         add_action( 'tournament_player_Reserve_to_Active', [ $this, 'reset_reserve_quote_position'], 10, 2 );
 
+        add_filter( 'update_p2p_metadata', [ $this, 'set_withdraw_date'], 10, 5 );
+
     }
 
 
@@ -98,6 +100,26 @@ class WPTM_Tournament_Players {
         $reserve_position = p2p_get_meta($p2p_id, 'reserve_position', true);
 
         return $reserve_position;
+
+    }
+
+    public function set_withdraw_date( $result, $object_id, $meta_key, $meta_value, $prev_value ) {
+
+        if ( $meta_key != 'status' ){
+
+            return null;
+
+        }
+
+        if ( $meta_value != tournamentCPT::$tournament_player_status[5] ) {
+
+            return null;
+
+        }
+
+        p2p_update_meta( $object_id, 'withdraw_date', current_time('mysql') );
+
+        return null;
 
     }
 
