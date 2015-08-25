@@ -58,7 +58,7 @@ class WPTM_Match_Comments {
 
         if ( get_post_type( $post->ID ) != matchCPT::$post_type ){
 
-            return;
+            return $submit_field;
 
         }
 
