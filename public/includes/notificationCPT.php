@@ -5,7 +5,7 @@ class notificationCPT {
     public static $post_type = 'notification';
 
     public static $notification_actions = array(
-        'tournament_signup_Active' => 'Tournament Signup Not Reserve',
+        'tournament_signup_Active' => 'Tournament Signup Active',
         'tournament_signup_Reserve' => 'Tournament Signup Reserve',
         'player_missing_pa_stats_id' => 'Player Missing PA Stats ID',
         'tournament_2_day_notice' => 'Tournament 2 day notice',
@@ -136,7 +136,11 @@ class notificationCPT {
 
     public function email_notification($player_id, $tournament_id ) {
 
+        global $wp_exodus_functionality;
+
         $action = current_filter();
+
+        remove_filter( 'the_content', [ $wp_exodus_functionality, 'exodus_name'] );
 
         switch ($action) {
 
@@ -238,7 +242,7 @@ class notificationCPT {
                                 get_the_title($tournament_id),
                                 sprintf('<a href="%s">%s</a>', get_permalink($tournament_id), get_the_title($player_id)),
                                 get_the_title($player_id),
-                                sprintf('<a href="%s/rules">%s</a>', get_permalink($tournament_id), 'rules'),
+                                sprintf('<a href="%srules">%s</a>', get_permalink($tournament_id), 'rules'),
                             );
 
                             $html_message = apply_filters( 'message_html', html_entity_decode( $message ) );
@@ -264,6 +268,9 @@ class notificationCPT {
 
                 }
         }
+
+
+        add_filter( 'the_content', [ $wp_exodus_functionality, 'exodus_name'] );
 
 
     }
