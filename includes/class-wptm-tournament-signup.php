@@ -576,10 +576,10 @@ class WPTM_Tournament_Signup {
 
             //if we are there, no exceptions so we have a new user with player profile, with a tournament that they can signup to
             if($signup->is_excluded_player($signup_data['email']))
-                throw new Exception('Sorry but you are excluded from this tournament.');
+                throw new Exception('Sorry but you are excluded from this tournament. Please see the Eligibility section in the description for more details');
 
             if($signup->is_existing_tournament_player($player_id, $tournament_id))
-                throw new Exception('Great news, you\'re already signed up to this tournament. Please see the Eligibility section in the description for more details');
+                throw new Exception('Great news, you\'re already signed up to this tournament.');
 
             $signup->join_tournament($player_id);
 
