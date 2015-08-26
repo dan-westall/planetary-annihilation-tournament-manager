@@ -658,6 +658,8 @@ class WPTM_Tournament_Signup {
         $tournament_id = intval($_POST['tournament_id']);
         $player_id     = intval($_POST['player_id']);
 
+        $reason = null;
+
         //todo make sure tournament signup are open
 
         $p2p_id = p2p_type( 'tournament_players' )->get_p2p_id( $tournament_id, $player_id );
@@ -670,13 +672,13 @@ class WPTM_Tournament_Signup {
 
             if (!empty($_POST['reason'])) {
 
-                p2p_update_meta($p2p_id, 'note', $_POST['reason']);
+                $reason = sanitize_text_field($_POST['reason']);
+
+                p2p_update_meta($p2p_id, 'note', $reason);
 
             }
 
-            $t = "tournament_player_{$status}";
-
-            do_action( "tournament_signup_{$status}", $player_id , $tournament_id );
+            do_action( "tournament_signup_{$status}", $player_id , $tournament_id, $reason);
 
             do_action( "tournament_state_change", $tournament_id );
 
