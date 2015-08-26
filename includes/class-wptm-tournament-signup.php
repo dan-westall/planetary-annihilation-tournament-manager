@@ -579,7 +579,7 @@ class WPTM_Tournament_Signup {
                 throw new Exception('Sorry but you are excluded from this tournament.');
 
             if($signup->is_existing_tournament_player($player_id, $tournament_id))
-                throw new Exception('Great news, you\'re already signed up to this tournament.');
+                throw new Exception('Great news, you\'re already signed up to this tournament. Please see the Eligibility section in the description for more details');
 
             $signup->join_tournament($player_id);
 
