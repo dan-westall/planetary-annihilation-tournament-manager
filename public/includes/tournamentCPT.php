@@ -31,9 +31,9 @@ class tournamentCPT {
         add_action( 'p2p_delete_connections', array( $this, 'action_p2p_delete_connection' ) );
         add_action( 'p2p_tournament_matches_args',   array( $this, 'p2p_tournament_match_fields'));
 
-        add_action( 'gform_after_submission', array( $this, 'signup_tournament_player'), 10, 2);
-        add_filter( 'gform_validation', array( $this, 'signup_form_validation'), 10, 4);
-        add_filter( 'gform_validation_message', array( $this, 'signup_form_validation_message'), 10, 2);
+//        add_action( 'gform_after_submission', array( $this, 'signup_tournament_player'), 10, 2);
+//        add_filter( 'gform_validation', array( $this, 'signup_form_validation'), 10, 4);
+//        add_filter( 'gform_validation_message', array( $this, 'signup_form_validation_message'), 10, 2);
         //add_action( 'gform_confirmation', array( $this, 'signup_custom_confirmation'), 10, 2);
 
         add_action( 'template_include', array( $this, 'load_endpoint_template')  );
