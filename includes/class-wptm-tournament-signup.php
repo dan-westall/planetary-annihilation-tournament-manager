@@ -145,6 +145,8 @@ class WPTM_Tournament_Signup {
         add_action( 'tournament_signup_Withdrawn',  [ $plugin, 'challonge_remove_player_from_tournament'], 10, 2 );
         add_action( 'tournament_signup_Active',  [ $plugin, 'challonge_add_player_to_tournament'], 10, 2 );
 
+        add_action( 'tournament_signup_Reserve',  [ $plugin, 'challonge_add_player_to_tournament'], 10, 2 );
+
         //add_action( 'updated_p2p_meta',  [ $plugin, 'challonge_add_player_to_tournament'], 10, 4  );
 
 
@@ -273,25 +275,33 @@ class WPTM_Tournament_Signup {
 
     }
 
-    public function is_excluded_player($values){
+    public function is_excluded_player($email){
 
         global $wpdb;
 
-        $excluded_players_list = $wpdb->query(
+        $excluded_players_list = $wpdb->get_results(
             $wpdb->prepare(
                 "
                 SELECT
                 user_email
-                    FROM $wpdb->users AS user WHERE user.ID IN ( SELECT ( SELECT meta_value FROM $wpdb->postmeta WHERE post_id = p2p_to AND meta_key = 'user_id') FROM {$wpdb->prefix}p2p  WHERE p2p_type = 'tournament_excluded_players' AND p2p_from = %s)
+                    FROM $wpdb->users AS user WHERE user.ID IN ( SELECT ( SELECT meta_value FROM $wpdb->postmeta WHERE post_id = p2p_to AND meta_key = 'user_id') FROM $wpdb->p2p  WHERE p2p_type = 'tournament_excluded_players' AND p2p_from = %s)
                 ",
-                $this->tournament_id
+                $this->getTournamentId()
             )
         );
 
         //if email is in excluded players bin, if there are any
         if(is_array($excluded_players_list)){
-            if (in_array($values['email'], $excluded_players_list))
-                return true;
+
+            foreach( $excluded_players_list as $player) {
+
+                if( $player->user_email == $email) {
+
+                    return true;
+
+                }
+
+            }
 
         }
 
@@ -352,6 +362,12 @@ class WPTM_Tournament_Signup {
         $current_player_count = tournamentCPT::get_tournament_player_count($tournament_id, [$tournament_player_status[0]]);
         $status               = ($current_player_count >= $tournament_slots ? $tournament_player_status[1] : $tournament_player_status[0]);
 
+//        if( ! apply_filters( 'wptm_can_join_tournament', true, $this->getPlayerId(), $tournament_id ) ){
+//
+//            throw new Exception('Sorry there was a error, we could not enter you into this tournament.');
+//
+//        }
+
         $this->setTournamentJoinStatus($status);
 
 
@@ -361,9 +377,11 @@ class WPTM_Tournament_Signup {
             'status' => $this->getTournamentJoinStatus()
         ]);
 
-        if(is_wp_error($p2p_result))
+        if(is_wp_error($p2p_result)) {
+
             throw new Exception('Sorry there was a error, we could not enter you into this tournament.');
 
+        }
 
         $this->setJoinId($p2p_result);
 
@@ -557,11 +575,11 @@ class WPTM_Tournament_Signup {
             }
 
             //if we are there, no exceptions so we have a new user with player profile, with a tournament that they can signup to
-            if($signup->is_excluded_player($player_id))
+            if($signup->is_excluded_player($signup_data['email']))
                 throw new Exception('Sorry but you are excluded from this tournament.');
 
             if($signup->is_existing_tournament_player($player_id, $tournament_id))
-                throw new Exception('Great news, you\'re already signed up to this tournament.');
+                throw new Exception('Great news, you\'re already signed up to this tournament. Please see the Eligibility section in the description for more details');
 
             $signup->join_tournament($player_id);
 
@@ -640,6 +658,8 @@ class WPTM_Tournament_Signup {
         $tournament_id = intval($_POST['tournament_id']);
         $player_id     = intval($_POST['player_id']);
 
+        $reason = null;
+
         //todo make sure tournament signup are open
 
         $p2p_id = p2p_type( 'tournament_players' )->get_p2p_id( $tournament_id, $player_id );
@@ -652,13 +672,13 @@ class WPTM_Tournament_Signup {
 
             if (!empty($_POST['reason'])) {
 
-                p2p_update_meta($p2p_id, 'note', $_POST['reason']);
+                $reason = sanitize_text_field($_POST['reason']);
+
+                p2p_update_meta($p2p_id, 'note', $reason);
 
             }
 
-            $t = "tournament_player_{$status}";
-
-            do_action( "tournament_signup_{$status}", $player_id , $tournament_id );
+            do_action( "tournament_signup_{$status}", $player_id , $tournament_id, $reason);
 
             do_action( "tournament_state_change", $tournament_id );
 

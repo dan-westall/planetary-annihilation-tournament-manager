@@ -241,7 +241,6 @@ class tournamentCPT {
             'name' => 'tournament_players',
             'from' => self::$post_type,
             'to' => 'player',
-            'sortable' => 'from',
             'title' => array(
                 'from' => __( 'Players', 'PLTM' )
             ),
@@ -302,8 +301,7 @@ class tournamentCPT {
             ),
             'reserve_position' => array(
                 'title' => 'R#',
-                'type' => 'custom',
-                'render' => 'WPTM_Tournament_Players::get_reserve_position'
+                'type' => 'text'
             )
         ]]);
 
@@ -1663,6 +1661,13 @@ class tournamentCPT {
             }
         }
 
+        if( $wp_query->query_vars['connected_type'] === 'tournament_players' ){
+//
+//            causes doubling
+//            $wp_query->set('connected_orderby', 'date');
+//            $wp_query->set('connected_order', 'asc');
+
+        }
 
         return $wp_query;
 
@@ -1680,7 +1685,6 @@ class tournamentCPT {
             }
 
         }
-
 
     }
 
@@ -1750,7 +1754,6 @@ class tournamentCPT {
     public static function get_tournament_prize_tiers($tournament_id = 0){
 
 
-//        $result = [ 0 => 'Not Ranked' ];
         $result = [];
         $position = 1;
 
@@ -1758,15 +1761,21 @@ class tournamentCPT {
             return false;
 
         if(!empty($tournament_id)){
-            while ( have_rows('prize_tiers', $tournament_id) ) : the_row();
 
-            $result[$position] = [ get_sub_field('place') => get_sub_field('prize')];
+            while ( have_rows('prize_tiers', $tournament_id) ) {
 
-                $position ++;
+                the_row();
 
-            endwhile;
+                $result[$position] = get_sub_field('place');
+
+                $position++;
+
+            }
+
         } else {
+
             return array_merge($result, range(1, 10) );
+
         }
 
         return $result;
