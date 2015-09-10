@@ -976,7 +976,7 @@ class tournamentCPT {
 
 
 
-                echo '<span  itemprop="startDate" content="'.$rundate->format('c').'">'.$rundate->format('l jS F Y') . '</span> @ <a href="http://www.timeanddate.com/worldclock/fixedtime.html?msg=Tournament&iso=' . get_field('run_date') . 'T' . str_replace(':','',get_field('run_time')) . '" target="_blank">' . get_field('run_time') . ' UTC</a><br/><br/>';
+                echo '<span  itemprop="startDate" content="'.$rundate->format('c').'">'.$rundate->format('l jS F Y') . '</span> @ <a href="http://www.timeanddate.com/worldclock/fixedtime.html?msg=Tournament&iso=' . get_field('run_date') . 'T' . str_replace(':','',get_field('run_time')) . '" target="_blank">' . get_field('run_time') . ' UTC</a>';
                 echo '<meta itemprop="eventStatus" content="http://schema.org/EventScheduled">';
             }
             else{
@@ -989,7 +989,7 @@ class tournamentCPT {
             if(get_field('tournament_status', $tournament->ID ) === '1'){
                 if(get_field('run_date', $tournament->ID ) && get_field('run_time', $tournament->ID )){
 
-                    echo '<span  itemprop="startDate" content="'.$rundate->format('c').'">'.$rundate->format('l jS F Y') . '</span> @ <a href="http://www.timeanddate.com/worldclock/fixedtime.html?msg=Tournament&iso=' . get_field('run_date') . 'T' . str_replace(':','',get_field('run_time')) . '" target="_blank">' . get_field('run_time') . ' UTC</a><br/>';
+                    echo '<span  itemprop="startDate" content="'.$rundate->format('c').'">'.$rundate->format('l jS F Y') . '</span> @ <a href="http://www.timeanddate.com/worldclock/fixedtime.html?msg=Tournament&iso=' . get_field('run_date') . 'T' . str_replace(':','',get_field('run_time')) . '" target="_blank">' . get_field('run_time') . ' UTC</a>';
                     echo '<meta itemprop="eventStatus" content="http://schema.org/EventScheduled">';
                 }
 
@@ -1000,7 +1000,7 @@ class tournamentCPT {
                 if(get_field('tournament_status', $tournament->ID ) === '2'){
                     if(get_field('run_date', $tournament->ID ) && get_field('run_time', $tournament->ID )){
 
-                        echo '<span  itemprop="startDate" content="'.$rundate->format('c').'">'.$rundate->format('l jS F Y') . '</span> @ <a href="http://www.timeanddate.com/worldclock/fixedtime.html?msg=Tournament&iso=' . get_field('run_date') . 'T' . str_replace(':','',get_field('run_time')) . '" target="_blank">' . get_field('run_time') . ' UTC</a><br/>';
+                        echo '<span  itemprop="startDate" content="'.$rundate->format('c').'">'.$rundate->format('l jS F Y') . '</span> @ <a href="http://www.timeanddate.com/worldclock/fixedtime.html?msg=Tournament&iso=' . get_field('run_date') . 'T' . str_replace(':','',get_field('run_time')) . '" target="_blank">' . get_field('run_time') . ' UTC</a>';
                         echo '<meta itemprop="eventStatus" content="http://schema.org/EventScheduled">';
                     }
 
@@ -1010,7 +1010,7 @@ class tournamentCPT {
 
                     if(get_field('run_date', $tournament->ID ) && get_field('run_time', $tournament->ID )){
 
-                        echo '<span  itemprop="startDate" content="'.$rundate->format('c').'">'.$rundate->format('l jS F Y') . '</span> @ <a href="http://www.timeanddate.com/worldclock/fixedtime.html?msg=Tournament&iso=' . get_field('run_date') . 'T' . str_replace(':','',get_field('run_time')) . '" target="_blank">' . get_field('run_time') . ' UTC</a><br/>';
+                        echo '<span  itemprop="startDate" content="'.$rundate->format('c').'">'.$rundate->format('l jS F Y') . '</span> @ <a href="http://www.timeanddate.com/worldclock/fixedtime.html?msg=Tournament&iso=' . get_field('run_date') . 'T' . str_replace(':','',get_field('run_time')) . '" target="_blank">' . get_field('run_time') . ' UTC</a>';
                         echo '<meta itemprop="eventStatus" content="http://schema.org/EventScheduled">';
                     }
                     echo '<h4 style="margin-top:15px;">Finished</h4>';
