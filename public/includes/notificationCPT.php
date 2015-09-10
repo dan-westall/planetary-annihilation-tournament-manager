@@ -163,9 +163,13 @@ class notificationCPT {
 
                     foreach($all_players as $player){
 
+                        $find = array();
+                        $replace = array();
+                        $body_message = '';
+                        $subject = '';
+
                         $user_id = get_post_meta($player->ID, 'user_id', true);
                         $user    = get_userdata($user_id);
-                        $user_email = $user->user_email;
 
                         if(!$user_id)
                             continue;
@@ -188,12 +192,12 @@ class notificationCPT {
 
                         $html_message = apply_filters( 'message_html', html_entity_decode( $message ) );
 
-                        $message = str_replace($find, $replace, $html_message );
+                        $body_message = str_replace($find, $replace, $html_message );
                         $subject = str_replace($find, $replace, $subject );
 
                         $headers = array('Content-Type: text/html; charset=UTF-8', 'From: eXodus eSports <info@exodusesports.com>');
 
-                        $mail = wp_mail( $user_email, html_entity_decode($subject), $message, $headers );
+                        $mail = wp_mail( $user->user_email, html_entity_decode($subject), $body_message, $headers );
 
                         if($mail){
                             $p2p_result = p2p_type('notification_players')->connect($notification->ID, $user_id, array( 'date' =>  date("Y-m-d H:i:s"), 'tournament' => get_the_title($tournament_id), 'tournament_id' => $tournament_id ));
@@ -321,7 +325,7 @@ class notificationCPT {
 
         $testarea = get_post($testarea_id);
 
-        return apply_filters($filter, $testarea->{$return_field});
+        return $testarea->{$return_field};
 
     }
 
