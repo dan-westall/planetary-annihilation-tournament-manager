@@ -519,24 +519,30 @@ class tournamentCPT {
 
         $args = array('subdomain' => 'exodusesports');
 
-        $tournaments = $c->getTournaments($args);
+        try{
 
-        //converts the simplexmlobject to a standard object with arrays, much easier to work with.
-        $tournaments = json_decode( json_encode( (array) $tournaments), false );
+            $tournaments = $c->getTournaments($args);
 
-        if(is_array($tournaments->tournament)){
+            //converts the simplexmlobject to a standard object with arrays, much easier to work with.
+            $tournaments = json_decode( json_encode( (array) $tournaments), false );
 
-            foreach($tournaments->tournament as $t){
+            if(is_array($tournaments->tournament)){
 
-                $form_listing[$t->id] = $t->name;
+                foreach($tournaments->tournament as $t){
 
+                    $form_listing[$t->id] = $t->name;
+
+                }
+
+            } else {
+                $form_listing[$tournaments->tournament->id] = $tournaments->tournament->name;
             }
 
-        } else {
-            $form_listing[$tournaments->tournament->id] = $tournaments->tournament->name;
-        }
+            $field['choices'] = $form_listing;
 
-        $field['choices'] = $form_listing;
+        } catch (Exception $e) {
+
+        }
 
         return $field;
 

@@ -48,12 +48,14 @@ class WPTM_Tournament_Players {
         //remove the connection order, tidy
         p2p_delete_meta( $tournament_player[0]->p2p_id, 'reserve_position', "1");
 
-        do_action('tournament_player_Reserve_to_Active', $tournament_player[0]->ID, $tournament_id);
+        do_action( 'tournament_player_Reserve_to_Active', $tournament_player[0]->ID, $tournament_id);
+
+        do_action( "tournament_signup_" . tournamentCPT::$tournament_player_status[0], $tournament_player[0]->ID, $tournament_id );
 
         //reset all reserve players positions
         WPTM_Tournament_Players::reset_reserve_position( $tournament_id );
 
-        do_action( "tournament_signup_" . tournamentCPT::$tournament_player_status[0], $player_id, $tournament_id );
+
 
         //hook for cache clear
         do_action( "tournament_state_change", $tournament_id );

@@ -660,7 +660,6 @@ class WPTM_Tournament_Signup {
 
         $reason = null;
 
-        //todo make sure tournament signup are open
 
         $p2p_id = p2p_type( 'tournament_players' )->get_p2p_id( $tournament_id, $player_id );
 
@@ -705,9 +704,11 @@ class WPTM_Tournament_Signup {
         $tournament_player_status = tournamentCPT::$tournament_player_status;
         $tournament_slots         = get_post_meta($tournament_id, 'slots', true);
 
+        //todo make sure tournament signup are open
         $current_player_count = tournamentCPT::get_tournament_player_count($tournament_id, [ $tournament_player_status[0] ] );
-        $status = ( $current_player_count >= $tournament_slots ? $tournament_player_status[1] : $tournament_player_status[0] );
 
+        //set correct status depending on tournament state
+        $status = ( $current_player_count >= $tournament_slots ? $tournament_player_status[1] : $tournament_player_status[0] );
 
         $p2p_id = p2p_type( 'tournament_players' )->get_p2p_id( $tournament_id, $player_id );
 
