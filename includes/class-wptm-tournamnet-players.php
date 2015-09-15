@@ -42,15 +42,16 @@ class WPTM_Tournament_Players {
 
         //set player with 1 queue to active
         p2p_update_meta( $tournament_player[0]->p2p_id, 'status', tournamentCPT::$tournament_player_status[0] );
+
         p2p_update_meta( $tournament_player[0]->p2p_id, 'date', current_time('mysql') );
 
         //remove the connection order, tidy
         p2p_delete_meta( $tournament_player[0]->p2p_id, 'reserve_position', "1");
 
-        //reset all reserve players positions
-        WPTM_Tournament_Players::reset_reserve_position( $player_id, $tournament_id );
+        do_action('tournament_player_Reserve_to_Active', $tournament_player[0]->ID, $tournament_id);
 
-        do_action('tournament_player_Reserve_to_Active', $player_id, $tournament_id);
+        //reset all reserve players positions
+        WPTM_Tournament_Players::reset_reserve_position( $tournament_id );
 
         do_action( "tournament_signup_" . tournamentCPT::$tournament_player_status[0], $player_id, $tournament_id );
 
@@ -73,10 +74,9 @@ class WPTM_Tournament_Players {
 
 
     /**
-     * @param $player_id
      * @param $tournament_id
      */
-    public static function reset_reserve_position( $player_id, $tournament_id ) {
+    public static function reset_reserve_position( $tournament_id ) {
 
         $tournament = new WPTM_Tournament_Helper($tournament_id);
         $reserve_position = 1;
