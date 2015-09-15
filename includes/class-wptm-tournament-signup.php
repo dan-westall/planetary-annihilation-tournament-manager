@@ -142,10 +142,10 @@ class WPTM_Tournament_Signup {
 
         add_action( 'tournament_signup',  [ $plugin, 'challonge_add_player_to_tournament'] );
 
-        add_action( 'tournament_signup_Withdrawn',  [ $plugin, 'challonge_remove_player_from_tournament'], 10, 2 );
-        add_action( 'tournament_signup_Active',  [ $plugin, 'challonge_add_player_to_tournament'], 10, 2 );
+        add_action( 'tournament_signup_withdrawn',  [ $plugin, 'challonge_remove_player_from_tournament'], 10, 2 );
+        add_action( 'tournament_signup_active',  [ $plugin, 'challonge_add_player_to_tournament'], 10, 2 );
 
-        add_action( 'tournament_signup_Reserve',  [ $plugin, 'challonge_add_player_to_tournament'], 10, 2 );
+        add_action( 'tournament_signup_reserve',  [ $plugin, 'challonge_add_player_to_tournament'], 10, 2 );
 
         //add_action( 'updated_p2p_meta',  [ $plugin, 'challonge_add_player_to_tournament'], 10, 4  );
 
@@ -308,7 +308,7 @@ class WPTM_Tournament_Signup {
         return false;
     }
 
-    public static function is_existing_tournament_player($player_id, $tournament_id, $player_status = []){
+    public static function is_existing_tournament_player( $tournament_id, $player_id, $player_status = []){
 
         $p2p_id        = p2p_type('tournament_players')->get_p2p_id($tournament_id, $player_id);
         $player_status = empty($player_status) ? tournamentCPT::$tournament_player_status : $player_status;
@@ -372,7 +372,7 @@ class WPTM_Tournament_Signup {
 
 
         //player found add player to tornament
-        $p2p_result = p2p_type('tournament_players')->connect($tournament_id, $this->player_id, [
+        $p2p_result = p2p_type('tournament_players')->connect( $tournament_id, $this->player_id, [
             'date'   => current_time('mysql'),
             'status' => $this->getTournamentJoinStatus()
         ]);
@@ -385,7 +385,7 @@ class WPTM_Tournament_Signup {
 
         $this->setJoinId($p2p_result);
 
-        do_action( "tournament_signup_{$status}", $this->player_id, $tournament_id );
+        do_action( sprintf( "tournament_signup_%s", strtolower( $status ) ), $tournament_id, $this->player_id );
 
         tournamentCPT::delete_tournament_caches($tournament_id);
 
@@ -416,7 +416,7 @@ class WPTM_Tournament_Signup {
 
     }
 
-    public static function challonge_add_player_to_tournament($player_id, $tournament_id){
+    public static function challonge_add_player_to_tournament( $tournament_id, $player_id ){
 
         if(false === ($challonge_tournament_id  = tournamentCPT::get_the_challonge_tournament_id($tournament_id)))
             return false;
@@ -441,7 +441,7 @@ class WPTM_Tournament_Signup {
 
         } catch (Exception $e){
 
-            do_action('challonge_add_player_error', $challonge_tournament_id, $player_id, $tournament_id);
+            do_action('challonge_add_player_error', $challonge_tournament_id, $tournament_id, $player_id );
 
         }
 
@@ -453,7 +453,7 @@ class WPTM_Tournament_Signup {
 
         } else {
 
-            do_action('challonge_add_player_error', $challonge_tournament_id, $player_id, $tournament_id);
+            do_action('challonge_add_player_error', $challonge_tournament_id, $tournament_id, $player_id );
 
         }
 
@@ -461,7 +461,7 @@ class WPTM_Tournament_Signup {
 
     }
 
-    public static function challonge_remove_player_from_tournament($player_id, $tournament_id){
+    public static function challonge_remove_player_from_tournament($tournament_id, $player_id ){
 
         if(false === ($challonge_tournament_id  = tournamentCPT::get_the_challonge_tournament_id($tournament_id)))
             return false;
@@ -480,7 +480,7 @@ class WPTM_Tournament_Signup {
 
         } catch (Exception $e){
 
-            do_action('challonge_remove_player_error', $challonge_tournament_id, $challonge_participant_id, $player_id, $tournament_id);
+            do_action('challonge_remove_player_error', $challonge_tournament_id, $challonge_participant_id, $tournament_id, $player_id );
 
         }
 
@@ -578,7 +578,7 @@ class WPTM_Tournament_Signup {
             if($signup->is_excluded_player($signup_data['email']))
                 throw new Exception('Sorry but you are excluded from this tournament. Please see the Eligibility section in the description for more details');
 
-            if($signup->is_existing_tournament_player($player_id, $tournament_id))
+            if($signup->is_existing_tournament_player( $tournament_id, $player_id ))
                 throw new Exception('Great news, you\'re already signed up to this tournament.');
 
             $signup->join_tournament($player_id);
@@ -610,20 +610,20 @@ class WPTM_Tournament_Signup {
 
             } else {
 
-                do_action( "tournament_signup_no_pastats", $player_id, $tournament_id, $_POST['signup_data'] );
+                do_action( "tournament_signup_no_pastats", $tournament_id, $player_id, $_POST['signup_data'] );
 
             }
 
 
         } catch (Exception $e) {
 
-            do_action( "tournament_signup_error", $player_id, $tournament_id, $e->getMessage(), $_POST['signup_data'] );
+            do_action( "tournament_signup_error", $tournament_id, $player_id, $e->getMessage(), $_POST['signup_data'] );
 
             wp_send_json_error(['message' => $e->getMessage(), 'type' => 'error']);
 
         }
 
-        do_action( "tournament_signup", $player_id, $tournament_id, $signup->get_signup_message(), $_POST['signup_data'] , $signup->getTournamentJoinStatus() );
+        do_action( "tournament_signup", $tournament_id, $player_id, $signup->get_signup_message(), $_POST['signup_data'] , $signup->getTournamentJoinStatus() );
 
         do_action( "tournament_state_change", $tournament_id );
 
@@ -677,7 +677,7 @@ class WPTM_Tournament_Signup {
 
             }
 
-            do_action( "tournament_signup_{$status}", $player_id , $tournament_id, $reason);
+            do_action( sprintf( "tournament_signup_%s", strtolower( $status) ), $tournament_id, $player_id, $reason );
 
             do_action( "tournament_state_change", $tournament_id );
 
@@ -716,7 +716,9 @@ class WPTM_Tournament_Signup {
 
             p2p_update_meta($p2p_id, 'status', $status);
 
-            do_action( "tournament_signup_{$status}", $player_id, $tournament_id );
+            do_action( sprintf( "tournament_signup_%s", strtolower( $status) ), $tournament_id, $player_id  );
+
+            do_action( sprintf( "tournament_player_state_%s_to_%s ", strtolower( tournamentCPT::$tournament_player_status[5] ), strtolower( $status) ), $tournament_id, $player_id  );
 
             do_action( "tournament_state_change", $tournament_id );
 

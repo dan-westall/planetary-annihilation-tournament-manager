@@ -659,57 +659,6 @@ class tournamentCPT {
 
     }
 
-    //moved to signup class
-    public function action_add_player_to_tournament($player_id, $tournament_id, $connection_meta = []){
-
-        $status                   = self::$tournament_player_status[0];
-        $tournament_slots         = get_post_meta($tournament_id, 'slots', true);
-        $tournament_reserve_slots = get_post_meta($tournament_id, 'reserve_slots', true);
-        $total_tournament_slots   = ($tournament_slots + $tournament_reserve_slots);
-        $current_player_count     = count(get_tournament_players($tournament_id, array(self::$tournament_player_status[0], self::$tournament_player_status[1])));
-
-        //TODO not sure the challonge stuff should be in here
-        //save the return to db as this has useful info in it
-
-        $connection_meta = array_merge($connection_meta, array(
-            'date'                     => current_time('mysql'),
-            'status'                   => $status
-        ));
-
-        if(isset($connection_meta['challonge_result'])){
-
-            update_post_meta($player_id, 'challonge_data', $connection_meta['challonge_result']);
-
-            //easy search
-            update_post_meta($player_id, 'challonge_participant_id', $meta['challonge_result']->id);
-
-            $connection_meta = array_merge($connection_meta, [ 'challonge_tournament_id'  => $connection_meta['challonge_tournament_id'], 'challonge_participant_id' => $connection_meta['challonge_result']->id ] );
-
-        }
-
-        //if therere are more players then slots reserve, any logic should have been done by this point
-        if($current_player_count >= $tournament_slots){
-
-            $status = self::$tournament_player_status[1];
-
-        }
-
-        $this->player_tournament_status = $status;
-
-        //if ladder information is entered then add that to the connection meta
-        if (false) {
-            $connection_meta['ladder'] = 0;
-        }
-
-        //player found add player to tornament
-        $p2p_result = p2p_type('tournament_players')->connect($tournament_id, $player_id, $connection_meta);
-
-        self::delete_tournament_caches($tournament_id);
-
-        return $p2p_result;
-
-    }
-
     public static function get_the_challonge_tournament_id($post_id){
 
 

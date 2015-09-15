@@ -21,8 +21,8 @@ class notificationCPT {
 
         add_action( 'p2p_init', array( $this, 'register_p2p_connections' ) );
 
-        add_action( 'tournament_signup_Active', array( $this, 'email_notification' ), 10, 3);
-        add_action( 'tournament_signup_Reserve', array( $this, 'email_notification' ), 10, 3);
+        add_action( 'tournament_signup_active', array( $this, 'email_notification' ), 10, 3);
+        add_action( 'tournament_signup_reserve', array( $this, 'email_notification' ), 10, 3);
 
         add_action( 'player_missing_pa_stats_id', array( $this, 'email_notification' ), 10, 3);
 
@@ -134,7 +134,7 @@ class notificationCPT {
 
     }
 
-    public function email_notification($player_id, $tournament_id ) {
+    public function email_notification( $tournament_id, $player_id ) {
 
         global $wp_exodus_functionality;
 
@@ -359,7 +359,7 @@ class notificationCPT {
 
         check_ajax_referer( 'send-players-2-day-notification', 'security' );
 
-        do_action('tournament_2_day_notice', null, $_POST['tournament_id']);
+        do_action('tournament_2_day_notice', $_POST['tournament_id'], null );
 
         die();
 
@@ -369,7 +369,7 @@ class notificationCPT {
 
         check_ajax_referer( 'send-players-tournament-wrap-up', 'security' );
 
-        do_action('tournament_wrap_up', null, $_POST['tournament_id']);
+        do_action('tournament_wrap_up', $_POST['tournament_id'], null );
 
         //todo link notifications to tournament for tournament wide emails.
         update_post_meta($_POST['tournament_id'], 'wrap_up_email_sent', date('Y-m-d H:i:s'));
