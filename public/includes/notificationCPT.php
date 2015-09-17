@@ -5,8 +5,8 @@ class notificationCPT {
     public static $post_type = 'notification';
 
     public static $notification_actions = array(
-        'tournament_signup_Active' => 'Tournament Signup Active',
-        'tournament_signup_Reserve' => 'Tournament Signup Reserve',
+        'tournament_signup_active' => 'Tournament Signup Active',
+        'tournament_signup_reserve' => 'Tournament Signup Reserve',
         'player_missing_pa_stats_id' => 'Player Missing PA Stats ID',
         'tournament_2_day_notice' => 'Tournament 2 day notice',
         'tournament_wrap_up' => 'Tournament Wrap Up');
