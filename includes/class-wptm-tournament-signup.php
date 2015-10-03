@@ -434,7 +434,7 @@ class WPTM_Tournament_Signup {
             $c->verify_ssl = false;
 
             $params = array(
-                'participant[name]' => $player->post_title
+                'participant[name]' => $name
             );
 
             $participant = (array) $c->createParticipant($challonge_tournament_id, $params);
