@@ -5,11 +5,12 @@ class notificationCPT {
     public static $post_type = 'notification';
 
     public static $notification_actions = array(
-        'tournament_signup_Active' => 'Tournament Signup Active',
-        'tournament_signup_Reserve' => 'Tournament Signup Reserve',
+        'tournament_signup_active'   => 'Tournament Signup Active',
+        'tournament_signup_reserve'  => 'Tournament Signup Reserve',
         'player_missing_pa_stats_id' => 'Player Missing PA Stats ID',
-        'tournament_2_day_notice' => 'Tournament 2 day notice',
-        'tournament_wrap_up' => 'Tournament Wrap Up');
+        'tournament_2_day_notice'    => 'Tournament 2 day notice',
+        'tournament_wrap_up'         => 'Tournament Wrap Up'
+    );
 
     function __construct() {
 
@@ -21,8 +22,8 @@ class notificationCPT {
 
         add_action( 'p2p_init', array( $this, 'register_p2p_connections' ) );
 
-        add_action( 'tournament_signup_Active', array( $this, 'email_notification' ), 10, 3);
-        add_action( 'tournament_signup_Reserve', array( $this, 'email_notification' ), 10, 3);
+        add_action( 'tournament_signup_active', array( $this, 'email_notification' ), 10, 3);
+        add_action( 'tournament_signup_reserve', array( $this, 'email_notification' ), 10, 3);
 
         add_action( 'player_missing_pa_stats_id', array( $this, 'email_notification' ), 10, 3);
 
@@ -33,8 +34,8 @@ class notificationCPT {
 
         //mass notifications
         add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
-        add_action('wp_ajax_tournament_2_day_notice', array($this,'tournament_2_day_notice'));
-        add_action('wp_ajax_tournament_wrap_up', array($this,'tournament_wrap_up'));
+        add_action( 'wp_ajax_tournament_2_day_notice', array($this,'tournament_2_day_notice'));
+        add_action( 'wp_ajax_tournament_wrap_up', array($this,'tournament_wrap_up'));
 
 
         add_action( 'admin_enqueue_scripts',  [ $this, 'register_scripts'], 10 , 0 );
@@ -134,7 +135,7 @@ class notificationCPT {
 
     }
 
-    public function email_notification($player_id, $tournament_id ) {
+    public function email_notification( $tournament_id, $player_id ) {
 
         global $wp_exodus_functionality;
 
@@ -166,7 +167,6 @@ class notificationCPT {
                         $find = array();
                         $replace = array();
                         $body_message = '';
-                        $subject = '';
 
                         $user_id = get_post_meta($player->ID, 'user_id', true);
                         $user    = get_userdata($user_id);
@@ -359,7 +359,7 @@ class notificationCPT {
 
         check_ajax_referer( 'send-players-2-day-notification', 'security' );
 
-        do_action('tournament_2_day_notice', null, $_POST['tournament_id']);
+        do_action('tournament_2_day_notice', $_POST['tournament_id'], null );
 
         die();
 
@@ -369,7 +369,7 @@ class notificationCPT {
 
         check_ajax_referer( 'send-players-tournament-wrap-up', 'security' );
 
-        do_action('tournament_wrap_up', null, $_POST['tournament_id']);
+        do_action('tournament_wrap_up', $_POST['tournament_id'], null );
 
         //todo link notifications to tournament for tournament wide emails.
         update_post_meta($_POST['tournament_id'], 'wrap_up_email_sent', date('Y-m-d H:i:s'));
@@ -406,7 +406,9 @@ class notificationCPT {
 
         // Display the form, using the current value.
         echo '<label for="myplugin_new_field">';
+
         _e( 'Send notifications', 'PLTM' );
+
         echo '</label> ';
 
         echo '<br /><br /><a href="javascript:void(0);" class="button" data-tournament-id="'.$post->ID.'" data-security="'.wp_create_nonce( "send-players-2-day-notification" ).'" id="send-players-2-day-notification">Send 2 day notification</a>';
@@ -450,8 +452,12 @@ class notificationCPT {
     }
 
     public function register_scripts(){
+
         wp_register_script(
-            'WPTM-Notification', WPTM_PLUGIN_URI . 'admin/assets/js/default.admin.js' , array( 'jquery' ), WP_Tournament_Manager::VERSION
+            'WPTM-Notification',
+            WPTM_PLUGIN_URI . 'admin/assets/js/default.admin.js',
+            array( 'jquery' ),
+            WP_Tournament_Manager::VERSION
         );
 
     }

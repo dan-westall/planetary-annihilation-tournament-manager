@@ -266,6 +266,7 @@ class playerCPT {
 
     }
 
+    //todo this function naming sucks, also var format is now wrong
     public static function get_player_info_tournament($player_id, $tournament_id){
         //$player_tournament = tournamentCPT::tournament_return_format($tournament, array(), array('results' => false, 'prize' => false));
         $player_tournament['matches'] = self::get_player_tournament_matches($player_id, $tournament_id);

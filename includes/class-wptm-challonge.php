@@ -94,29 +94,49 @@ class WPTM_Challonge {
 
             }
 
-            if ( count( $tournament_player_active ) ) {
+//            if( get_tournament_type( $tournament_id )  === 'standard') {
 
-                foreach ($tournament_player_active as $player) {
+                if ( count( $tournament_player_active ) ) {
 
-                    WPTM_Tournament_Signup::challonge_add_player_to_tournament($player->ID, $tournament_id);
+                    foreach ( $tournament_player_active as $player ) {
 
-                    $total_players ++;
+                        WPTM_Tournament_Signup::challonge_add_player_to_tournament( $tournament_id, $player->ID );
 
-                }
+                        $total_players ++;
 
-            }
-
-            if ( count( $tournament_player_reserve ) ) {
-
-                foreach ($tournament_player_reserve as $player) {
-
-                    WPTM_Tournament_Signup::challonge_add_player_to_tournament($player->ID, $tournament_id);
-
-                    $total_players ++;
+                    }
 
                 }
 
-            }
+                if ( count( $tournament_player_reserve ) ) {
+
+                    foreach ( $tournament_player_reserve as $player ) {
+
+                        WPTM_Tournament_Signup::challonge_add_player_to_tournament( $tournament_id, $player->ID );
+
+                        $total_players ++;
+
+                    }
+
+                }
+
+//            } else if (get_tournament_type( $tournament_id ) === 'teamarmies' ) {
+//
+//                $teams = array();
+//
+//                foreach ( $tournament_player_active as $player ) {
+//
+//                    $teams[ strtolower( p2p_get_meta( $player->p2p_id, 'team_name', true ) ) ][] = $player;
+//
+//                 }
+//
+//                foreach( $teams as $team_name => $team ) {
+//
+//
+//
+//                }
+//
+//            }
 
         } catch (Exception $e){
 

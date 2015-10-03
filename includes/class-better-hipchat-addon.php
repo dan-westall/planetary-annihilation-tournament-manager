@@ -21,7 +21,7 @@ class better_hipchat_intergration {
                 'action'      => 'tournament_signup_error',
                 'description' => __( 'When theres a signup error', 'wp-tournament-manager' ),
                 'default'     => true,
-                'message'     => function(  $player_id, $tournament_id, $message, $signup_data ) {
+                'message'     => function(  $tournament_id, $player_id, $message, $signup_data ) {
                     return sprintf(
                         'Signup Error: User <strong>%1$s</strong> tried signing up to  <strong>%2$s</strong>
 							<br>
@@ -41,7 +41,7 @@ class better_hipchat_intergration {
                 'action'      => 'tournament_signup',
                 'description' => __( 'When theres a new tournament signup', 'wp-tournament-manager' ),
                 'default'     => true,
-                'message'     => function(  $player_id, $tournament_id, $message, $signup_data, $signup_status ) {
+                'message'     => function(  $tournament_id, $player_id, $message, $signup_data, $signup_status ) {
                     return sprintf(
                         'New Tournament Signup: User <strong>%1$s</strong> signed up to  <strong>%2$s</strong> as <strong>%3$s</strong>
 							<br>
