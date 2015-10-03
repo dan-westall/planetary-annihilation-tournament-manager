@@ -40,6 +40,12 @@ class WPTM_Tournament_Players {
         //fetch tournament players order by there queue
         $tournament_player = $tournament->get_tourament_players(['connected_orderby' => 'reserve_position', 'connected_meta' => [ ['key' => 'reserve_position', 'value' => 1] ] ], [tournamentCPT::$tournament_player_status[1]]);
 
+        if( count( $tournament_player ) > 0 ) {
+
+            return '';
+
+        }
+
         //set player with 1 queue to active
         p2p_update_meta( $tournament_player[0]->p2p_id, 'status', tournamentCPT::$tournament_player_status[0] );
 
@@ -54,8 +60,6 @@ class WPTM_Tournament_Players {
 
         //reset all reserve players positions
         WPTM_Tournament_Players::reset_reserve_position( $tournament_id );
-
-
 
         //hook for cache clear
         do_action( "tournament_state_change", $tournament_id );

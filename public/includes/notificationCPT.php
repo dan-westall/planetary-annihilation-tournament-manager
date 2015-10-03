@@ -5,11 +5,12 @@ class notificationCPT {
     public static $post_type = 'notification';
 
     public static $notification_actions = array(
-        'tournament_signup_active' => 'Tournament Signup Active',
-        'tournament_signup_reserve' => 'Tournament Signup Reserve',
+        'tournament_signup_active'   => 'Tournament Signup Active',
+        'tournament_signup_reserve'  => 'Tournament Signup Reserve',
         'player_missing_pa_stats_id' => 'Player Missing PA Stats ID',
-        'tournament_2_day_notice' => 'Tournament 2 day notice',
-        'tournament_wrap_up' => 'Tournament Wrap Up');
+        'tournament_2_day_notice'    => 'Tournament 2 day notice',
+        'tournament_wrap_up'         => 'Tournament Wrap Up'
+    );
 
     function __construct() {
 
@@ -33,8 +34,8 @@ class notificationCPT {
 
         //mass notifications
         add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
-        add_action('wp_ajax_tournament_2_day_notice', array($this,'tournament_2_day_notice'));
-        add_action('wp_ajax_tournament_wrap_up', array($this,'tournament_wrap_up'));
+        add_action( 'wp_ajax_tournament_2_day_notice', array($this,'tournament_2_day_notice'));
+        add_action( 'wp_ajax_tournament_wrap_up', array($this,'tournament_wrap_up'));
 
 
         add_action( 'admin_enqueue_scripts',  [ $this, 'register_scripts'], 10 , 0 );
@@ -166,7 +167,6 @@ class notificationCPT {
                         $find = array();
                         $replace = array();
                         $body_message = '';
-                        $subject = '';
 
                         $user_id = get_post_meta($player->ID, 'user_id', true);
                         $user    = get_userdata($user_id);
@@ -406,7 +406,9 @@ class notificationCPT {
 
         // Display the form, using the current value.
         echo '<label for="myplugin_new_field">';
+
         _e( 'Send notifications', 'PLTM' );
+
         echo '</label> ';
 
         echo '<br /><br /><a href="javascript:void(0);" class="button" data-tournament-id="'.$post->ID.'" data-security="'.wp_create_nonce( "send-players-2-day-notification" ).'" id="send-players-2-day-notification">Send 2 day notification</a>';
@@ -450,8 +452,12 @@ class notificationCPT {
     }
 
     public function register_scripts(){
+
         wp_register_script(
-            'WPTM-Notification', WPTM_PLUGIN_URI . 'admin/assets/js/default.admin.js' , array( 'jquery' ), WP_Tournament_Manager::VERSION
+            'WPTM-Notification',
+            WPTM_PLUGIN_URI . 'admin/assets/js/default.admin.js',
+            array( 'jquery' ),
+            WP_Tournament_Manager::VERSION
         );
 
     }
