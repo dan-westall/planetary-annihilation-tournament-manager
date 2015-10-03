@@ -206,7 +206,12 @@ class tournamentCPT {
         //todo move fields off into filters?
 
         $object_id = isset($_REQUEST['post_ID']) ? $_REQUEST['post_ID'] : 0;
-        $object_id = isset($_REQUEST['post']) ? $_REQUEST['post']: 0;
+
+        if( ! $object_id ) {
+
+            $object_id = isset($_REQUEST['post']) ? $_REQUEST['post']: 0;
+
+        }
 
 
         $post_type = get_post_type($object_id);
