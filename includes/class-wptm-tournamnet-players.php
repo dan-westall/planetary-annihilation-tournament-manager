@@ -35,7 +35,7 @@ class WPTM_Tournament_Players {
     public function player_reserve_to_active( $tournament_id, $player_id ) {
 
         //find next reserve player, with quote number of 1
-        $tournament = new WPTM_Tournament_Helper($tournament_id);
+        $tournament =  WPTM()->tournament->set_tournament_id( $tournament_id );
 
         //fetch tournament players order by there queue
         $tournament_player = $tournament->get_tourament_players(['connected_orderby' => 'reserve_position', 'connected_meta' => [ ['key' => 'reserve_position', 'value' => 1] ] ], [tournamentCPT::$tournament_player_status[1]]);
@@ -84,7 +84,7 @@ class WPTM_Tournament_Players {
      */
     public static function reset_reserve_position( $tournament_id ) {
 
-        $tournament = new WPTM_Tournament_Helper($tournament_id);
+        $tournament = WPTM()->tournament->set_tournament_id( $tournament_id );
         $reserve_position = 1;
 
         $tournament_reserve_players = $tournament->get_tourament_players([ 'connected_orderby' => 'reserve_position', 'connected_order' => 'asc', 'connected_order_num' => true ], [tournamentCPT::$tournament_player_status[1]]);

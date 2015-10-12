@@ -9,7 +9,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class WPTM_Tournament_Helper {
 
+    /**
+     * @var WP_Better_HipChat_Plugin
+     */
+    private $plugin;
     private $tournament_id;
+    private $tournament_status;
 
     /**
      * @return mixed
@@ -23,12 +28,29 @@ class WPTM_Tournament_Helper {
      */
     public function set_tournament_id( $tournament_id ) {
         $this->tournament_id = $tournament_id;
+
+        return $this;
     }
 
+    public function get_tournament_status() {
 
-    function __construct( $tournmanet_id ) {
+        $tournament_status = get_post_meta( $this->get_tournament_id(), 'tournament_status', true);
 
-        $this->set_tournament_id($tournmanet_id);
+        return $tournament_status;
+
+    }
+
+    public function set_tournament_status( $tournament_status ){
+
+        update_post_meta( $this->get_tournament_id(), 'tournament_status', $tournament_status );
+
+        return $this;
+
+    }
+
+    function __construct(  WP_Better_HipChat_Plugin $plugin ) {
+
+        $this->plugin = $plugin;
 
         return $this;
 
@@ -133,13 +155,8 @@ class WPTM_Tournament_Helper {
     public function get_tournament_status_id(){
 
         return apply_filters( 'wptm_tournament_status', get_post_meta( $this->get_tournament_id(), 'tournament_status', true), $this->get_tournament_id() );
-    }
-
-    public function get_tournament_status(){
-
-        return tournamentCPT::$tournament_status[ $this->get_tournament_status_id() ];
 
     }
-
 
 }
+

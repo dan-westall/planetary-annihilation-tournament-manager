@@ -71,7 +71,7 @@ class WPTM_Match_Generator{
     public function generate_tournament_matches($groups = false){
 
 
-        $tournament = new WPTM_Tournament_Helper($this->get_tournament_id());
+        $tournament =  WPTM()->tournament->set_tournament_id( $this->get_tournament_id() );
 
         $test = $tournament->get_tournament_matches();
 
@@ -203,7 +203,7 @@ class WPTM_Match_Generator{
 
         global $post;
 
-        $tournament = new WPTM_Tournament_Helper( $post->ID );
+        $tournament =  WPTM()->tournament->set_tournament_id( $post->ID );
 
         if( !in_array( $tournament->get_tournament_status(), [ tournamentCPT::$tournament_status[0], tournamentCPT::$tournament_status[4] ] ) ) {
             return;
@@ -230,7 +230,7 @@ class WPTM_Match_Generator{
 
         $this->set_tournament_id($tournament_id);
 
-        $tournament = new WPTM_Tournament_Helper($this->get_tournament_id());
+        $tournament =  WPTM()->tournament->set_tournament_id( $this->get_tournament_id());
 
         //if( $tournament->get_tournament_type() === 'Round Robin' && $tournament->get_tournament_status() === tournamentCPT::$tournament_status[4] ){
         if( in_array( $tournament->get_tournament_status(), [ tournamentCPT::$tournament_status[0], tournamentCPT::$tournament_status[4] ] ) ){

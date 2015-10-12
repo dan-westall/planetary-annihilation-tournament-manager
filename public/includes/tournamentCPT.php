@@ -98,7 +98,6 @@ class tournamentCPT {
             'hierarchical'          => false,
             'menu_position'         => 10,
             'menu_icon'             => 'dashicons-networking',
-            'capability_type'       => array('tournament', 'tournaments'),
             'supports'              => array('title', 'editor', 'thumbnail')
         );
 
@@ -166,7 +165,7 @@ class tournamentCPT {
             'hierarchical'      => true,
             'show_admin_column' => true,
             'query_var'         => true,
-            'rewrite'           => array( 'slug' => 'affiliation-type' ),
+            'rewrite'           => array( 'slug' => 'affiliation-type' )
         );
 
         register_taxonomy( 'tournament_affiliation', self::$post_type, $args );
@@ -191,7 +190,7 @@ class tournamentCPT {
             'hierarchical'      => true,
             'show_admin_column' => true,
             'query_var'         => true,
-            'rewrite'           => array( 'slug' => 'series' ),
+            'rewrite'           => array( 'slug' => 'series' )
         );
 
         register_taxonomy( 'tournament_series', self::$post_type, $args );

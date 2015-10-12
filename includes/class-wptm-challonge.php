@@ -41,7 +41,7 @@ class WPTM_Challonge {
 
         check_ajax_referer( 'challonge-sync', 'security' );
 
-        if ( ! current_user_can( 'manage_options' ) ) {
+        if ( ! current_user_can( 'edit_post' ) ) {
 
             return;
 
@@ -155,9 +155,21 @@ class WPTM_Challonge {
 
         global $post;
 
-        $tournament = new WPTM_Tournament_Helper( $post->ID );
+        $tournament = WPTM()->tournament->set_tournament_id( $post->ID );
+
+        if ( ! current_user_can( 'edit_post' ) ) {
+
+            return;
+
+        }
 
         if( ! in_array( $tournament->get_tournament_status(), [ tournamentCPT::$tournament_status[0], tournamentCPT::$tournament_status[4] ] ) ) {
+
+            return;
+
+        }
+
+        if( get_post_meta( $post->ID, 'challonge_tournament_link', true ) === '' ) {
 
             return;
 
