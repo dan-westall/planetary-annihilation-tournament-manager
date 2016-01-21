@@ -1,16 +1,18 @@
 <?php
 
+if ( ! defined( 'WP_CLI' ) ) {
+
     //make path pretty
-    require_once(__DIR__ . '/../../../../wp-load.php');
+    require_once( __DIR__ . '/../../../../wp-load.php' );
 
 
-    if (!$wpdb) {
-        $wpdb = new wpdb(DB_USER, DB_PASSWORD, DB_NAME, DB_HOST);
+    if ( ! $wpdb ) {
+        $wpdb = new wpdb( DB_USER, DB_PASSWORD, DB_NAME, DB_HOST );
     } else {
         global $wpdb;
     }
 
-
+}
 
 class tournament_in_progress {
 
