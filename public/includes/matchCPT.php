@@ -95,6 +95,7 @@ class matchCPT {
                 'exclude_from_search' => true,
                 'show_ui'             => true,
                 'show_in_json'        => true,
+                'show_in_menu'        => 'edit.php?post_type=tournament',
                 'menu_position'       => 10,
                 'menu_icon'           => 'dashicons-video-alt3',
                 'capability_type'     => array('match','matches'),

@@ -46,7 +46,7 @@ class notificationCPT {
 
         $notificationLabel = array(
             'name'               => __('notifications'),
-            'menu_name'          => __('notification'),
+            'menu_name'          => __('Notification'),
             'all_items'          => __('All notifications'),
             'singular_name'      => __('notification'),
             'add_new_item'       => __('Add New notification'),
@@ -65,6 +65,7 @@ class notificationCPT {
             'has_archive'         => true,
             'exclude_from_search' => true,
             'show_ui'             => true,
+            'show_in_menu'        => 'edit.php?post_type=tournament',
             'menu_position'       => 10,
             'menu_icon'           => 'dashicons-email-alt',
             'capability_type'     => array('notification','notifications'),

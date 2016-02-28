@@ -67,6 +67,7 @@ class playerCPT {
             'public'              => true,
             'has_archive'         => 'players',
             'show_ui'             => true,
+            'show_in_menu'        => 'edit.php?post_type=tournament',
             'menu_position'       => 10,
             'menu_icon'           => 'dashicons-id',
             'supports'            => array('title', 'author'),
