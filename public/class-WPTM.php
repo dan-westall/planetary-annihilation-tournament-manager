@@ -205,7 +205,7 @@ class WP_Tournament_Manager {
 
         //?minPlanets=1&maxPlanets=16&start=0&limit=100&request_time=1&sort_field=system_id&sort_direction=desc&name=&creator=
 
-        foreach($forms as $form){
+        foreach( (array) $forms as $form){
 
             $form_listing[$form->id] = $form->title;
 

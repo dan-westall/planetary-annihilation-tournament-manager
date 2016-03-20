@@ -1,5 +1,8 @@
 <?php
 
+
+namespace Helper\Tournaments;
+
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
@@ -7,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class WPTM_Tournament_Helper
  */
-class WPTM_Tournament_Helper {
+class WPTM_Tournaments {
 
     /**
      * @var WP_Better_HipChat_Plugin
@@ -48,11 +51,8 @@ class WPTM_Tournament_Helper {
 
     }
 
-    function __construct(  WP_Better_HipChat_Plugin $plugin ) {
+    function __construct( ) {
 
-        $this->plugin = $plugin;
-
-        return $this;
 
     }
 

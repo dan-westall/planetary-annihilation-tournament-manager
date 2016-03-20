@@ -1,5 +1,7 @@
 <?php
 
+use Helper\Tournaments;
+
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
@@ -69,7 +71,6 @@ class WPTM_Match_Generator{
     }
 
     public function generate_tournament_matches($groups = false){
-
 
         $tournament =  WPTM()->tournament->set_tournament_id( $this->get_tournament_id() );
 
@@ -203,7 +204,7 @@ class WPTM_Match_Generator{
 
         global $post;
 
-        $tournament =  WPTM()->tournament->set_tournament_id( $post->ID );
+        $tournament = ( new Helper\Tournaments\WPTM_Tournaments() )->set_tournament_id( $post->ID );
 
         if( !in_array( $tournament->get_tournament_status(), [ tournamentCPT::$tournament_status[0], tournamentCPT::$tournament_status[4] ] ) ) {
             return;

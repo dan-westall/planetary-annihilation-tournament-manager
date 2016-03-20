@@ -1,5 +1,7 @@
 <?php
 
+use Helper\Tournaments;
+
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
@@ -155,7 +157,7 @@ class WPTM_Challonge {
 
         global $post;
 
-        $tournament = WPTM()->tournament->set_tournament_id( $post->ID );
+        $tournament = ( new Helper\Tournaments\WPTM_Tournaments() )->set_tournament_id( $post->ID );
 
         if ( ! current_user_can( 'edit_post' ) ) {
 
