@@ -12,10 +12,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class WPTM_Tournaments {
 
-    /**
-     * @var WP_Better_HipChat_Plugin
-     */
-    private $plugin;
     private $tournament_id;
     private $tournament_status;
 
