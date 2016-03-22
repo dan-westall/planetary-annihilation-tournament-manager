@@ -37,7 +37,7 @@ class WPTM_Tournaments {
 
     public function get_tournament_status() {
 
-        $tournament_status = get_post_meta( $this->get_tournament_id(), 'tournament_status', true);
+        $tournament_status = \tournamentCPT::$tournament_status[ get_post_meta( $this->get_tournament_id(), 'tournament_status', true) ];
 
         return $tournament_status;
 
@@ -59,7 +59,7 @@ class WPTM_Tournaments {
     public function get_tourament_players(  $args = [], $status = [] ){
 
         if( empty($status))
-            $status = [ tournamentCPT::$tournament_player_status[0], tournamentCPT::$tournament_player_status[1] ];
+            $status = [ \tournamentCPT::$tournament_player_status[0], \tournamentCPT::$tournament_player_status[1] ];
 
         $args = array_merge_recursive( [
             'connected_type'   => 'tournament_players',

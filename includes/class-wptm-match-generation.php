@@ -231,7 +231,7 @@ class WPTM_Match_Generator{
 
         $this->set_tournament_id($tournament_id);
 
-        $tournament =  WPTM()->tournament->set_tournament_id( $this->get_tournament_id());
+        $tournament = ( new Helper\Tournaments\WPTM_Tournaments() )->set_tournament_id( $tournament_id );
 
         //if( $tournament->get_tournament_type() === 'Round Robin' && $tournament->get_tournament_status() === tournamentCPT::$tournament_status[4] ){
         if( in_array( $tournament->get_tournament_status(), [ tournamentCPT::$tournament_status[0], tournamentCPT::$tournament_status[4] ] ) ){
