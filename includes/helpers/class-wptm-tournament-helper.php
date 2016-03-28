@@ -90,9 +90,7 @@ class WPTM_Tournaments {
         wp_reset_postdata();
 
         return $matches;
-
-
-
+        
     }
 
     public function is_tournament_in_progress(){
